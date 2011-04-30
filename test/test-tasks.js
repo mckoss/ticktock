@@ -5,7 +5,7 @@ namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
 
     ut.module('tasks');
 
-    coverage = new utCoverage.Coverage('com.ticktocktask.tasks');
+    coverage = new utCoverage.Coverage('xcom.ticktocktask.tasks');
 
     ut.test("version", function () {
         var version = tasks.VERSION.split('.');
@@ -17,7 +17,14 @@ namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
        var project = new tasks.Project();
        ut.ok(project != undefined); 
     });
+    
+    ut.test("tasks", function () {
+        var project = new tasks.Project();
+        project.addTask({description: "hello"});
+        ut.equal(project.tasks[0].description, "hello");
+    });
 
     coverage.testCoverage();
 
 });
+
