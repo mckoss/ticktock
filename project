@@ -33,7 +33,7 @@
 		      <div> Time:<input type=number id=time />hours<input id=done type=button value=done /></div>
 		    </div>
 		  </div>
-		  <div class=footer><input type=button value=+ /></div>
+		  <div class=footer><input id=r-add type=button value=+ /></div>
 		  
 		</div>
 		<div class="column grid_4">
@@ -42,7 +42,7 @@
 		    <div class=task>Figure out html templates</div>
 		    <div class=task>Connect newTask to javascript</div>
 		  </div>
-		  <div class=footer><input type=button value=+ /></div>
+		  <div class=footer><input id=w-add type=button value=+ /></div>
 		</div>
 		<div class="column grid_4">
 		  <div class=header>Done</div>
@@ -51,7 +51,7 @@
 		    <div class=task>Get static page</div>
 		    <div class=task>Get static new task box</div>
 		  </div>
-		  <div class=footer><input type=button value=+ /></div>
+		  <div class=footer><input id=d-add type=button value=+ /></div>
 		</div>
 	</div>
   </div>
