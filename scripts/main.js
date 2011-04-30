@@ -12,37 +12,43 @@ exports.extend({
 
 var client;
 var doc;                            // Bound elements here
+var project;
 
 function onReady() {
     handleAppCache();
     doc = dom.bindIDs();
+    
+    project = new taskLib.Project({title: ''});
     client = new clientLib.Client(exports);
     client.saveInterval = 0;
 
-    client.addAppBar();
     
-    project = new taskLib.Project({title: "Bobby's Contributions Panda"});
     var tasks = testTasks();
     console.log(project.tasks);
+    console.log('tasks', tasks);
+    
+    client.addAppBar();
 }
 
 function testTasks() {
     var t = [];
     for (var i = 0; i < 10; i++) {
-        t[0] = project.addTask({description: "task number " + i, estimated: 0, completed: 0});
+        t[i] = project.addTask({description: "task number " + i, estimated: 0, completed: 0});
     }
+    return t;
 }
 
 
 function setDoc(json) {
+    project = new taskLib.Project(json.blob);
+    //update UI
 }
 
 function getDoc() {
+    var p = project.toJSON();
     return {
-        blob: {
-            version: 1,
-            tasks: [],
-        },
+        title: p.title,
+        blob: p,
         readers: ['public']
     };
 }
