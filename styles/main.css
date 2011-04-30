@@ -27,14 +27,19 @@ div.task {
   border: 1px solid green;
   width: 298px;
   height: 28px;
-  
+  text-align: left;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  line-height: 30px;
+  font-size: 12px;
 }
-div.new {
+
+div.footer {
+  border: 1px solid blue;
   width: 298px;
   height: 28px;
 }
 
-div.new input {
+div.footer input {
   width: 24px;
   height: 24px;
   margin: 3px;
