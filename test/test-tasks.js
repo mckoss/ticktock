@@ -18,9 +18,8 @@ namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
     
     ut.test("tasks", function () {
         var project = new tasks.Project();
-        project.addTask({description: "hello"});
-        ut.equal(project.tasks[0].description, "hello");
+        var task = project.addTask({description: "hello"});
+        ut.equal(task.description, "hello");
     });
 
 });
-

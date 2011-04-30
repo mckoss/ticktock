@@ -14,5 +14,6 @@ function Project() {
 Project.methods({
    addTask: function(task) {
        this.tasks.push(task);
+       return task;
    } 
 });
