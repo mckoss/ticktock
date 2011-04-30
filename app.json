@@ -1,0 +1,18 @@
+{
+  "application": "ticktock",
+  "cloneable": true,
+  "icon": "images/icon.png",
+  "owner": "mckoss",
+  "readers": [
+    "public"
+  ],
+  "referers": [],
+  "secureData": false,
+  "tags": [
+    "demo",
+    "sample"
+  ],
+  "title": "Tick-Tock Task",
+  "url": "http://ticktock.pageforest.com/",
+  "writers": []
+}
