@@ -398,7 +398,8 @@ namespace.module('com.ticktocktask.main', function (exports, require) {
 var clientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
 var taskLib = require('com.ticktocktask.tasks');
-//
+var strings = require('org.startpad.strings');
+var format = strings.format;
 
 
 exports.extend({
@@ -411,6 +412,7 @@ var client;
 var doc;                            // Bound elements here
 var project;
 
+
 function onReady() {
     handleAppCache();
     doc = dom.bindIDs();
@@ -419,6 +421,7 @@ function onReady() {
     client = new clientLib.Client(exports);
     client.saveInterval = 0;
 
+    console.log(format.replaceKeys);
 
     var tasks = testTasks();
     console.log(project.tasks);
