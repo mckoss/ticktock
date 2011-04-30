@@ -31,6 +31,14 @@ namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
         ut.equal(json.tasks.length, 1);
         ut.equal(json.tasks[0].description, "foo");
     });
+    
+    ut.test("task change", function () {
+        var project = new taskLib.Project({title: "Sample"});
+        var task = project.addTask({description: "foo"});
+        task.change({description: "bar"});
+        ut.equal(task.description, "bar");
+        
+    });
 
     
 });
