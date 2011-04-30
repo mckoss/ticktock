@@ -397,6 +397,9 @@ function strip(s) {
 namespace.module('com.ticktocktask.main', function (exports, require) {
 var clientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
+var taskLib = require('com.ticktocktask.tasks');
+//
+
 
 exports.extend({
     'onReady': onReady,
@@ -414,7 +417,19 @@ function onReady() {
     client.saveInterval = 0;
 
     client.addAppBar();
+
+    project = new taskLib.Project({title: "Bobby's Contributions Panda"});
+    var tasks = testTasks();
+    console.log(project.tasks);
 }
+
+function testTasks() {
+    var t = [];
+    for (var i = 0; i < 10; i++) {
+        t[0] = project.addTask({description: "task number " + i, estimated: 0, completed: 0});
+    }
+}
+
 
 function setDoc(json) {
 }
