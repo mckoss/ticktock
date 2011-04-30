@@ -12,6 +12,11 @@ namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
         ut.equal(version.length, 3, "VERSION has 3 parts");
         ut.ok(version[0] == 0 && version[1] == 1, "tests for version 0.1");
     });
+    
+    ut.test("project", function () {
+       var project = new tasks.Project();
+       ut.ok(project != undefined); 
+    });
 
     coverage.testCoverage();
 

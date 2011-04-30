@@ -456,6 +456,7 @@ exports.extend({
 });
 
 function Project() {
-
+    this.tasks = [];
 }
+
 });
