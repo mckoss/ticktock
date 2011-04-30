@@ -28,10 +28,6 @@
 		  
 		  <div class=r-tasks>
 		    <div class=task>Integrate with abstract tasks</div>
-		    <div class=newTask>
-		      <div> What:<input id=description /></div>
-		      <div> Time:<input type=number id=time />hours<input id=done type=button value=done /></div>
-		    </div>
 		  </div>
 		  <div class=footer><input id=r-add type=button value=+ /></div>
 		  
