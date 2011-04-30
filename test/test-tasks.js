@@ -5,8 +5,6 @@ namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
 
     ut.module('tasks');
 
-    coverage = new utCoverage.Coverage('xcom.ticktocktask.tasks');
-
     ut.test("version", function () {
         var version = tasks.VERSION.split('.');
         ut.equal(version.length, 3, "VERSION has 3 parts");
@@ -23,8 +21,6 @@ namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
         project.addTask({description: "hello"});
         ut.equal(project.tasks[0].description, "hello");
     });
-
-    coverage.testCoverage();
 
 });
 
