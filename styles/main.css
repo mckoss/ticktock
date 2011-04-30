@@ -40,11 +40,34 @@ div.footer {
 }
 
 div.footer input {
+  
   width: 24px;
   height: 24px;
   margin: 3px;
+  padding 0;
+  border-radius: 3px;
 }
 
+div.newTask {
+  border: 1px solid grey;
+  width: 298px;
+  height: 58px;
+}
+div.newTask div {
+  width: 298px;
+  height: 29px;
+}
+div.newTask div input {
+  font-family: "Courier New", Courier, monospace;
+}
+div.newTask div input#description {
+  width: 220px;
+  margin: 3px;
+}
+div.newTask div input#time {
+  width: 100px;
+  margin: 3px;
+}
 
 
 div { padding:0; margin:0; }
