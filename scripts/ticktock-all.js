@@ -444,3 +444,18 @@ function handleAppCache() {
     applicationCache.addEventListener('updateready', handleAppCache, false);
 }
 });
+
+/* Source: scripts/tasks.js */
+namespace.module('com.ticktocktask.tasks', function (exports, require) {
+var clientLib = require('com.pageforest.client');
+var dom = require('org.startpad.dom');
+
+exports.extend({
+    'Version': "0.1.0",
+    'Project': Project
+});
+
+function Project() {
+
+}
+});

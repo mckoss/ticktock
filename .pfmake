@@ -2,7 +2,8 @@
   "files": {
       "scripts/ticktock-all.js": [
           "scripts/namespace-plus.js",
-          { "path": "scripts/main.js", "namespace": "com.ticktocktask.main" }
+          { "path": "scripts/main.js", "namespace": "com.ticktocktask.main" },
+          { "path": "scripts/tasks.js", "namespace": "com.ticktocktask.tasks"}
       ]
   },
   "minify": false,
