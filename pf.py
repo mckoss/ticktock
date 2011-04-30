@@ -31,7 +31,7 @@ try:
 except ImportError:
     import simplejson as json  # Please easy_install simplejson
 
-VERSION = '1.9.6'
+VERSION = '1.9.7'
 PF_DIST_SERVER = 'http://dist.pageforest.com'
 PF_DIST_DIRECTORY = '/directory.json'
 PF_FILENAME = 'pf.py'
@@ -39,7 +39,7 @@ PF_FILENAME = 'pf.py'
 # See http://code.google.com/closure/compiler/docs/gettingstarted_api.html
 CLOSURE_API = 'http://closure-compiler.appspot.com/compile'
 
-NAMESPACE_PATTERN = "namespace.module('%s', function (exports, require) {\n%s\n});"
+NAMESPACE_PATTERN = "namespace.module('%s', function (exports, require) {\n%s\n});\n"
 
 # Swag at max content that can fit in a Blob
 MAX_FILE_SIZE = 1024 * 1024 - 200
@@ -124,6 +124,7 @@ class AuthRequest(urllib2.Request):
             self.add_header('Cookie', 'sessionkey=' + options.session_key)
         if options.verbose:
             print "HTTP %s %s" % (self.get_method(), url)
+            print "Data: %s" % self.get_data()
 
 
 class PutRequest(AuthRequest):
@@ -434,7 +435,7 @@ def delete_file(filename):
     if options.noop:
         return
 
-    response = urllib2.urlopen(DeleteRequest(url))
+    response = urllib2.urlopen(AuthRequest(url + '?method=delete'))
     if options.verbose:
         print "Response: %s" % response.read()
 
