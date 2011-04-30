@@ -490,7 +490,7 @@ Project.methods({
    },
 
    toJSON: function () {
-
+       return this;
    }
 });
 });
