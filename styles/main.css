@@ -13,14 +13,31 @@ div.main {
 }
 
 div.header {
-  width: 300px;
-  height: 30px;
+  width: 298px;
+  height: 28px;
   border: 1px solid red;
   text-align: center;
   font-family: Verdana, Arial, Helvetica, sans-serif;
   line-height: 30px;
   font-size: 24px;
   font-weight: bold;
+}
+
+div.task {
+  border: 1px solid green;
+  width: 298px;
+  height: 28px;
+  
+}
+div.new {
+  width: 298px;
+  height: 28px;
+}
+
+div.new input {
+  width: 24px;
+  height: 24px;
+  margin: 3px;
 }
 
 
