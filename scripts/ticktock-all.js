@@ -397,10 +397,14 @@ function strip(s) {
 namespace.module('com.ticktocktask.main', function (exports, require) {
 var clientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
+<<<<<<< HEAD
 var taskLib = require('com.ticktocktask.tasks');
 //
 
 
+=======
+
+>>>>>>> 5ee1d95c7cff9408a8def583ff11babc6dbfd318
 exports.extend({
     'onReady': onReady,
     'getDoc': getDoc,
@@ -417,6 +421,7 @@ function onReady() {
     client.saveInterval = 0;
 
     client.addAppBar();
+<<<<<<< HEAD
 
     project = new taskLib.Project({title: "Bobby's Contributions Panda"});
     var tasks = testTasks();
@@ -456,6 +461,35 @@ function handleAppCache() {
         return;
     }
 
+=======
+}
+
+function setDoc(json) {
+}
+
+function getDoc() {
+    return {
+        blob: {
+            version: 1,
+            tasks: [],
+        },
+        readers: ['public']
+    };
+}
+
+// For offline - capable applications
+function handleAppCache() {
+    if (typeof applicationCache == 'undefined') {
+        return;
+    }
+
+    if (applicationCache.status == applicationCache.UPDATEREADY) {
+        applicationCache.swapCache();
+        location.reload();
+        return;
+    }
+
+>>>>>>> 5ee1d95c7cff9408a8def583ff11babc6dbfd318
     applicationCache.addEventListener('updateready', handleAppCache, false);
 }
 });
@@ -464,6 +498,7 @@ function handleAppCache() {
 namespace.module('com.ticktocktask.tasks', function (exports, require) {
 var clientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
+var types = require('org.startpad.types');
 require('org.startpad.funcs').patch();
 
 exports.extend({
@@ -471,13 +506,19 @@ exports.extend({
     'Project': Project
 });
 
-function Project() {
+function Project(options) {
+    types.extend(this, options);
     this.tasks = [];
 }
 
 Project.methods({
    addTask: function(task) {
        this.tasks.push(task);
+       return task;
+   },
+
+   toJSON: function () {
+
    }
 });
 });
