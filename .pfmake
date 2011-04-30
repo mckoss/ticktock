@@ -1,0 +1,10 @@
+{
+  "files": {
+      "scripts/ticktock-all.js": [
+          "scripts/namespace-plus.js",
+          { "path": "scripts/main.js", "namespace": "com.ticktocktask.main" }
+      ]
+  },
+  "minify": false,
+  "uploadIndividualFiles": false
+}
