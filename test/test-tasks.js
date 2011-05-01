@@ -41,7 +41,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
     });
     
     ut.test("task change", function () {
-        var project = new taskLib.Project({title: "Sample"});
+        var project = new taskLib.Project();
         var task = project.addTask({description: "foo"});
         task.change({description: "bar"});
         ut.equal(task.description, "bar");
@@ -54,6 +54,25 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.equal(task.history[0].oldValue, 0);
         ut.equal(task.history[0].prop, 'actual');
         ut.ok(task.modified > task.created, "modified date update");
+    });
+    
+    ut.test("move after", function () {
+        var task;
+        var project = new taskLib.Project();
+        
+        for (var i = 0; i < 10; i++) {
+            project.addTask({description: "Task #" + (i + 1)});
+        }
+        for (var i = 0; i < 10; i++) {
+            task = project.tasks[i];
+            ut.equal(task.description, "Task #" + (i + 1));
+        }
+        project.moveAfter(project.tasks[5], project.tasks[3]);
+        var reorder = [0, 1, 2, 3, 5, 4, 6, 7, 8, 9];
+        for (var i = 0; i < 10; i++) {
+            task = project.tasks[i];
+            ut.equal(task.description, "Task #" + reorder[i]);
+        }
     });
     
     ut.test("parseDescription", function () {
