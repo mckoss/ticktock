@@ -868,6 +868,9 @@ function addTask(task, listName, className) {
     $(doc[listName])[top ? 'prepend': 'append'](TASK.format(
         types.extend({content: content}, task)));
     $('#' + task.id).click(editTask.curry(task));
+    if (listName == 'done-tasks') {
+        $('#check_' + task.id)[0].checked = true;
+    }
 }
 
 function addTemplateTask() {
