@@ -18,13 +18,13 @@ var editedTask;
 var editedText;
 var editedStatus;
 
-var TASK = '<div id="{id}" class="task {className}">' +
-           '<div class="content if-not-edit">{content}</div>' +
-           '<textarea class="if-edit"></textarea>' +
-           '</div>';
-           
+var TASK = "<div class='action'><a id='promote-{id}' href='#' class='promote icon'></a>" +
+           "</div><div id='edit-{id}' class='docket task'>{description}<a href='#' class='icon'>" +
+           "<img 'drag-{id}' src='images/drag-and-drop.png' class='icon' alt='Reorder' />" +
+           "</a><a href='#' class='icon'><img id='delete-{id}' src='images/remove.png' class='icon' alt='Delete' /></a></div>";
+
 var UPDATE_INTERVAL = 1000 * 60;
-           
+
 function onReady() {
     handleAppCache();
     doc = dom.bindIDs();
@@ -33,13 +33,13 @@ function onReady() {
     client = new clientLib.Client(exports);
     client.saveInterval = 0;
     client.autoLoad = true;
-    
+
     client.addAppBar();
     refresh();
-    
+
     $(window).keydown(onKey);
     $(document.body).mousedown(onClick);
-    
+
     setInterval(taskLib.updateNow, UPDATE_INTERVAL);
 }
 

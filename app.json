@@ -1,18 +1,31 @@
 {
-  "application": "pandatask",
+  "application": "ticktock-sam",
   "cloneable": true,
+  "created": {
+    "__class__": "Date",
+    "isoformat": "2011-04-30T19:24:40.365294Z"
+  },
   "icon": "images/icon.png",
-  "owner": "mckoss",
+  "modified": {
+    "__class__": "Date",
+    "isoformat": "2011-05-01T16:44:55.595884Z"
+  },
+  "owner": "samgro",
   "readers": [
     "public"
   ],
   "referers": [],
   "secureData": false,
+  "sha1": "3520e0a5ea705c438586bb2733d8280d869417ff",
+  "size": 307,
   "tags": [
     "demo",
     "sample"
   ],
   "title": "Panda Task",
   "url": "http://pandatask.pageforest.com/",
-  "writers": ["bobbys", "samgro"]
+  "writers": [
+    "bobbys",
+    "samgro"
+  ]
 }

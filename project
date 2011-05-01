@@ -65,12 +65,16 @@
     		      </a>
     		    </div>
     		    
-    		    
     		    <!-- Task -->
     		    <div class='action'>
     		      <a href='#' class='promote icon'></a>
     		    </div>
       	    <div class='docket task'>Task 3</div>
+      	    
+      	    <!-- New task -->
+      	    <div class='task'>
+      	      <input id='new-task' />
+      	    </div>
       	    
       	    <!-- Add task link -->
       	    <a href='#' id='add-task'>
