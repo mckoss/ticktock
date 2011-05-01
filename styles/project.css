@@ -12,7 +12,7 @@ h1, h2 {
   font-weight: bold;
 }
 
-.done {
+#done-tasks {
   text-decoration: line-through;
   color: #777;
 }
@@ -123,4 +123,10 @@ input[type='checkbox'] {
 .task:hover .promote,
 .task:hover .delete {
   display: block;
+}
+
+.if-edit {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
