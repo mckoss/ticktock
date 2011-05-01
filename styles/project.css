@@ -94,3 +94,10 @@ a.icon:hover {
 #new-task-container {
   margin-right: 12px;
 }
+
+.delete {
+  width: 16px;
+  height: 16px;
+  float: right;
+  background: url('/images/remove.png');
+}

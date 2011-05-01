@@ -9,6 +9,7 @@
 <link rel="stylesheet" type="text/css" href="/styles/main.css" />
 <link rel="stylesheet" type="text/css" href="/styles/grid.css" />
 <link rel="stylesheet" type="text/css" href="/lib/beta/css/client.css" />
+<link rel="stylesheet" type="text/css" href="/styles/project.css" />
 
 <script type="text/javascript" src="/lib/beta/js/pf-client.js"></script>
 <script type="text/javascript" src="/scripts/pandatask-all.js"></script>
