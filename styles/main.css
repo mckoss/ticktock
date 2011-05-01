@@ -79,7 +79,7 @@ div.task {
 div.task .assigned {
   font-size: 75%;
   color: red;
-  width: 100%;
+  width: 100px;
   text-align: right;
   position: absolute;
   padding-right: 7px;
