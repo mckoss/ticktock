@@ -31,12 +31,14 @@ function onReady() {
     project = new taskLib.Project({title: ''});
     client = new clientLib.Client(exports);
     client.saveInterval = 0;
-
-    /*$('#r-add').click(onAdd.curry('r'));
+    client.autoLoad = true;
+    
+    
+    $('#r-add').click(onAdd.curry('r'));
     $('#w-add').click(onAdd.curry('w'));
-    $('#d-add').click(onAdd.curry('d'));*/
+    $('#d-add').click(onAdd.curry('d'));
 
-    $('.header').click(refresh);
+    //$('.header').click(refresh);
     
     client.addAppBar();
 }
@@ -61,6 +63,7 @@ function onOk(i) {
     $('#add' + i).remove();
     $('div.' + list + '-tasks').append(TASK.format({id: task.id, description: task.description, time: task.time, units: task.units}));
     $('div#' + task.id).find()
+    client.save();
 }
 
 function refresh() {
