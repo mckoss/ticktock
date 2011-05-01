@@ -1,22 +1,22 @@
 {
-  "application": "ticktock-sam",
+  "application": "pandatask",
   "cloneable": true,
   "created": {
     "__class__": "Date",
-    "isoformat": "2011-04-30T19:24:40.365294Z"
+    "isoformat": "2011-04-30T21:29:41.127781Z"
   },
   "icon": "images/icon.png",
   "modified": {
     "__class__": "Date",
-    "isoformat": "2011-05-01T16:44:55.595884Z"
+    "isoformat": "2011-05-01T05:15:00.119935Z"
   },
-  "owner": "samgro",
+  "owner": "mckoss",
   "readers": [
     "public"
   ],
   "referers": [],
   "secureData": false,
-  "sha1": "3520e0a5ea705c438586bb2733d8280d869417ff",
+  "sha1": "c67f59aeb4af72edf31cb51cdb1ef61588a063bf",
   "size": 307,
   "tags": [
     "demo",
