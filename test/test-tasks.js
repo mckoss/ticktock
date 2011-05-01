@@ -55,6 +55,29 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.equal(task.history[0].prop, 'actual');
         ut.ok(task.modified > task.created, "modified date update");
     });
+    
+    ut.test("parseDescription", function () {
+        var tests = [
+            ["nothing here", "nothing here", {}],
+            ["  extra space  ", "extra space", {}],
+            ["my task @mike", "my task", {assignedTo: ['mike']}],
+            ["out @mike task @bobby", "our task", {assignedTo: ['mike', 'bobby']}],
+            ["more work +2", "more work", {remaining: 2.0}],
+            ["tagged task [this is tagged, milestone]", "tagged task",
+             {tags: ['this-is-tagged', 'milestone']}],
+            ["kitchen sink @mike [sink, kitchen] +1.3", "kitchen sink",
+             {assignedTo: ['mike'], tags: ['sink', 'kitchen'], remaining: 1.3}]
+        ];
+        
+        for (var i = 0; i < tests.length; i++) {
+            var test = tests[i];
+            var options = {description: test[0]};
+            taskLib.parseDescription(options);
+            ut.equal(options.description, test[1]);
+            test[2].description = test[1];
+            ut.deepEqual(options, test[2]);
+        }
+    });
 
     coverage.testCoverage();
     
