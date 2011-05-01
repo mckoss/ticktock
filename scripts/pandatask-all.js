@@ -1027,10 +1027,14 @@ Project.methods({
         return this.map[id];
    },
 
-   findIndex: function (id) {
+   // Search for target - either a task or task.id - return index in array
+   findIndex: function (target) {
        for (var i = 0; i < this.tasks.length; i++) {
            var task = this.tasks[i];
-           if (task.id == id) {
+           if (typeof target == 'string') {
+               task = task.id;
+           }
+           if (task === target) {
                return i;
            }
        }
@@ -1038,17 +1042,17 @@ Project.methods({
 
    // Move the first tasks to a position just after the second task
    // If no 2nd task is given, more the first task to position 0.
-   moveAfter: function (idAfter, idBefore) {
+   moveAfter: function (after, before) {
        var iAfter, iBefore;
-       iAfter = this.findIndex(idAfter);
-       if (idBefore) {
-           iBefore = this.findIndex(idBefore);
+       iAfter = this.findIndex(after);
+       if (before) {
+           iBefore = this.findIndex(before);
        } else {
            iBefore = -1;
        }
 
-       var after = this.tasks.splice(iAfter, 1)[0];
-       this.tasks.splice(iBefore + 1, 0, after);
+       var mover = this.tasks.splice(iAfter, 1)[0];
+       this.tasks.splice(iBefore + 1, 0, mover);
    },
 
    toJSON: function () {
