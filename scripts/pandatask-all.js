@@ -786,6 +786,15 @@ exports.extend({
     'setDoc': setDoc
 });
 
+/*if (editedTask) {
+            var newStatus = toStatus[evt.keyCode];
+            if (editedTask.id != 'new' && newStatus) {
+                editedTask.change({status: newStatus});
+                editedStatus = newStatus;
+            }
+            saveTask(editedTask);
+        }*/
+
 var client;
 var doc;                            // Bound elements here
 var project;
@@ -795,7 +804,7 @@ var editedStatus;
 
 var TASK = '<div id="{id}" class="task {className}">' +
            '<div class="content if-not-edit">{content}' +
-           '<div id="action_{id}" class="action"><input type="checkbox" /></div>' +
+           '<div id="action_{id}" class="action"><input id="check_{id}" type="checkbox" /></div>' +
            '<div id="promote_{id}" class="promote icon"></div>' +
            '<div class="delete icon" id="delete_{id}"></div>' +
            '</div>' +
@@ -826,6 +835,7 @@ function onClick(evt) {
     if (evt.target.tagName == 'TEXTAREA') {
         return;
     }
+    console.log($(evt.target));
     if (editedTask) {
         saveTask(editedTask);
     }
@@ -912,7 +922,6 @@ function editTask(task, evt) {
 }
 
 function onKey(evt) {
-    console.log('')
     var right = 39,
         left = 37,
         enter = 13,
@@ -945,7 +954,6 @@ function onKey(evt) {
                 editedStatus = newStatus;
             }
             saveTask(editedTask);
-            $('#' + editedTask.id).addClass('edit');
         }
         break;
     }

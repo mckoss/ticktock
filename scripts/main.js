@@ -11,6 +11,15 @@ exports.extend({
     'setDoc': setDoc
 });
 
+/*if (editedTask) {
+            var newStatus = toStatus[evt.keyCode];
+            if (editedTask.id != 'new' && newStatus) {
+                editedTask.change({status: newStatus});
+                editedStatus = newStatus;
+            }
+            saveTask(editedTask);
+        }*/
+
 var client;
 var doc;                            // Bound elements here
 var project;
@@ -20,15 +29,15 @@ var editedStatus;
 
 var TASK = '<div id="{id}" class="task {className}">' +
            '<div class="content if-not-edit">{content}' + 
-           '<div id="action_{id}" class="action"><input id=check type="checkbox" /></div>' +          
+           '<div id="action_{id}" class="action"><input id="check_{id}" type="checkbox" /></div>' +          
            '<div id="promote_{id}" class="promote icon"></div>' +
            '<div class="delete icon" id="delete_{id}"></div>' +
            '</div>' +
            '<textarea class="if-edit"></textarea>' +
            '</div>';
-           
+
 var UPDATE_INTERVAL = 1000 * 60;
-           
+
 function onReady() {
     handleAppCache();
     doc = dom.bindIDs();
@@ -51,9 +60,14 @@ function onClick(evt) {
     if (evt.target.tagName == 'TEXTAREA') {
         return;
     }
-    if (editedTask) {
+    var id = $(evt.target).attr('id').split('_');
+    if (!id.length && editedTask) {
         saveTask(editedTask);
+        evt.preventDefault();
+        return;
     }
+    
+    console.log($(evt.target));
     evt.preventDefault();
 }
 
@@ -137,7 +151,6 @@ function editTask(task, evt) {
 }
 
 function onKey(evt) {
-    console.log('')
     var right = 39,
         left = 37,
         enter = 13,
