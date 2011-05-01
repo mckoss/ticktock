@@ -393,6 +393,30 @@ function strip(s) {
     return (s || "").replace(/^\s+|\s+$/g, "");
 }
 });
+/* Source: scripts/random.js */
+namespace.module('org.startpad.random', function (exports, require) {
+exports.randomString = randomString;
+
+var upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+var lower = 'abcdefghijklmnopqrstuvwxyz';
+var digits = '0123456789';
+var base64 = upper + lower + digits + '+/';
+var base64url = upper + lower + digits + '-_';
+var hexdigits = digits + 'abcdef';
+
+function randomString(len, chars) {
+    if (typeof chars == 'undefined') {
+        chars = base64url;
+    }
+    var radix = chars.length;
+    var result = [];
+    for (var i = 0; i < len; i++) {
+        result[i] = chars[0 | Math.random() * radix];
+    }
+    return result.join('');
+};
+});
+
 /* Source: scripts/main.js */
 namespace.module('com.ticktocktask.main', function (exports, require) {
 var clientLib = require('com.pageforest.client');
@@ -489,6 +513,7 @@ namespace.module('com.ticktocktask.tasks', function (exports, require) {
 var cLientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
 var types = require('org.startpad.types');
+var random = require('org.startpad.random');
 require('org.startpad.funcs').patch();
 
 exports.extend({
@@ -522,6 +547,9 @@ Project.methods({
 
 function Task(options) {
     types.extend(this, options);
+    this.created = timestamp();
+    this.modified = this.created;
+    this.id = random.randomString();
 }
 
 Task.methods({
@@ -530,4 +558,8 @@ Task.methods({
        return this;
    }
 });
+
+function timestamp() {
+    return new Date().getTime();
+}
 });
