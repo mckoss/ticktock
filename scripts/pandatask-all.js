@@ -525,6 +525,7 @@ function saveTask(task) {
         addTemplateTask();
     } else {
         task.change({description: text});
+        $('.content', '#' + task.id).text(task.description);
     }
     client.setDirty();
     client.save();
