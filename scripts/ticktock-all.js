@@ -547,14 +547,26 @@ Project.methods({
 });
 
 function Task(options) {
-    types.extend(this, options);
-    this.created = timestamp();
-    this.modified = this.created;
     this.id = random.randomString(16);
+    this.created = timestamp();
+    this.history = [];
+    this.change(options);
 }
+
+historyProps = {'estimate': true, 'actual': true, 'remaining': true};
 
 Task.methods({
    change: function (options) {
+       this.modified = timestamp();
+       for (var prop in options) {
+           if (options.hasOwnProperty(prop)) {
+               if (!historyProps[prop]) {
+                   continue;
+               }
+               this.history.push({prop: prop, when: this.modified,
+                                  oldValue: this[prop], newValue: options[prop]});
+           }
+       }
        types.extend(this, options);
        return this;
    }
