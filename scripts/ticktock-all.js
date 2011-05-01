@@ -412,10 +412,11 @@ var doc;                            // Bound elements here
 var project;
 var addList = [];
 
-var NEW_TASK = '<div id=add{i} class=newTask>' +
+var ADD_TASK = '<div id=add{i} class=newTask>' +
                '<div> What:<input id=desc{i} class=desc /></div>' +
                '<div> Time:<input type=number id=time{i} class=time />hours<input id=ok{i} type=button value=OK />' +
                '</div>';
+var TASK = '<div id={id} class=task><input class=left value=l />{desc}. {time} hours<input class=right value=r /></div>';
 
 function onReady() {
     handleAppCache();
@@ -430,6 +431,9 @@ function onReady() {
     $('#d-add').click(onAdd.curry('d'));
 
     //task.change();
+    console.log('project.tasks');
+    console.log(project.tasks)
+
 
     console.log('onOk exists');
     client.addAppBar();
@@ -440,7 +444,7 @@ function onAdd(list) {
     console.log('list: ' + list);
     var i = addList.length;
     addList[addList.length] = list;
-    $('div.'+list+'-tasks').append(NEW_TASK.format({i: i}));
+    $('div.'+list+'-tasks').append(ADD_TASK.format({i: i}));
     $('#ok' + i).click(onOk.curry(i));
 }
 
@@ -448,11 +452,11 @@ function onOk(i) {
   //t[i] = project.addTask({description: "task number " + i, estimated: 0, completed: 0});
     var desc = $('#desc' + i).val();
     var time = $('#time' + i).val();
-    var task = project.addTask({description: desc, time: time, list: addList[i]});
+    var list = addList[i];
+    var task = project.addTask({desc: desc, time: time, list: list});
     addList[i] = undefined;
     $('#add' + i).remove();
-    console.log('project: ');
-    console.log(project);
+    $('.' + list + '-tasks').append(NEW_TASK.format({id: task.id, task.desc, task.time}));
 }
 
 function setDoc(json) {

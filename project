@@ -25,9 +25,8 @@
 	<div class="row">
 		<div class="column grid_4">
 		  <div class=header>Ready</div>
-		  
 		  <div class=r-tasks>
-		    <div class=task>Integrate with abstract tasks</div>
+		    
 		  </div>
 		  <div class=footer><input id=r-add type=button value=+ /></div>
 		  
@@ -35,17 +34,14 @@
 		<div class="column grid_4">
 		  <div class=header>Working</div>
 		  <div class=w-tasks>
-		    <div class=task>Figure out html templates</div>
-		    <div class=task>Connect newTask to javascript</div>
+
 		  </div>
 		  <div class=footer><input id=w-add type=button value=+ /></div>
 		</div>
 		<div class="column grid_4">
 		  <div class=header>Done</div>
 		  <div class=d-tasks>
-		    <div class=task>Put a completed task in done</div>
-		    <div class=task>Get static page</div>
-		    <div class=task>Get static new task box</div>
+
 		  </div>
 		  <div class=footer><input id=d-add type=button value=+ /></div>
 		</div>

@@ -32,6 +32,11 @@ div.task {
   line-height: 30px;
   font-size: 12px;
 }
+/*
+div.task input.left {
+  width: 15px;
+  height: 
+}*/
 
 div.footer {
   border: 1px solid blue;
