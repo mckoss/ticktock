@@ -786,6 +786,15 @@ exports.extend({
     'setDoc': setDoc
 });
 
+/*if (editedTask) {
+            var newStatus = toStatus[evt.keyCode];
+            if (editedTask.id != 'new' && newStatus) {
+                editedTask.change({status: newStatus});
+                editedStatus = newStatus;
+            }
+            saveTask(editedTask);
+        }*/
+
 var client;
 var doc;                            // Bound elements here
 var project;
@@ -794,13 +803,14 @@ var editedText;
 var editedStatus;
 
 var TASK = '<div id="{id}" class="task {className}">' +
-           '<div class="content if-not-edit">{content}' +
-           '<div id="action_{id}" class="action"><input id=check type="checkbox" /></div>' +
+           '<div id="action_{id}" class="action"><input type="checkbox" id="check_{id}"/></div>' +
            '<div id="promote_{id}" class="promote icon"></div>' +
            '<div class="delete icon" id="delete_{id}"></div>' +
+           '<div class="content if-not-edit">{content}' +
            '</div>' +
+           '<div class="edit-container">' +
            '<textarea class="if-edit"></textarea>' +
-           '</div>';
+           '</div></div>';
 
 var UPDATE_INTERVAL = 1000 * 60;
 
@@ -826,9 +836,14 @@ function onClick(evt) {
     if (evt.target.tagName == 'TEXTAREA') {
         return;
     }
-    if (editedTask) {
+    var id = $(evt.target).attr('id').split('_');
+    if (!id.length && editedTask) {
         saveTask(editedTask);
+        evt.preventDefault();
+        return;
     }
+
+    console.log($(evt.target));
     evt.preventDefault();
 }
 

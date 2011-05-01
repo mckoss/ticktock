@@ -8,7 +8,11 @@ h1 {
   margin: 18px 5px;
 }
 
-.done {
+h1, h2 {
+  font-weight: bold;
+}
+
+#done-tasks {
   text-decoration: line-through;
   color: #777;
 }
@@ -116,7 +120,19 @@ input[type='checkbox'] {
   display: none;
 }
 
-.if-not-edit:hover .promote,
-.if-not-edit:hover .delete {
+.task:hover .promote,
+.task:hover .delete {
   display: block;
+}
+
+.edit-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding-right: 7px;
+  width: 100%;
+}
+
+.if-edit {
+  padding: 5px 24px;
 }
