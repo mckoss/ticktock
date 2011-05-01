@@ -2,6 +2,7 @@
   "files": {
       "scripts/ticktock-all.js": [
           "scripts/namespace-plus.js",
+          { "path": "scripts/random.js", "namespace": "org.startpad.random"},
           { "path": "scripts/main.js", "namespace": "com.ticktocktask.main" },
           { "path": "scripts/tasks.js", "namespace": "com.ticktocktask.tasks"}
       ]

@@ -1,6 +1,7 @@
 var cLientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
 var types = require('org.startpad.types');
+var random = require('org.startpad.random');
 require('org.startpad.funcs').patch();
 
 exports.extend({
@@ -34,6 +35,9 @@ Project.methods({
 
 function Task(options) {
     types.extend(this, options);
+    this.created = timestamp();
+    this.modified = this.created;
+    this.id = random.randomString(16);
 }
 
 Task.methods({
@@ -42,3 +46,7 @@ Task.methods({
        return this;
    } 
 });
+
+function timestamp() {
+    return new Date().getTime();
+}
