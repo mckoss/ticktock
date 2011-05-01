@@ -1,7 +1,12 @@
 h2.task-header {
   background: #333;
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#414141), to(#1d1d1d));
+  background: -moz-linear-gradient(0% 100% 90deg,#6B4020, #AD6734);
   color: #fff;
-  padding: 0px 5px;
+  padding: 6px 14px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
 }
 
 h1 {
@@ -85,7 +90,6 @@ a.icon:hover {
 }
 
 .if-not-edit {
-  position: relative;
   margin: 0px;
 }
 
@@ -135,4 +139,5 @@ input[type='checkbox'] {
 
 .if-edit {
   padding: 5px 24px;
+  background: #fff;
 }
