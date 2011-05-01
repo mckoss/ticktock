@@ -564,7 +564,7 @@ Task.methods({
                    continue;
                }
                this.history.push({prop: prop, when: this.modified,
-                                  old: this[prop], new: options[prop]});
+                                  oldValue: this[prop], newValue: options[prop]});
            }
        }
        types.extend(this, options);
