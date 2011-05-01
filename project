@@ -24,7 +24,7 @@
 <body>
 	<div class="row">
 		<div class="column grid_12">
-		  <h1>My Project</h1>
+		  <div class='logo'>PandaTask</div>
 		</div>
 	</div>
 	<div class="row">

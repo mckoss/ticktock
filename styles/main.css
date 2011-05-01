@@ -15,7 +15,7 @@ body, textarea {
   font-family:  helvetica, arial, sans-serif;
   font-size: 14px;
   line-height: 1.5;
-  background: #EBEBEB;
+  background: #EBEBEB url('/images/bodybg.jpg');
 }
 
 h1 {
@@ -57,7 +57,7 @@ div.task:not(.edit) .if-edit { display: none; }
   min-height: 50px;
 }
 
-#working-tasks div.task .content {
+#working-tasks div.task {
   background-color: #c0ffac;
 }
 
@@ -108,4 +108,14 @@ div.task textarea {
   padding: 10px 0;
   margin-top: 10px;
   text-align: center;
+}
+
+.logo {
+  background: url('/images/panda-header.png') top left no-repeat;
+  padding-left: 160px;
+  padding-top: 65px;
+  line-height: 36px;
+  color: #777;
+  font-size: 36px;
+  font-weight: bold;
 }
