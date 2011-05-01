@@ -771,7 +771,7 @@ Task.methods({
        var html = "";
        html += format.escapeHTML(this.description);
        var est = this.actual + this.remaining + 0.05;
-       if (est > 0) {
+       if (est > 0.05) {
            html += " (";
            if (this.actual) {
                html += format.thousands(this.actual + 0.05, 1) + '/';
