@@ -543,6 +543,9 @@ exports.extend({
 
 var now = new Date().getTime();
 
+var historyProps = {'actual': true, 'remaining': true};
+var taskProps = {'actual': true, 'remaining': true, 'status': true, 'description': true};
+
 function Project(options) {
     this.map = {};
     types.extend(this, options);
@@ -571,6 +574,30 @@ Project.methods({
         return this.map[id];
    },
 
+   findIndex: function (id) {
+       for (var i = 0; i < this.tasks.length; i++) {
+           var task = this.tasks[i];
+           if (task.id == id) {
+               return i;
+           }
+       }
+   },
+
+   // Move the first tasks to a position just after the second task
+   // If no 2nd task is given, more the first task to position 0.
+   moveAfter: function (idAfter, idBefore) {
+       var iAfter, iBefore;
+       iAfter = this.findIndex(idAfter);
+       if (idBefore) {
+           iBefore = this.findIndex(idBefore);
+       } else {
+           iBefore = -1;
+       }
+
+       var after = this.tasks.splice(iAfter, 1)[0];
+       this.tasks.splice(iBefore + 1, 0, after);
+   },
+
    toJSON: function () {
        return {tasks: this.tasks};
    },
@@ -593,7 +620,7 @@ Project.methods({
                if (maxDate == undefined || change.when > maxDate) {
                    maxDate = change.when;
                }
-               var bucket = buckets[change.when];
+               bucket = buckets[change.when];
                if (bucket == undefined) {
                    bucket = {actual: 0, remaining: 0};
                    buckets[change.when] = bucket;
@@ -624,8 +651,6 @@ function Task(options, project) {
     project.install(this);
 }
 
-historyProps = {'actual': true, 'remaining': true};
-
 Task.methods({
    change: function (options) {
        this.modified = now;
@@ -635,6 +660,9 @@ Task.methods({
 
        }
        for (var prop in options) {
+           if (!taskProps[prop]) {
+               throw new Error("Invalid task property: " + prop);
+           }
            if (options.hasOwnProperty(prop)) {
                if (!historyProps[prop]) {
                    continue;
