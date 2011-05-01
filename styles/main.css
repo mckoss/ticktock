@@ -29,6 +29,7 @@ div.task:not(.edit) .if-edit { display: none; }
 }
 
 div.task .content {
+  position: relative;
   background-color: #f9f6a8;
   height: 50px;
   padding: 5px;
@@ -37,7 +38,19 @@ div.task .content {
   -webkit-transition: -webkit-transform 1.0s ease-out;
 }
 
-div.task.new .content {
+div.task .assigned {
+  font-size: 75%;
+  color: red;
+  width: 100%;
+  text-align: right;
+  position: absolute;
+  padding-right: 10px;
+  padding-bottom: 5px;
+  bottom: 0;
+  right: 0;
+}
+
+#new .content {
   color: #aaa;
 }
 

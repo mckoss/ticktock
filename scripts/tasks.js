@@ -188,6 +188,9 @@ Task.methods({
            }
            html += format.thousands(est, 1) + ' ' + pluralize('hr', est) + ")";
        }
+       if (this.assignedTo && this.assignedTo.length > 0) {
+           html += '<div class="assigned">' + this.assignedTo.join(', ') + "</div>";
+       }
        return html;
    },
    
@@ -204,7 +207,7 @@ Task.methods({
        if (remaining > 0.5) {
            text += ' +' + format.thousands(remaining, 1);
        }
-       return text; 
+       return text;
    }
    
 });
