@@ -4,7 +4,9 @@ namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
     var utCoverage = require('org.startpad.qunit.coverage');
     var taskLib = require('com.ticktocktask.tasks');
 
-    ut.module('tasks');
+    ut.module('com.ticktocktask.tasks');
+    
+    var coverage = new utCoverage.Coverage('com.ticktocktask.tasks');
 
     ut.test("version", function () {
         var version = taskLib.VERSION.split('.');
@@ -46,5 +48,6 @@ namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
         ut.equal(task.history[0].prop, 'actual');
     });
 
+    coverage.testCoverage();
     
 });
