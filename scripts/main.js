@@ -15,7 +15,8 @@ var client;
 var doc;                            // Bound elements here
 var project;
 var editedTask;
-var editText;
+var editedText;
+var editedStatus;
 
 var TASK = '<div id="{id}" class="task {className}">' +
            '<div class="content if-not-edit">{description} ({remaining} {units})</div>' +
@@ -71,10 +72,14 @@ function refresh() {
 }
 
 function addTask(task, listName, className) {
+    var top = className == 'top';
+    if (top) {
+        className = undefined;
+    }
     if (className == undefined) {
         className = '';
     }
-    $(doc[listName]).append(TASK.format(
+    $(doc[listName])[top ? 'prepend': 'append'](TASK.format(
         types.extend({units: pluralize('hr', task.remaining),
                       className: className}, task)));
     $('#' + task.id + ' .content').click(editTask.curry(task));
@@ -85,21 +90,28 @@ function addTemplateTask() {
 }
 
 function saveTask(task) {
-    $('#' + task.id).removeClass('edit');
-    var text = $('textarea', '#' + task.id).val();
+    var $taskDiv = $('#' + task.id);
+    $taskDiv.removeClass('edit');
+    var text = $('textarea', $taskDiv).val();
     editedTask = undefined;
-    if (text == editText) {
+    if (text == editedText) {
         return;
     }
     if (task.id == 'new') {
         task = project.addTask({description: text});
         $('#new').remove();
-        addTask(task, 'ready-tasks');
+        addTask(task, 'ready-tasks', 'top');
         addTemplateTask();
     } else {
         task.change({description: text});
-        $('.content', '#' + task.id).text(task.description);
+        if (editedStatus) {
+            $taskDiv.remove();
+            addTask(task, editedStatus + '-tasks', 'top');
+        } else {
+            $('.content', $taskDiv).text(task.description);
+        }
     }
+    editedStatus = undefined;
     client.setDirty();
     client.save();
 }
@@ -109,8 +121,8 @@ function editTask(task, evt) {
         saveTask(editedTask);
     }
     $('#' + task.id).addClass('edit');
-    editText = task.description;
-    $('textarea', '#' + task.id).val(editText).focus().select();
+    editedText = task.description;
+    $('textarea', '#' + task.id).val(editedText).focus().select();
     editedTask = task;
     evt.stopPropagation();
 }
@@ -133,15 +145,10 @@ function onKey(evt) {
             var newStatus = toStatus[evt.keyCode];
             if (editedTask.id != 'new' && newStatus) {
                 editedTask.change({status: newStatus});
+                editedStatus = newStatus;
             }
             saveTask(editedTask);
         }
-        break;
-    case left:
-        changeSlide(iSlide - 1);
-        break;
-    case right:
-        changeSlide(iSlide + 1);
         break;
     }
 }

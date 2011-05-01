@@ -12,7 +12,7 @@ exports.extend({
 
 var now = new Date().getTime();
 
-var historyProps = {'actual': true, 'remaining': true};
+var historyProps = {'actual': true, 'remaining': true, 'status': true};
 var taskProps = {'actual': true, 'remaining': true, 'status': true, 'description': true,
                  'history': true, 'id': true, 'created': true, 'modified': true};
 
