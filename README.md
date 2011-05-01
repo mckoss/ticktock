@@ -13,5 +13,5 @@ Design Goals
 
 - [Try It](http://pandatask.pageforest.com/project)
 - [Help](http://wiki.pageforest.com/#pandatask)
-- [Our Task List](http://pandatask.pageforest.com/project/#panda-task-list)
+- [Our Task List](http://pandatask.pageforest.com/project/#panda-task-help)
 
