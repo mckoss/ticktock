@@ -481,23 +481,6 @@ function getDoc() {
     };
 }
 
-function onOk(i) {
-    var d = $('#description' + i).val();
-    var t = $('#time' + i).val();
-    var listName = addList[i];
-    var units;
-    units = t == 1 ? 'hour' : 'hours';
-    var task = project.addTask({description: d, remaining: t, status: listName});
-    addList[i] = undefined;
-    $('#add' + i).remove();
-    $('div.' + listName + '-tasks').append(TASK.format({
-            id: task.id, description: task.description, time: task.remaining,
-            units: task.units}));
-    $('div#' + task.id).find();
-    client.setDirty();
-    client.save();
-}
-
 function refresh() {
     $('#ready-tasks').empty();
     $('#done-tasks').empty();
