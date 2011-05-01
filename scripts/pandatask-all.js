@@ -786,15 +786,6 @@ exports.extend({
     'setDoc': setDoc
 });
 
-/*if (editedTask) {
-            var newStatus = toStatus[evt.keyCode];
-            if (editedTask.id != 'new' && newStatus) {
-                editedTask.change({status: newStatus});
-                editedStatus = newStatus;
-            }
-            saveTask(editedTask);
-        }*/
-
 var client;
 var doc;                            // Bound elements here
 var project;
@@ -803,12 +794,7 @@ var editedText;
 var editedStatus;
 
 var TASK = '<div id="{id}" class="task {className}">' +
-<<<<<<< HEAD
-           '<div class="content if-not-edit">{content}' +
-           '<div id="action_{id}" class="action"><input id="check_{id}" type="checkbox" /></div>' +
-=======
-           '<div id="action_{id}" class="action"><input type="checkbox" id="check"/></div>' +
->>>>>>> 7e9c291d8f20d5f7638f4f34689e10d6539264d9
+           '<div id="action_{id}" class="action"><input type="checkbox" id="check_{id}"/></div>' +
            '<div id="promote_{id}" class="promote icon"></div>' +
            '<div class="delete icon" id="delete_{id}"></div>' +
            '<div class="content if-not-edit">{content}' +
@@ -841,7 +827,6 @@ function onClick(evt) {
     if (evt.target.tagName == 'TEXTAREA') {
         return;
     }
-    console.log($(evt.target));
     if (editedTask) {
         saveTask(editedTask);
     }
@@ -882,7 +867,7 @@ function addTask(task, listName, className) {
     content = task.getContentHTML ? task.getContentHTML() : task.description;
     $(doc[listName])[top ? 'prepend': 'append'](TASK.format(
         types.extend({content: content}, task)));
-    $('#' + task.id + ' .content').click(editTask.curry(task));
+    $('#' + task.id).click(editTask.curry(task));
 }
 
 function addTemplateTask() {
@@ -920,47 +905,74 @@ function editTask(task, evt) {
     if (editedTask) {
         saveTask(editedTask);
     }
+
     $('#' + task.id).addClass('edit');
     editedText = task.getEditText ? task.getEditText() : task.description;
     $('textarea', '#' + task.id).val(editedText).focus().select();
     editedTask = task;
+    // We don't want the body click event to cancel enter edit mode.
     evt.stopPropagation();
+
+    function moveIt(status) {
+        if (editedTask.id != 'new') {
+            editedStatus = status;
+            editedTask.change({status: editedStatus});
+        }
+        saveTask(editedTask);
+    }
+
+    var id = $(evt.target).attr('id');
+    if (id.length && id.split('_').length) {
+        var type = id.split('_')[0];
+        if (type == 'delete') {
+            //deleteTask(task);
+        }
+        if (type == 'check') {
+            if (editedTask.status == 'done') {
+                moveIt('working');
+                $('#' + id)[0].checked = false;
+                return;
+            }
+            moveIt('done');
+            $('#' + id)[0].checked = true;
+        }
+        if (type == 'promote') {
+            if (editedTask.status == 'ready') {
+                moveIt('working');
+            } else if (editedTask.status == 'working') {
+                moveIt('ready');
+            }
+        }
+    }
 }
 
 function onKey(evt) {
     var right = 39,
         left = 37,
-        enter = 13,
         up = 38,
-        down = 40;
-    var toStatus = {37: 'ready', 39: 'done', 38: 'working'};
+        down = 40,
+        enter = 13;
+
+    if (!editedTask) {
+        return;
+    }
 
     if (event.keyCode == enter) {
-        if (editedTask) {
-            var newStatus = toStatus[evt.keyCode];
-            if (editedTask.id != 'new' && newStatus) {
-                editedTask.change({status: newStatus});
-                editedStatus = newStatus;
-            }
-            saveTask(editedTask);
-        }
+        saveTask(editedTask);
         return;
     }
-    if (!evt.ctrlKey) {
-        return;
-    }
+
     switch (evt.keyCode) {
     case up:
-    case left:
-    case right:
-        if (editedTask) {
-            var newStatus = toStatus[evt.keyCode];
-            if (editedTask.id != 'new' && newStatus) {
-                editedTask.change({status: newStatus});
-                editedStatus = newStatus;
-            }
-            saveTask(editedTask);
+    case down:
+        if (!evt.ctrlKey || editTask.id == 'new') {
+            evt.preventDefault();
+            return;
         }
+        var taskSave = editedTask;
+        saveTask(editedTask);
+        project.move(taskSave, evt.keyCode == up ? -1 : 1);
+        refresh();
         break;
     }
 }
@@ -1067,6 +1079,18 @@ Project.methods({
 
        var mover = this.tasks.splice(iAfter, 1)[0];
        this.tasks.splice(iBefore + 1, 0, mover);
+   },
+
+   // Move task by n positions up or down - but should not move
+   // above it's own same-status section. TODO
+   move: function (task, n) {
+       var iTask = this.findIndex(task);
+       var iMove = iTask + n;
+       if (iMove < 0 || iMove >= this.tasks.length) {
+           return;
+       }
+       task = this.tasks.splice(iTask, 1)[0];
+       this.tasks.splice(iMove, 0, task);
    },
 
    toJSON: function () {
