@@ -95,12 +95,12 @@ div.task .assigned {
 
 div.task textarea {
   width: 100%;
-  height: 50px;
-  padding: 5px;
-  margin: 5px;
+  height: 60px;
+  padding: 5px 24px;
   font-family: inherit;
   font-size: inherit;
   resize: none;
+  box-sizing: border-box;
 }
 
 #footer {

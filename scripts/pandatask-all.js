@@ -794,13 +794,14 @@ var editedText;
 var editedStatus;
 
 var TASK = '<div id="{id}" class="task {className}">' +
-           '<div id="action_{id}" class="action"><input type="checkbox" /></div>' +
+           '<div id="action_{id}" class="action"><input type="checkbox" id="check"/></div>' +
            '<div id="promote_{id}" class="promote icon"></div>' +
            '<div class="delete icon" id="delete_{id}"></div>' +
            '<div class="content if-not-edit">{content}' +
            '</div>' +
+           '<div class="edit-container">' +
            '<textarea class="if-edit"></textarea>' +
-           '</div>';
+           '</div></div>';
 
 var UPDATE_INTERVAL = 1000 * 60;
 
@@ -945,7 +946,6 @@ function onKey(evt) {
                 editedStatus = newStatus;
             }
             saveTask(editedTask);
-            $('#' + editedTask.id).addClass('edit');
         }
         break;
     }

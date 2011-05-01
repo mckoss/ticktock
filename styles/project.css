@@ -125,8 +125,14 @@ input[type='checkbox'] {
   display: block;
 }
 
-.if-edit {
+.edit-container {
   position: absolute;
   top: 0;
   left: 0;
+  padding-right: 7px;
+  width: 100%;
+}
+
+.if-edit {
+  padding: 5px 24px;
 }
