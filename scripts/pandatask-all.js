@@ -950,7 +950,6 @@ function onKey(evt) {
     }
 }
 
-
 // For offline - capable applications
 function handleAppCache() {
     if (typeof applicationCache == 'undefined') {

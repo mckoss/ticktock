@@ -139,3 +139,13 @@ input[type='checkbox'] {
 .task {
   position: relative;
 }
+
+.promote,
+.delete {
+  display: none;
+}
+
+.if-not-edit:hover .promote,
+.if-not-edit:hover .delete {
+  display: block;
+}
