@@ -56,7 +56,7 @@ Task.methods({
        }
        types.extend(this, options);
        return this;
-   } 
+   }
 });
 
 function timestamp() {
