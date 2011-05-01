@@ -9,8 +9,6 @@
 <link rel="stylesheet" type="text/css" href="/styles/main.css" />
 <link rel="stylesheet" type="text/css" href="/styles/grid.css" />
 <link rel="stylesheet" type="text/css" href="/lib/beta/css/client.css" />
-<link rel="stylesheet" type="text/css" href="/styles/project.css" />
-
 
 <script type="text/javascript" src="/lib/beta/js/pf-client.js"></script>
 <script type="text/javascript" src="/scripts/pandatask-all.js"></script>
@@ -23,96 +21,22 @@
 </head>
 
 <body>
-  <div class=main>
-    <div class='row'>
-      <div class='column grid_10'>
-        <h1 id='project-name'>My Project</h1>
-      </div>
-    </div>
-  	<div class="row">
-  	  <!-- Left column -->
-  		<div class="column grid_4">
-  		  
-  		  <!-- Active tasks -->
-  		  <div class='box'>
-    		  <h2 class='task-header'>Active</h2>
-    		  <div id='active-items' class='task-group'>
-    		    <div class='action'>
-    		      <input type='checkbox' />
-    		    </div>
-    		    <div class='active task'>Task 1</div>
-    		  </div>
-    		</div>
-  		  
-  		  <!-- Docket tasks -->
-  		  <div class='box'>
-    		  <h2 class='task-header'>On the docket</h2>
-    		  <div id='docket-items' class='task-group'>
-    		    
-    		    <!-- Task -->
-    		    <div class='action'>
-    		      <a href='#' class='promote icon'></a>
-    		    </div>
-    		    <div class='docket task'>
-    		      Task 2
-    		      <!-- Drag and drop -->
-    		      <a href='#' class='icon'>
-    		        <img src='images/drag-and-drop.png' class='icon' alt='Reorder' />
-    		      </a>
-    		      <!-- Delete -->
-    		      <a href='#' class='icon'>
-    		        <img src='images/remove.png' class='icon' alt='Delete' />
-    		      </a>
-    		    </div>
-    		    
-    		    
-    		    <!-- Task -->
-    		    <div class='action'>
-    		      <a href='#' class='promote icon'></a>
-    		    </div>
-      	    <div class='docket task'>Task 3</div>
-      	    
-      	    <!-- New task -->
-      	    <div class='task' id='new-task-container'>
-      	      <input id='new-task' type='text' />
-      	    </div>
-      	    
-      	    <!-- Add task link -->
-      	    <a href='#' id='add-task'>
-      	      <div class='action'>
-      	        <img src='images/add.png' class='add-button' alt />
-      	      </div>
-      	      <div class='task'>
-      	        Add a task
-      	      </div>
-      	    </a>
-      	  </div>
-      	</div>
-  		</div>
-  		
-  		<!-- Right column -->
-  		<div class='column grid_4'>
-  		  <div class='box'>
-  		    <!-- Done tasks -->
-    		  <h2 class='task-header'>Done</h2>
-    		  <div id='done-items' class='task-group'>
-    		    
-    		    <!-- Task -->
-    		    <div class='action'>
-    		      <input type='checkbox' checked />
-    		    </div>
-    		    <div class='done task'>Task 4</div>
-    		    
-    		    <!-- Task -->
-    		    <div class='action'>
-    		      <input type='checkbox' checked />
-    		    </div>
-      	    <div class='done task'>Task 5</div>
-      	  </div>
-      	</div>
-  		</div>
-  	</div>
-  </div>
+	<div class="row">
+		<div class="column grid_12">
+			<div class="task-list-header"><h2>Working</h2></div>
+			<div id="working-tasks" class="task-list"></div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="column grid_6">
+			<div class="task-list-header"><h2>Ready</h2></div>
+			<div id="ready-tasks" class="task-list"></div>
+		</div>
+		<div class="column grid_6">
+			<div class="task-list-header"><h2>Complete</h2></div>
+			<div id="done-tasks" class="task-list"></div>
+		</div>
+	</div>
 	
 	<div id="footer" class="row">
 		<a href="http://wiki.pageforest.com/#panda-task-help">Help</a> |

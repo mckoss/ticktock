@@ -18,13 +18,11 @@ var editedTask;
 var editedText;
 var editedStatus;
 
-var TASK = "<div class='action'><a href='#' id='promote-{id}' class='promote icon'></a></div>" + 
-           "<div id={id} class='docket task'>{description}<a href='#' class='icon'>" +
-           "<img src='images/drag-and-drop.png' class='icon' alt='Reorder' />" +
-           "</a><a id=delete-{id} href='#' class='icon'><img src='images/remove.png' class='icon' alt='Delete' />" +
-           "</a></div>";
-
-
+var TASK = '<div id="{id}" class="task {className}">' +
+           '<div class="content if-not-edit">{content}</div>' +
+           '<textarea class="if-edit"></textarea>' +
+           '</div>';
+           
 var UPDATE_INTERVAL = 1000 * 60;
            
 function onReady() {
@@ -52,6 +50,7 @@ function onClick(evt) {
     if (editedTask) {
         saveTask(editedTask);
     }
+    evt.preventDefault();
 }
 
 function setDoc(json) {
