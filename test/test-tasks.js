@@ -25,6 +25,11 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         var task = project.addTask({description: "hello"});
         ut.equal(task.description, "hello");
         ut.ok(task.id.length > 10, "task id is " + task.id);
+        ut.equal(types.typeOf(task.modified), 'number', 'modified');
+        ut.equal(types.typeOf(task.created), 'number', 'created');
+        
+        var other = project.getTask(task.id);
+        ut.strictEqual(task, other, "id lookup");
     });
     
     ut.test("toJSON", function () {

@@ -10,7 +10,7 @@ exports.extend({
     'updateNow': updateNow
 });
 
-var now;
+var now = new Date().getTime();
 
 function Project(options) {
     this.map = {};
