@@ -63,6 +63,7 @@ function onOk(i) {
     $('#add' + i).remove();
     $('div.' + list + '-tasks').append(TASK.format({id: task.id, description: task.description, time: task.time, units: task.units}));
     $('div#' + task.id).find()
+    client.setDirty();
     client.save();
 }
 

@@ -30,6 +30,10 @@ Project.methods({
    
    toJSON: function () {
        return this;
+   },
+   
+   timeData: function(prop, dateStart, dateEnd) {
+       return [];
    }
 });
 
