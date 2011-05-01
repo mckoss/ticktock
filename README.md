@@ -12,6 +12,6 @@ Design Goals
 - Burn down charts to predict completion date
 
 - [Try It](http://pandatask.pageforest.com/project)
-- [Help](http://wiki.pageforest.com/#pandatask)
-- [Our Task List](http://pandatask.pageforest.com/project/#panda-task-help)
+- [Help](http://wiki.pageforest.com/#panda-task-help)
+- [Our Task List](http://pandatask.pageforest.com/project/#panda-task-list)
 
