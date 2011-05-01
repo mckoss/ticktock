@@ -55,7 +55,6 @@ function onClick(evt) {
     if (editedTask) {
         saveTask(editedTask);
     }
-    console.log($(evt.target));
     evt.preventDefault();
 }
 
@@ -156,11 +155,11 @@ function editTask(task, evt) {
         if (type == 'check') {
             if (editedTask.status == 'done') {
                 moveIt('working');
-                evt.target.checked = false;
+                $('#' + id)[0].checked = false;
                 return;
             }
             moveIt('done');
-            evt.target.checked = true;
+            $('#' + id)[0].checked = true;
         }
         if (type == 'promote') {
             if (editedTask.status == 'ready') {

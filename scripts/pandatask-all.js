@@ -827,21 +827,9 @@ function onClick(evt) {
     if (evt.target.tagName == 'TEXTAREA') {
         return;
     }
-<<<<<<< HEAD
     if (editedTask) {
-=======
-    var id = $(evt.target).attr('id').split('_');
-    if (!id.length && editedTask) {
->>>>>>> f31d72bc7b1db63c6a4873fe574149a8ea3c1466
         saveTask(editedTask);
-        evt.preventDefault();
-        return;
     }
-<<<<<<< HEAD
-=======
-
->>>>>>> f31d72bc7b1db63c6a4873fe574149a8ea3c1466
-    console.log($(evt.target));
     evt.preventDefault();
 }
 
@@ -942,11 +930,11 @@ function editTask(task, evt) {
         if (type == 'check') {
             if (editedTask.status == 'done') {
                 moveIt('working');
-                evt.target.checked = false;
+                $('#' + id)[0].checked = false;
                 return;
             }
             moveIt('done');
-            evt.target.checked = true;
+            $('#' + id)[0].checked = true;
         }
         if (type == 'promote') {
             if (editedTask.status == 'ready') {
