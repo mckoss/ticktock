@@ -117,7 +117,7 @@ function saveTask(task) {
             $taskDiv.remove();
             addTask(task, editedStatus + '-tasks', 'top');
         } else {
-            $('.content', $taskDiv).text(task.description);
+            $('.content', $taskDiv).html(task.getContentHTML());
         }
     }
     editedStatus = undefined;
@@ -170,6 +170,7 @@ function onKey(evt) {
                 editedStatus = newStatus;
             }
             saveTask(editedTask);
+            $('#' + editedTask.id).addClass('edit');
         }
         break;
     }
