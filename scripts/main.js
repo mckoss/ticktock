@@ -126,7 +126,7 @@ function editTask(task, evt) {
         saveTask(editedTask);
     }
     $('#' + task.id).addClass('edit');
-    editedText = task.description;
+    editedText = task.getEditText ? task.getEditText() : task.description;
     $('textarea', '#' + task.id).val(editedText).focus().select();
     editedTask = task;
     evt.stopPropagation();

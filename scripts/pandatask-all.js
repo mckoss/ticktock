@@ -901,7 +901,7 @@ function editTask(task, evt) {
         saveTask(editedTask);
     }
     $('#' + task.id).addClass('edit');
-    editedText = task.description;
+    editedText = task.getEditText ? task.getEditText() : task.description;
     $('textarea', '#' + task.id).val(editedText).focus().select();
     editedTask = task;
     evt.stopPropagation();
@@ -1133,7 +1133,7 @@ Task.methods({
    getContentHTML: function () {
        var html = "";
        html += format.escapeHTML(this.description);
-       var est = this.actual + this.remaining + 0.05;
+       var est = Math.max(this.actual, this.remaining) + 0.05;
        if (est > 0.05) {
            html += " (";
            if (this.actual) {
@@ -1142,6 +1142,22 @@ Task.methods({
            html += format.thousands(est, 1) + ' ' + pluralize('hr', est) + ")";
        }
        return html;
+   },
+
+   getEditText: function () {
+       var text = "";
+       text += this.description;
+       if (this.tags && this.tags.length > 0) {
+           text += ' [' + this.tags.join(',') + ']';
+       }
+       if (this.assignedTo && this.assignedTo.length > 0) {
+           text += ' @' + this.assignedTo.join(' @');
+       }
+       var remaining = this.remaining + 0.05;
+       if (remaining > 0.5) {
+           text += ' +' + format.thousands(remaining, 1);
+       }
+       return text;
    }
 
 });
