@@ -46,11 +46,14 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         task.change({description: "bar"});
         ut.equal(task.description, "bar");
         ut.equal(task.history.length, 0);
+        
+        taskLib.updateNow(new Date(new Date().getTime() + 1000));
         task.change({actual: 8});
         ut.equal(task.history.length, 1);
         ut.equal(task.history[0].newValue, 8);
         ut.equal(task.history[0].oldValue, 0);
         ut.equal(task.history[0].prop, 'actual');
+        ut.ok(task.modified > task.created, "modified date update");
     });
 
     coverage.testCoverage();
