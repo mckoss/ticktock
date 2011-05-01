@@ -9,6 +9,7 @@
 <link rel="stylesheet" type="text/css" href="/styles/main.css" />
 <link rel="stylesheet" type="text/css" href="/styles/grid.css" />
 <link rel="stylesheet" type="text/css" href="/lib/beta/css/client.css" />
+<link rel="stylesheet" type="text/css" href="/styles/project.css" />
 
 <script type="text/javascript" src="/lib/beta/js/pf-client.js"></script>
 <script type="text/javascript" src="/scripts/pandatask-all.js"></script>
@@ -23,17 +24,19 @@
 <body>
 	<div class="row">
 		<div class="column grid_12">
-			<div class="task-list-header"><h2>Working</h2></div>
-			<div id="working-tasks" class="task-list"></div>
+		  <h1>My Project</h1>
 		</div>
 	</div>
 	<div class="row">
 		<div class="column grid_6">
-			<div class="task-list-header"><h2>Ready</h2></div>
+			<h2 class='task-header'>Working</h2>
+			<div id="working-tasks" class="task-list"></div>
+      
+			<h2 class='task-header'>Ready</h2>
 			<div id="ready-tasks" class="task-list"></div>
 		</div>
 		<div class="column grid_6">
-			<div class="task-list-header"><h2>Complete</h2></div>
+			<h2 class='task-header'>Complete</h2>
 			<div id="done-tasks" class="task-list"></div>
 		</div>
 	</div>

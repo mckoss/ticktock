@@ -19,7 +19,11 @@ var editedText;
 var editedStatus;
 
 var TASK = '<div id="{id}" class="task {className}">' +
-           '<div class="content if-not-edit">{content}</div>' +
+           '<div class="content if-not-edit">{content}' + 
+           '<div id="action_{id}" class="action"><input type="checkbox" /></div>' +          
+           '<div id="promote_{id}" class="promote icon"></div>' +
+           '<div class="delete icon" id="delete_{id}"></div>' +
+           '</div>' +
            '<textarea class="if-edit"></textarea>' +
            '</div>';
            
@@ -113,7 +117,7 @@ function saveTask(task) {
             $taskDiv.remove();
             addTask(task, editedStatus + '-tasks', 'top');
         } else {
-            $('.content', $taskDiv).text(task.description);
+            $('.content', $taskDiv).html(task.getContentHTML());
         }
     }
     editedStatus = undefined;
@@ -133,6 +137,7 @@ function editTask(task, evt) {
 }
 
 function onKey(evt) {
+    console.log('')
     var right = 39,
         left = 37,
         enter = 13,
@@ -140,8 +145,21 @@ function onKey(evt) {
         down = 40;
     var toStatus = {37: 'ready', 39: 'done', 38: 'working'};
 
+    if (event.keyCode == enter) {
+        if (editedTask) {
+            var newStatus = toStatus[evt.keyCode];
+            if (editedTask.id != 'new' && newStatus) {
+                editedTask.change({status: newStatus});
+                editedStatus = newStatus;
+            }
+            saveTask(editedTask);
+        }
+        return;
+    }
+    if (!evt.ctrlKey) {
+        return;
+    }
     switch (evt.keyCode) {
-    case enter:
     case up:
     case left:
     case right:
@@ -152,11 +170,11 @@ function onKey(evt) {
                 editedStatus = newStatus;
             }
             saveTask(editedTask);
+            $('#' + editedTask.id).addClass('edit');
         }
         break;
     }
 }
-
 
 // For offline - capable applications
 function handleAppCache() {

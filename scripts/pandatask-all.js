@@ -794,7 +794,11 @@ var editedText;
 var editedStatus;
 
 var TASK = '<div id="{id}" class="task {className}">' +
-           '<div class="content if-not-edit">{content}</div>' +
+           '<div class="content if-not-edit">{content}' +
+           '<div id="action_{id}" class="action"><input type="checkbox" /></div>' +
+           '<div id="promote_{id}" class="promote icon"></div>' +
+           '<div class="delete icon" id="delete_{id}"></div>' +
+           '</div>' +
            '<textarea class="if-edit"></textarea>' +
            '</div>';
 
@@ -888,7 +892,7 @@ function saveTask(task) {
             $taskDiv.remove();
             addTask(task, editedStatus + '-tasks', 'top');
         } else {
-            $('.content', $taskDiv).text(task.description);
+            $('.content', $taskDiv).html(task.getContentHTML());
         }
     }
     editedStatus = undefined;
@@ -908,6 +912,7 @@ function editTask(task, evt) {
 }
 
 function onKey(evt) {
+    console.log('')
     var right = 39,
         left = 37,
         enter = 13,
@@ -915,8 +920,21 @@ function onKey(evt) {
         down = 40;
     var toStatus = {37: 'ready', 39: 'done', 38: 'working'};
 
+    if (event.keyCode == enter) {
+        if (editedTask) {
+            var newStatus = toStatus[evt.keyCode];
+            if (editedTask.id != 'new' && newStatus) {
+                editedTask.change({status: newStatus});
+                editedStatus = newStatus;
+            }
+            saveTask(editedTask);
+        }
+        return;
+    }
+    if (!evt.ctrlKey) {
+        return;
+    }
     switch (evt.keyCode) {
-    case enter:
     case up:
     case left:
     case right:
@@ -927,11 +945,11 @@ function onKey(evt) {
                 editedStatus = newStatus;
             }
             saveTask(editedTask);
+            $('#' + editedTask.id).addClass('edit');
         }
         break;
     }
 }
-
 
 // For offline - capable applications
 function handleAppCache() {
@@ -1009,10 +1027,14 @@ Project.methods({
         return this.map[id];
    },
 
-   findIndex: function (id) {
+   // Search for target - either a task or task.id - return index in array
+   findIndex: function (target) {
        for (var i = 0; i < this.tasks.length; i++) {
            var task = this.tasks[i];
-           if (task.id == id) {
+           if (typeof target == 'string') {
+               task = task.id;
+           }
+           if (task === target) {
                return i;
            }
        }
@@ -1020,17 +1042,17 @@ Project.methods({
 
    // Move the first tasks to a position just after the second task
    // If no 2nd task is given, more the first task to position 0.
-   moveAfter: function (idAfter, idBefore) {
+   moveAfter: function (after, before) {
        var iAfter, iBefore;
-       iAfter = this.findIndex(idAfter);
-       if (idBefore) {
-           iBefore = this.findIndex(idBefore);
+       iAfter = this.findIndex(after);
+       if (before) {
+           iBefore = this.findIndex(before);
        } else {
            iBefore = -1;
        }
 
-       var after = this.tasks.splice(iAfter, 1)[0];
-       this.tasks.splice(iBefore + 1, 0, after);
+       var mover = this.tasks.splice(iAfter, 1)[0];
+       this.tasks.splice(iBefore + 1, 0, mover);
    },
 
    toJSON: function () {
