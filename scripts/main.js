@@ -11,15 +11,6 @@ exports.extend({
     'setDoc': setDoc
 });
 
-/*if (editedTask) {
-            var newStatus = toStatus[evt.keyCode];
-            if (editedTask.id != 'new' && newStatus) {
-                editedTask.change({status: newStatus});
-                editedStatus = newStatus;
-            }
-            saveTask(editedTask);
-        }*/
-
 var client;
 var doc;                            // Bound elements here
 var project;
@@ -61,13 +52,9 @@ function onClick(evt) {
     if (evt.target.tagName == 'TEXTAREA') {
         return;
     }
-    var id = $(evt.target).attr('id').split('_');
-    if (!id.length && editedTask) {
+    if (editedTask) {
         saveTask(editedTask);
-        evt.preventDefault();
-        return;
     }
-    
     console.log($(evt.target));
     evt.preventDefault();
 }
@@ -106,7 +93,7 @@ function addTask(task, listName, className) {
     content = task.getContentHTML ? task.getContentHTML() : task.description;
     $(doc[listName])[top ? 'prepend': 'append'](TASK.format(
         types.extend({content: content}, task)));
-    $('#' + task.id + ' .content').click(editTask.curry(task));
+    $('#' + task.id).click(editTask.curry(task));
 }
 
 function addTemplateTask() {
@@ -144,11 +131,44 @@ function editTask(task, evt) {
     if (editedTask) {
         saveTask(editedTask);
     }
+    
     $('#' + task.id).addClass('edit');
     editedText = task.getEditText ? task.getEditText() : task.description;
     $('textarea', '#' + task.id).val(editedText).focus().select();
     editedTask = task;
     evt.stopPropagation();
+    
+    function moveIt(status) {
+        if (editedTask.id != 'new') {
+            editedStatus = status;
+            editedTask.change({status: editedStatus});
+        }
+        saveTask(editedTask);
+    }
+    
+    var id = $(evt.target).attr('id');
+    if (id.length && id.split('_').length) {
+        var type = id.split('_')[0];
+        if (type == 'delete') {
+            //deleteTask(task);
+        }
+        if (type == 'check') {
+            if (editedTask.status == 'done') {
+                moveIt('working');
+                evt.target.checked = false;
+                return;
+            }
+            moveIt('done');
+            evt.target.checked = true;
+        }
+        if (type == 'promote') {
+            if (editedTask.status == 'ready') {
+                moveIt('working');
+            } else if (editedTask.status == 'working') {
+                moveIt('ready');
+            }
+        }
+    }
 }
 
 function onKey(evt) {
