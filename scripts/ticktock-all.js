@@ -449,7 +449,7 @@ function onReady() {
     handleAppCache();
     doc = dom.bindIDs();
 
-    project = new taskLib.Project({title: ''});
+    project = new taskLib.Project();
     client = new clientLib.Client(exports);
     client.saveInterval = 0;
     client.autoLoad = true;
@@ -505,10 +505,8 @@ function setDoc(json) {
 }
 
 function getDoc() {
-    var p = project.toJSON();
     return {
-        title: p.title,
-        blob: p,
+        blob: project.toJSON(),
         readers: ['public']
     };
 }
@@ -546,6 +544,7 @@ exports.extend({
 var now;
 
 function Project(options) {
+    this.map = {};
     types.extend(this, options);
     if (this.tasks == undefined) {
         this.tasks = [];
@@ -553,19 +552,27 @@ function Project(options) {
 
     for (var i = 0; i < this.tasks.length; i++) {
         var task = this.tasks[i];
-        this.tasks[i] = new Task(task);
+        this.tasks[i] = new Task(task, this);
     }
 }
 
 Project.methods({
    addTask: function(task) {
-       task = new Task(task);
+       task = new Task(task, this);
        this.tasks.push(task);
        return task;
    },
 
+   install: function(task) {
+       this.map[task.id] = task;
+   },
+
+   getTask: function (id) {
+        return this.map[id];
+   },
+
    toJSON: function () {
-       return this;
+       return {tasks: this.tasks};
    },
 
    // Calculate cumulative remaining, and actual
@@ -609,11 +616,12 @@ Project.methods({
 
 });
 
-function Task(options) {
+function Task(options, project) {
     this.id = random.randomString(16);
     this.created = now;
     this.history = [];
     this.change(options);
+    project.install(this);
 }
 
 historyProps = {'actual': true, 'remaining': true};
@@ -621,6 +629,11 @@ historyProps = {'actual': true, 'remaining': true};
 Task.methods({
    change: function (options) {
        this.modified = now;
+       // status *->working: record start time
+       // status working->* increment actual time
+       if (options.status && options.status != this.status) {
+
+       }
        for (var prop in options) {
            if (options.hasOwnProperty(prop)) {
                if (!historyProps[prop]) {
@@ -639,7 +652,7 @@ function updateNow(d) {
     if (d == undefined) {
         d = new Date().getTime();
     }
-    now = new Date(d.getYear(), d.getMonth(), d.getDate())
+    now = d;
 }
 
 

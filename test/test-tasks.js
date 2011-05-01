@@ -1,5 +1,6 @@
 namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
     var ut = require('com.jquery.qunit');
+    var types = require('org.startpad.types');
     var utCoverage = require('org.startpad.qunit.coverage');
     var taskLib = require('com.ticktocktask.tasks');
 
@@ -12,9 +13,9 @@ namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
     });
     
     ut.test("project", function () {
-       var project = new taskLib.Project({title: "Sample Project"});
+       var project = new taskLib.Project();
        ut.ok(project != undefined); 
-       ut.equal(project.title, "Sample Project");
+       ut.ok(types.isArray(project.tasks));
     });
     
     ut.test("tasks", function () {
@@ -25,10 +26,9 @@ namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
     });
     
     ut.test("toJSON", function () {
-        var project = new taskLib.Project({title: "Sample"});
+        var project = new taskLib.Project();
         project.addTask({description: "foo"});
         var json = project.toJSON();
-        ut.equal(json.title, "Sample");
         ut.equal(json.tasks.length, 1);
         ut.equal(json.tasks[0].description, "foo");
     });

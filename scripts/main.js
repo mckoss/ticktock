@@ -28,7 +28,7 @@ function onReady() {
     handleAppCache();
     doc = dom.bindIDs();
 
-    project = new taskLib.Project({title: ''});
+    project = new taskLib.Project();
     client = new clientLib.Client(exports);
     client.saveInterval = 0;
     client.autoLoad = true;
@@ -84,10 +84,8 @@ function setDoc(json) {
 }
 
 function getDoc() {
-    var p = project.toJSON();
     return {
-        title: p.title,
-        blob: p,
+        blob: project.toJSON(),
         readers: ['public']
     };
 }
