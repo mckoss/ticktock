@@ -1,5 +1,5 @@
 {
-  "application": "ticktock",
+  "application": "pandatask",
   "cloneable": true,
   "icon": "images/icon.png",
   "owner": "mckoss",
@@ -12,7 +12,7 @@
     "demo",
     "sample"
   ],
-  "title": "Tick-Tock Task",
-  "url": "http://ticktock.pageforest.com/",
+  "title": "Panda Task",
+  "url": "http://pandatask.pageforest.com/",
   "writers": ["bobbys", "samgro"]
 }

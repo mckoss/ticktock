@@ -1,10 +1,10 @@
 {
   "files": {
-      "scripts/ticktock-all.js": [
+      "scripts/pandatask-all.js": [
           "scripts/namespace-plus.js",
           { "path": "scripts/random.js", "namespace": "org.startpad.random"},
-          { "path": "scripts/main.js", "namespace": "com.ticktocktask.main" },
-          { "path": "scripts/tasks.js", "namespace": "com.ticktocktask.tasks"}
+          { "path": "scripts/main.js", "namespace": "com.pandatask.main" },
+          { "path": "scripts/tasks.js", "namespace": "com.pandatask.tasks"}
       ]
   },
   "minify": false,

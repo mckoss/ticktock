@@ -10,9 +10,13 @@ exports.extend({
     'updateNow': updateNow
 });
 
-var now;
+var now = new Date().getTime();
+
+var historyProps = {'actual': true, 'remaining': true};
+var taskProps = {'actual': true, 'remaining': true, 'status': true, 'description': true};
 
 function Project(options) {
+    this.map = {};
     types.extend(this, options);
     if (this.tasks == undefined) {
         this.tasks = [];
@@ -20,19 +24,51 @@ function Project(options) {
 
     for (var i = 0; i < this.tasks.length; i++) {
         var task = this.tasks[i];
-        this.tasks[i] = new Task(task);
+        this.tasks[i] = new Task(task, this);
     }
 }
 
 Project.methods({
    addTask: function(task) {
-       task = new Task(task);
+       task = new Task(task, this);
        this.tasks.push(task);
        return task;
    },
    
+   install: function(task) {
+       this.map[task.id] = task;
+   },
+   
+   getTask: function (id) {
+        return this.map[id];
+   },
+   
+   findIndex: function (id) {
+       for (var i = 0; i < this.tasks.length; i++) {
+           var task = this.tasks[i];
+           if (task.id == id) {
+               return i;
+           }
+       }
+   },
+   
+   // Move the first tasks to a position just after the second task
+   // If no 2nd task is given, more the first task to position 0.
+   moveAfter: function (idAfter, idBefore) {
+       var iAfter, iBefore;
+       iAfter = this.findIndex(idAfter);
+       if (idBefore) {
+           iBefore = this.findIndex(idBefore);
+       } else {
+           iBefore = -1;
+       }
+       
+       var after = this.tasks.splice(iAfter, 1)[0];
+       this.tasks.splice(iBefore + 1, 0, after);
+   },
+   
    toJSON: function () {
-       return this;
+       return {tasks: this.tasks};
    },
    
    // Calculate cumulative remaining, and actual
@@ -53,7 +89,7 @@ Project.methods({
                if (maxDate == undefined || change.when > maxDate) {
                    maxDate = change.when;
                }
-               var bucket = buckets[change.when];
+               bucket = buckets[change.when];
                if (bucket == undefined) {
                    bucket = {actual: 0, remaining: 0};
                    buckets[change.when] = bucket;
@@ -76,19 +112,26 @@ Project.methods({
    
 });
 
-function Task(options) {
+function Task(options, project) {
     this.id = random.randomString(16);
     this.created = now;
     this.history = [];
     this.change(options);
+    project.install(this);
 }
-
-historyProps = {'actual': true, 'remaining': true};
 
 Task.methods({
    change: function (options) {
        this.modified = now;
+       // status *->working: record start time
+       // status working->* increment actual time
+       if (options.status && options.status != this.status) {
+           
+       }
        for (var prop in options) {
+           if (!taskProps[prop]) {
+               throw new Error("Invalid task property: " + prop);
+           }
            if (options.hasOwnProperty(prop)) {
                if (!historyProps[prop]) {
                    continue;
@@ -106,7 +149,7 @@ function updateNow(d) {
     if (d == undefined) {
         d = new Date().getTime();
     }
-    now = new Date(d.getYear(), d.getMonth(), d.getDate())
+    now = d;
 }
 
 

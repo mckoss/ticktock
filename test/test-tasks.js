@@ -1,9 +1,12 @@
-namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
+namespace.module('com.pandatask.tasks.test', function (exports, require) {
     var ut = require('com.jquery.qunit');
+    var types = require('org.startpad.types');
     var utCoverage = require('org.startpad.qunit.coverage');
-    var taskLib = require('com.ticktocktask.tasks');
+    var taskLib = require('com.pandatask.tasks');
 
-    ut.module('tasks');
+    ut.module('com.pandatask.tasks');
+    
+    var coverage = new utCoverage.Coverage('com.pandatask.tasks');
 
     ut.test("version", function () {
         var version = taskLib.VERSION.split('.');
@@ -12,9 +15,9 @@ namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
     });
     
     ut.test("project", function () {
-       var project = new taskLib.Project({title: "Sample Project"});
+       var project = new taskLib.Project();
        ut.ok(project != undefined); 
-       ut.equal(project.title, "Sample Project");
+       ut.ok(types.isArray(project.tasks));
     });
     
     ut.test("tasks", function () {
@@ -22,13 +25,17 @@ namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
         var task = project.addTask({description: "hello"});
         ut.equal(task.description, "hello");
         ut.ok(task.id.length > 10, "task id is " + task.id);
+        ut.equal(types.typeOf(task.modified), 'number', 'modified');
+        ut.equal(types.typeOf(task.created), 'number', 'created');
+        
+        var other = project.getTask(task.id);
+        ut.strictEqual(task, other, "id lookup");
     });
     
     ut.test("toJSON", function () {
-        var project = new taskLib.Project({title: "Sample"});
+        var project = new taskLib.Project();
         project.addTask({description: "foo"});
         var json = project.toJSON();
-        ut.equal(json.title, "Sample");
         ut.equal(json.tasks.length, 1);
         ut.equal(json.tasks[0].description, "foo");
     });
@@ -39,12 +46,16 @@ namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
         task.change({description: "bar"});
         ut.equal(task.description, "bar");
         ut.equal(task.history.length, 0);
+        
+        taskLib.updateNow(new Date(new Date().getTime() + 1000));
         task.change({actual: 8});
         ut.equal(task.history.length, 1);
         ut.equal(task.history[0].newValue, 8);
         ut.equal(task.history[0].oldValue, 0);
         ut.equal(task.history[0].prop, 'actual');
+        ut.ok(task.modified > task.created, "modified date update");
     });
 
+    coverage.testCoverage();
     
 });
