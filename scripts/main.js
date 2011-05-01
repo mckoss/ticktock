@@ -66,6 +66,7 @@ function getDoc() {
 }
 
 function refresh() {
+    $('#working-tasks').empty();
     $('#ready-tasks').empty();
     $('#done-tasks').empty();
     for (var i = 0; i < project.tasks.length; i++) {

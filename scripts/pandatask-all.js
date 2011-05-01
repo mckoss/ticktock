@@ -487,6 +487,7 @@ function getDoc() {
 }
 
 function refresh() {
+    $('#working-tasks').empty();
     $('#ready-tasks').empty();
     $('#done-tasks').empty();
     for (var i = 0; i < project.tasks.length; i++) {
@@ -607,17 +608,21 @@ exports.extend({
     'VERSION': "0.1.0",
     'Project': Project,
     'Task': Task,
-    'updateNow': updateNow
+    'updateNow': updateNow,
+    'parseDescription': parseDescription
 });
 
 var msPerHour = 1000 * 60 * 60;
+var reTags = /\s*\[[^\]]*\]\s*/g;
+var rePerson = /\s*@\S+\s*/g;
+var reRemain = /\s*\+\d+(\.\d*)?\s*/g;
 
 var now = new Date().getTime();
 
 var historyProps = {'actual': true, 'remaining': true, 'status': true};
 var taskProps = {'actual': true, 'remaining': true, 'status': true, 'description': true,
                  'history': true, 'id': true, 'created': true, 'modified': true,
-                 'start': true};
+                 'start': true, assignedTo: true, tags: true};
 
 function Project(options) {
     this.map = {};
@@ -747,6 +752,9 @@ Task.methods({
                options.actual += hrs;
            }
        }
+
+       parseDescription(options);
+
        for (var prop in options) {
            if (!taskProps[prop]) {
                throw new Error("Invalid task property: " + prop);
@@ -780,6 +788,7 @@ Task.methods({
        }
        return html;
    }
+
 });
 
 function updateNow(d) {
@@ -791,5 +800,51 @@ function updateNow(d) {
 
 function pluralize(base, n) {
     return base + (n == 1 ? '' : 's');
+}
+
+// Parse description to exctract:
+// +hrs - remaining
+// [tags] - tags
+// @person - assignedTo
+function parseDescription(options) {
+    if (options.description == undefined) {
+        return;
+    }
+    var assignedTo = [];
+    var tags = [];
+    var remaining = 0;
+    var desc = options.description;
+
+    desc = desc.replace(rePerson, function (whole, key) {
+        assignedTo.push(key);
+        return ' ';
+    });
+
+    desc = desc.replace(reTags, function (whole, key) {
+        var keys = key.split(',');
+        for (var i = 0; i < keys.length; i++) {
+            tags.push(format.slugify(keys[i]));
+        }
+        return ' ';
+    });
+
+    desc = desc.replace(reRemain, function (whole, key) {
+        remaining += parseFloat(key);
+        return ' ';
+    });
+
+    options.description = desc;
+
+    if (remaining > 0) {
+        options.remaining = remaining;
+    }
+
+    if (assignedTo.length > 0) {
+        options.assignedTo = assignedTo;
+    }
+
+    if (tags.length > 0) {
+        options.tags = tags;
+    }
 }
 });
