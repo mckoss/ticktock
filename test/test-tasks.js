@@ -39,11 +39,11 @@ namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
         task.change({description: "bar"});
         ut.equal(task.description, "bar");
         ut.equal(task.history.length, 0);
-        task.change({estimate: 8});
+        task.change({actual: 8});
         ut.equal(task.history.length, 1);
         ut.equal(task.history[0].newValue, 8);
-        ut.equal(task.history[0].oldValue, undefined);
-        ut.equal(task.history[0].prop, 'estimate');
+        ut.equal(task.history[0].oldValue, 0);
+        ut.equal(task.history[0].prop, 'actual');
     });
 
     
