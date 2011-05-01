@@ -15,9 +15,9 @@ var doc;                            // Bound elements here
 var project;
 var addList = [];
 
-var NEW_TASK = '<div id=new{i} class=newTask>' +
-               '<div> What:<input id=description{i} /></div>' +
-               '<div> Time:<input type=number id=time{i} />hours<input id=done{i} type=button value=done />' + 
+var NEW_TASK = '<div id=add{i} class=newTask>' +
+               '<div> What:<input id=desc{i} class=desc /></div>' +
+               '<div> Time:<input type=number id=time{i} class=time />hours<input id=ok{i} type=button value=OK />' + 
                '</div>';
 
 function onReady() {
@@ -32,11 +32,9 @@ function onReady() {
     $('#w-add').click(onAdd.curry('w'));
     $('#d-add').click(onAdd.curry('d'));
     
+    //task.change();
     
-    var tasks = testTasks();
-    console.log(project.tasks);
-    console.log('tasks', tasks);
-    
+    console.log('onOk exists');
     client.addAppBar();
 }
 
@@ -45,17 +43,20 @@ function onAdd(list) {
     console.log('list: ' + list);
     var i = addList.length;
     addList[addList.length] = list;
-    $('div.'+list+'-tasks').append(NEW_TASK.format());
+    $('div.'+list+'-tasks').append(NEW_TASK.format({i: i}));
+    $('#ok' + i).click(onOk.curry(i));
 }
 
-function testTasks() {
-    var t = [];
-    for (var i = 0; i < 10; i++) {
-        t[i] = project.addTask({description: "task number " + i, estimated: 0, completed: 0});
-    }
-    return t;
+function onOk(i) {
+  //t[i] = project.addTask({description: "task number " + i, estimated: 0, completed: 0});
+    var desc = $('#desc' + i).val();
+    var time = $('#time' + i).val();
+    var task = project.addTask({description: desc, time: time, list: addList[i]});
+    addList[i] = undefined;
+    $('#add' + i).remove();
+    console.log('project: ');
+    console.log(project);
 }
-
 
 function setDoc(json) {
     project = new taskLib.Project(json.blob);

@@ -60,11 +60,11 @@ div.newTask div {
 div.newTask div input {
   font: inherit;
 }
-div.newTask div input#description {
+div.newTask div input.desc {
   width: 220px;
   margin: 3px;
 }
-div.newTask div input#time {
+div.newTask div input.time {
   width: 100px;
   margin: 3px;
 }
