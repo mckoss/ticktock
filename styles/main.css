@@ -41,3 +41,10 @@ div.task textarea {
   font-family: inherit;
   font-size: inherit;
 }
+
+#footer {
+  border-top: 2px solid gray;
+  padding-top: 10px;
+  margin-top: 10px;
+  text-align: center;
+}

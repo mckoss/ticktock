@@ -31,5 +31,10 @@
 			<div id="done-tasks" class="task-list"></div>
 		</div>
 	</div>
+	
+	<div id="footer" class="row">
+		<a href="/burndown">Burn Down Chart</a> |
+		<a href="http://www.pageforest.com">Pageforest.com</a>
+	</div>
 </body>
 </html>
