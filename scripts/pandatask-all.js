@@ -435,6 +435,7 @@ exports.extend({
 var client;
 var doc;                            // Bound elements here
 var project;
+var editTask;
 
 var TASK = '<div id="{id}" class="task {className}">' +
            '<div class="content if-not-edit">{description} ({remaining} {units})</div>' +
@@ -452,6 +453,9 @@ function onReady() {
 
     client.addAppBar();
     refresh();
+
+    $(window).keydown(onKey);
+    $(window).click(onClick);
 }
 
 function setDoc(json) {
@@ -490,7 +494,7 @@ function refresh() {
         var task = project.tasks[i];
         addTask(task, task.status + '-tasks');
     }
-    addTask({id: 'new', description: "Add new task"}, 'ready-tasks', 'new');
+    addTemplateTask();
 }
 
 function addTask(task, listName, className) {
@@ -503,19 +507,62 @@ function addTask(task, listName, className) {
     $('#' + task.id + ' .content').click(onTaskClick.curry(task));
 }
 
+function addTemplateTask() {
+    $('#new').remove();
+    addTask({id: 'new', description: "Add new task"}, 'ready-tasks', 'new');
+}
+
 function saveTask(task) {
     $('#' + task.id).removeClass('edit');
+    var text = $('textarea', '#' + task.id).val();
+    editTask = undefined;
+    if (task.id == 'new') {
+        if (text == "Add new task") {
+            return;
+        }
+        task = project.addTask({description: text});
+        addTask(task, 'ready-tasks');
+        addTemplateTask();
+    } else {
+        task.change({description: text});
+    }
     client.setDirty();
     client.save();
 }
 
 function onTaskClick(task) {
+    if (editTask) {
+        saveTask(editTask);
+    }
     $('#' + task.id).addClass('edit');
+    $('textarea', '#' + task.id).val(task.description).focus().select();
+    editTask = task;
 }
 
 function pluralize(base, n) {
     return base + (n == 1 ? '' : 's');
 }
+
+function onKey(evt) {
+    var right = 39,
+        left = 37,
+        enter = 13;
+
+    switch (evt.keyCode) {
+    case enter:
+        if (editTask) {
+            saveTask(editTask);
+        }
+        break;
+    case left:
+        changeSlide(iSlide - 1);
+        break;
+    case right:
+        changeSlide(iSlide + 1);
+        break;
+    }
+}
+
 
 // For offline - capable applications
 function handleAppCache() {
@@ -656,6 +703,7 @@ function Task(options, project) {
     this.id = random.randomString(16);
     this.created = now;
     this.history = [];
+    this.status = 'ready';
     this.change(options);
     project.install(this);
 }

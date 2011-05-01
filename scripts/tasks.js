@@ -119,6 +119,7 @@ function Task(options, project) {
     this.id = random.randomString(16);
     this.created = now;
     this.history = [];
+    this.status = 'ready';
     this.change(options);
     project.install(this);
 }
