@@ -61,7 +61,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
             ["nothing here", "nothing here", {}],
             ["  extra space  ", "extra space", {}],
             ["my task @mike", "my task", {assignedTo: ['mike']}],
-            ["out @mike task @bobby", "our task", {assignedTo: ['mike', 'bobby']}],
+            ["our @mike task @bobby", "our task", {assignedTo: ['mike', 'bobby']}],
             ["more work +2", "more work", {remaining: 2.0}],
             ["tagged task [this is tagged, milestone]", "tagged task",
              {tags: ['this-is-tagged', 'milestone']}],
@@ -73,9 +73,9 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
             var test = tests[i];
             var options = {description: test[0]};
             taskLib.parseDescription(options);
-            ut.equal(options.description, test[1]);
+            ut.equal(options.description, test[1], test[0]);
             test[2].description = test[1];
-            ut.deepEqual(options, test[2]);
+            ut.deepEqual(options, test[2], test[0] + " properties");
         }
     });
 

@@ -1,6 +1,7 @@
 var cLientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
 var types = require('org.startpad.types');
+var string = require('org.startpad.string');
 var random = require('org.startpad.random');
 var format = require('org.startpad.format');
 require('org.startpad.funcs').patch();
@@ -14,9 +15,9 @@ exports.extend({
 });
 
 var msPerHour = 1000 * 60 * 60;
-var reTags = /\s*\[[^\]]*\]\s*/g;
-var rePerson = /\s*@\S+\s*/g;
-var reRemain = /\s*\+\d+(\.\d*)?\s*/g;
+var reTags = /\s*\[([^\]]*)\]\s*/g;
+var rePerson = /\s*@(\S+)\s*/g;
+var reRemain = /\s*\+(\d+(?:\.\d*)?)\s*/g;
 
 var now = new Date().getTime();
 
@@ -234,7 +235,7 @@ function parseDescription(options) {
         return ' '; 
     });
 
-    options.description = desc;
+    options.description = string.strip(desc);
 
     if (remaining > 0) {
         options.remaining = remaining;
