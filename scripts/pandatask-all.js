@@ -500,8 +500,9 @@ function addTask(task, listName, className) {
     if (className == undefined) {
         className = '';
     }
+    content = task.getContentHTML ? task.getContentHTML() : task.description;
     $(doc[listName])[top ? 'prepend': 'append'](TASK.format(
-        types.extend({content: task.getContentHTML()}, task)));
+        types.extend({content: content}, task)));
     $('#' + task.id + ' .content').click(editTask.curry(task));
 }
 
