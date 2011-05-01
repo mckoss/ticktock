@@ -9,6 +9,8 @@
 <link rel="stylesheet" type="text/css" href="/styles/main.css" />
 <link rel="stylesheet" type="text/css" href="/styles/grid.css" />
 <link rel="stylesheet" type="text/css" href="/lib/beta/css/client.css" />
+<link rel="stylesheet" type="text/css" href="/styles/project.css" />
+
 
 <script type="text/javascript" src="/lib/beta/js/pf-client.js"></script>
 <script type="text/javascript" src="/scripts/ticktock-all.js"></script>
@@ -20,32 +22,90 @@
 </head>
 
 <body>
-
   <div class=main>
-	<div class="row">
-		<div class="column grid_4">
-		  <div class=header>Ready</div>
-		  <div class=r-tasks>
-		    
-		  </div>
-		  <div class=footer><input id=r-add type=button value=+ /></div>
-		</div>
-		<div class="column grid_4">
-		  <div class=header>Working</div>
-		  <div class=w-tasks>
-
-		  </div>
-		  <div class=footer><input id=w-add type=button value=+ /></div>
-		</div>
-		<div class="column grid_4">
-		  <div class=header>Done</div>
-		  <div class=d-tasks>
-
-		  </div>
-		  <div class=footer><input id=d-add type=button value=+ /></div>
-		</div>
-	</div>
+    <div class='row'>
+      <div class='column grid_10'>
+        <h1 id='project-name'>My Project</h1>
+      </div>
+    </div>
+  	<div class="row">
+  	  <!-- Left column -->
+  		<div class="column grid_4">
+  		  
+  		  <!-- Active tasks -->
+  		  <div class='box'>
+    		  <h2 class='task-header'>Active</h2>
+    		  <div id='active-items' class='task-group'>
+    		    <div class='action'>
+    		      <input type='checkbox' />
+    		    </div>
+    		    <div class='active task'>Task 1</div>
+    		  </div>
+    		</div>
+  		  
+  		  <!-- Docket tasks -->
+  		  <div class='box'>
+    		  <h2 class='task-header'>On the docket</h2>
+    		  <div id='docket-items' class='task-group'>
+    		    
+    		    <!-- Task -->
+    		    <div class='action'>
+    		      <a href='#' class='promote icon'></a>
+    		    </div>
+    		    <div class='docket task'>
+    		      Task 2
+    		      <!-- Drag and drop -->
+    		      <a href='#' class='icon'>
+    		        <img src='images/drag-and-drop.png' class='icon' alt='Reorder' />
+    		      </a>
+    		      <!-- Delete -->
+    		      <a href='#' class='icon'>
+    		        <img src='images/remove.png' class='icon' alt='Delete' />
+    		      </a>
+    		    </div>
+    		    
+    		    
+    		    <!-- Task -->
+    		    <div class='action'>
+    		      <a href='#' class='promote icon'></a>
+    		    </div>
+      	    <div class='docket task'>Task 3</div>
+      	    
+      	    <!-- Add task link -->
+      	    <a href='#' id='add-task'>
+      	      <div class='action'>
+      	        <img src='images/add.png' class='add-button' alt />
+      	      </div>
+      	      <div class='task'>
+      	        Add a task
+      	      </div>
+      	    </a>
+      	  </div>
+      	</div>
+  		</div>
+  		
+  		<!-- Right column -->
+  		<div class='column grid_4'>
+  		  <div class='box'>
+  		    <!-- Done tasks -->
+    		  <h2 class='task-header'>Done</h2>
+    		  <div id='done-items' class='task-group'>
+    		    
+    		    <!-- Task -->
+    		    <div class='action'>
+    		      <input type='checkbox' checked />
+    		    </div>
+    		    <div class='done task'>Task 4</div>
+    		    
+    		    <!-- Task -->
+    		    <div class='action'>
+    		      <input type='checkbox' checked />
+    		    </div>
+      	    <div class='done task'>Task 5</div>
+      	  </div>
+      	</div>
+  		</div>
+  	</div>
   </div>
-
 </body>
 </html>
