@@ -96,6 +96,7 @@ div.task textarea {
   margin: 5px;
   font-family: inherit;
   font-size: inherit;
+  resize: none;
 }
 
 #footer {
