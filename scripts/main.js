@@ -169,7 +169,7 @@ function onKey(evt) {
                 editedTask.change({status: newStatus});
                 editedStatus = newStatus;
             }
-            saveTask(editedTask);
+            //saveTask(editedTask);
         }
         break;
     }
