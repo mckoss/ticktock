@@ -21,6 +21,7 @@ namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
         var project = new taskLib.Project();
         var task = project.addTask({description: "hello"});
         ut.equal(task.description, "hello");
+        ut.ok(task.id.length > 10, "task id is " + task.id);
     });
     
     ut.test("toJSON", function () {

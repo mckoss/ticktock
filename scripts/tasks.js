@@ -37,7 +37,7 @@ function Task(options) {
     types.extend(this, options);
     this.created = timestamp();
     this.modified = this.created;
-    this.id = random.randomString();
+    this.id = random.randomString(16);
 }
 
 Task.methods({
