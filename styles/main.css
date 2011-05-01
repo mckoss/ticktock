@@ -33,6 +33,25 @@ div.task {
   font-size: 12px;
 }
 
+div.task img {
+  width: 24px;
+  height: 24px;
+  margin: 3px;
+}
+
+div.task img.left {
+  float: left;
+}
+div.task img.right {
+  float: right;
+}
+
+
+div.task div.content {
+  float: left;
+  font: inherit;
+}
+
 div.footer {
   border: 1px solid blue;
   width: 298px;
