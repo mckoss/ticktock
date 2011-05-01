@@ -892,7 +892,7 @@ function saveTask(task) {
             $taskDiv.remove();
             addTask(task, editedStatus + '-tasks', 'top');
         } else {
-            $('.content', $taskDiv).text(task.description);
+            $('.content', $taskDiv).html(task.getContentHTML());
         }
     }
     editedStatus = undefined;
@@ -944,7 +944,8 @@ function onKey(evt) {
                 editedTask.change({status: newStatus});
                 editedStatus = newStatus;
             }
-            //saveTask(editedTask);
+            saveTask(editedTask);
+            $('#' + editedTask.id).addClass('edit');
         }
         break;
     }
