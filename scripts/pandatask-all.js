@@ -436,6 +436,7 @@ var client;
 var doc;                            // Bound elements here
 var project;
 var editTask;
+var editText;
 
 var TASK = '<div id="{id}" class="task {className}">' +
            '<div class="content if-not-edit">{description} ({remaining} {units})</div>' +
@@ -504,7 +505,7 @@ function addTask(task, listName, className) {
     $(doc[listName]).append(TASK.format(
         types.extend({units: pluralize('hr', task.remaining),
                       className: className}, task)));
-    $('#' + task.id + ' .content').click(onTaskClick.curry(task));
+    $('#' + task.id + ' .content').click(editTask.curry(task));
 }
 
 function addTemplateTask() {
@@ -516,10 +517,10 @@ function saveTask(task) {
     $('#' + task.id).removeClass('edit');
     var text = $('textarea', '#' + task.id).val();
     editTask = undefined;
+    if (text == editText) {
+        return;
+    }
     if (task.id == 'new') {
-        if (text == "Add new task") {
-            return;
-        }
         task = project.addTask({description: text});
         addTask(task, 'ready-tasks');
         addTemplateTask();
@@ -531,12 +532,13 @@ function saveTask(task) {
     client.save();
 }
 
-function onTaskClick(task) {
+function editTask(task) {
     if (editTask) {
         saveTask(editTask);
     }
     $('#' + task.id).addClass('edit');
-    $('textarea', '#' + task.id).val(task.description).focus().select();
+    editText = task.description;
+    $('textarea', '#' + task.id).val(editText).focus().select();
     editTask = task;
 }
 
