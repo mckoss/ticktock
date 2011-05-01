@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-global.namespace = require('../src/namespace.js').namespace;
+global.namespace = require('../scripts/namespace.js').namespace;
 
-require('../ticktock-all.js');
+require('../scripts/pandatask-all.js');
+require('../scripts/format-extra.js');
 require('./qunit-node.js');
 require('./test-tasks.js');

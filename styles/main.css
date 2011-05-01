@@ -1,168 +1,89 @@
-body {
-    margin: 0;
-    padding: 0;
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: 100%;
-    background: #ebebeb url("/images/gradient.jpg") repeat-x left top;
+<<<<<<< HEAD
+/* CSS reset from Blueprint */
+html {margin:0;padding:0;border:0;}
+body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, code, del, dfn, em, img, q, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, dialog, figure, footer, header, hgroup, nav, section {margin:0;padding:0;border:0;font-weight:inherit;font-style:inherit;font-size:100%;font-family:inherit;vertical-align:baseline;}
+article, aside, dialog, figure, footer, header, hgroup, nav, section {display:block;}
+body {line-height:1.5;background:white;}
+table {border-collapse:separate;border-spacing:0;}
+caption, th, td {text-align:left;font-weight:normal;float:none !important;}
+table, th, td {vertical-align:middle;}
+blockquote:before, blockquote:after, q:before, q:after {content:'';}
+blockquote, q {quotes:"" "";}
+a img {border:none;}
+a:focus{outline:1px dotted;}
+
+body, textarea {
+  font-family:  helvetica, arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  background: #EBEBEB;
 }
 
-div.main {
-  height: 100%;
-  width: 960px;
-  margin: auto;
-}
-
-div.header {
-  width: 298px;
-  height: 28px;
-  border: 1px solid red;
-  text-align: center;
-  font-family: Verdana, Arial, Helvetica, sans-serif;
-  line-height: 30px;
+h1 {
   font-size: 24px;
+  margin-bottom: 18px;
+  color: #777;
+}
+
+h1, h2 {
   font-weight: bold;
 }
 
-div.task {
-  border: 1px solid green;
-  width: 298px;
-  height: 28px;
-  text-align: left;
-  font-family: Verdana, Arial, Helvetica, sans-serif;
-  line-height: 30px;
-  font-size: 12px;
+h2 {
+  font-size: 18px;
 }
 
-div.task img {
-  width: 24px;
-  height: 24px;
-  margin: 3px;
+h3 { 
+  font-size: 14px; 
+  line-height: 18px;
 }
 
-div.task img.left {
-  float: left;
-}
-div.task img.right {
-  float: right;
+em {
+  font-style: italic;
 }
 
-
-div.task div.content {
-  float: left;
-  font: inherit;
+strong {
+  font-weight: bold;
 }
 
-div.footer {
-  border: 1px solid blue;
-  width: 298px;
-  height: 28px;
+a,
+a:visited,
+a:hover,
+a:focus {
+  color: #069;
 }
 
-div.footer input {
-  width: 24px;
-  height: 24px;
-  margin: 3px;
-  padding 0;
-  border-radius: 5px;
+a,
+a:visited {
+  text-decoration: none;
 }
 
-div.newTask {
-  border: 1px solid grey;
-  width: 298px;
-  height: 58px;
-}
-div.newTask div {
-  font-family: "Courier New", Courier, monospace;
-  width: 298px;
-  height: 29px;
-}
-div.newTask div input {
-  font: inherit;
-}
-div.newTask div input.desc {
-  width: 220px;
-  margin: 3px;
-}
-div.newTask div input.time {
-  width: 100px;
-  margin: 3px;
-}
-
-
-div { padding:0; margin:0; }
-p { margin: 0 0 8px 0; line-height: 140%; }
-h1, h2, h3, h4, h5 { margin: 5px 0; }
-code { font-family: "Courier New", Courier, monospace; }
-a { color: #444; }
-a:visited { color: #888; }
-a:hover { color: #000; }
-li { line-height: 120%; margin-bottom: 8px; }
-
-#page { width: 90%; margin: auto; }
-#page:not(.edit) .if_edit { display: none; }
-
-#page-heading {
-    border-bottom: 2px solid black;
-    padding-bottom: 4px;
-    position: relative;
-    width: 100%;
-}
-
-span.menu-bar {
-    position: absolute;
-    display: block;
-    bottom: 3px;
-    right: 0;
-    color: gray;
-    font-size: 0.5em;
-    text-align: right;
-}
-
-#inputBlock { width: 48%; float: right; }
-#page.edit #outputBlock { width: 48%; float: left; margin: 0; }
-
-#output pre {
-    border: 2px solid gray;
-    display: block;
-    background-color: #F5F5DC;
-    padding: 5px 10px;
-    overflow: hidden;
-}
-
-#output pre.printed {
-    color: white;
-    background-color: black;
-}
-
-#output table {
-    border-collapse: collapse;
-    border: 1px solid #36362E;
-    margin: 0 0 8px 0;
-}
-
-#output th {
-    border: 1px solid #36362E;
-    padding: 5px;
-    text-style: bold;
-    color: white;
-    background-color: #69695A;
-    text-align: center;
-}
-
-#output td {
-    border: 1px solid #36362E;
-    padding: 5px;
-    background-color: #F5F5DC;
-}
-
-textarea {
-    font-family: "Courier New", Courier, monospace;
-    font-size: inherit;
-    width: 100%;
+a:hover,
+a:focus {
+  text-decoration: underline;
 }
 
 #footer {
-    clear: both;
-    margin: 10px 0;
-    text-align:center;
+  border-top: 2px solid gray;
+  padding: 10px 0;
+  margin-top: 10px;
+  text-align: center;
+}
+
+input[type='text'] {
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  padding: 4px 5px;
+  margin: 0px;
+  font-size: 14px;
+}
+
+input[type='text']:focus {
+  -webkit-box-shadow: 0 0 12px rgba(51, 204, 255, 0.5);
+  -moz-box-shadow: 0 0 12px rgba(51, 204, 255, 0.5);
+  box-shadow: 0 0 12px rgba(51, 204, 255, 0.5);
+  border: 1px solid rgba(51, 204, 255, 0.75);
+  outline: 0;
 }
