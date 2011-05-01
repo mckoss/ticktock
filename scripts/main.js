@@ -1,6 +1,6 @@
 var clientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
-var taskLib = require('com.ticktocktask.tasks');
+var taskLib = require('com.pandatask.tasks');
 require('org.startpad.string').patch();
 require('org.startpad.funcs').patch();
 

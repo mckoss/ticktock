@@ -418,10 +418,10 @@ function randomString(len, chars) {
 });
 
 /* Source: scripts/main.js */
-namespace.module('com.ticktocktask.main', function (exports, require) {
+namespace.module('com.pandatask.main', function (exports, require) {
 var clientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
-var taskLib = require('com.ticktocktask.tasks');
+var taskLib = require('com.pandatask.tasks');
 require('org.startpad.string').patch();
 require('org.startpad.funcs').patch();
 
@@ -528,7 +528,7 @@ function handleAppCache() {
 });
 
 /* Source: scripts/tasks.js */
-namespace.module('com.ticktocktask.tasks', function (exports, require) {
+namespace.module('com.pandatask.tasks', function (exports, require) {
 var cLientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
 var types = require('org.startpad.types');

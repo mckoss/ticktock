@@ -1,12 +1,12 @@
-namespace.module('com.ticktocktask.tasks.test', function (exports, require) {
+namespace.module('com.pandatask.tasks.test', function (exports, require) {
     var ut = require('com.jquery.qunit');
     var types = require('org.startpad.types');
     var utCoverage = require('org.startpad.qunit.coverage');
-    var taskLib = require('com.ticktocktask.tasks');
+    var taskLib = require('com.pandatask.tasks');
 
-    ut.module('com.ticktocktask.tasks');
+    ut.module('com.pandatask.tasks');
     
-    var coverage = new utCoverage.Coverage('com.ticktocktask.tasks');
+    var coverage = new utCoverage.Coverage('com.pandatask.tasks');
 
     ut.test("version", function () {
         var version = taskLib.VERSION.split('.');
