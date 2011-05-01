@@ -12,11 +12,14 @@ exports.extend({
     'updateNow': updateNow
 });
 
+var msPerHour = 1000 * 60 * 60;
+
 var now = new Date().getTime();
 
 var historyProps = {'actual': true, 'remaining': true, 'status': true};
 var taskProps = {'actual': true, 'remaining': true, 'status': true, 'description': true,
-                 'history': true, 'id': true, 'created': true, 'modified': true};
+                 'history': true, 'id': true, 'created': true, 'modified': true,
+                 'start': true};
 
 function Project(options) {
     this.map = {};
@@ -135,7 +138,16 @@ Task.methods({
        // status *->working: record start time
        // status working->* increment actual time
        if (options.status && options.status != this.status) {
-           
+           if (options.status == 'working') {
+               this.start = now;
+           } else if (this.status == 'working') {
+               var hrs = (now - this.start) / msPerHour;
+               delete this.start;
+               if (options.actual == undefined) {
+                   options.actual = 0;
+               }
+               options.actual += hrs;
+           }
        }
        for (var prop in options) {
            if (!taskProps[prop]) {
@@ -145,8 +157,12 @@ Task.methods({
                if (!historyProps[prop]) {
                    continue;
                }
-               this.history.push({prop: prop, when: this.modified,
-                                  oldValue: this[prop] || 0, newValue: options[prop]});
+               var oldValue = this[prop] || 0;
+               var newValue = options[prop];
+               if (oldValue != newValue) {
+                   this.history.push({prop: prop, when: this.modified,
+                       oldValue: oldValue, newValue: newValue});
+                   }
            }
        }
        types.extend(this, options);
@@ -156,13 +172,13 @@ Task.methods({
    getContentHTML: function () {
        var html = "";
        html += format.escapeHTML(this.description);
-       var est = this.actual + this.remaining;
+       var est = this.actual + this.remaining + 0.05;
        if (est > 0) {
            html += " (";
            if (this.actual) {
-               html += this.actual + '/';
+               html += format.thousands(this.actual + 0.05, 1) + '/';
            }
-           html += pluralize('hr', est) + ")";
+           html += format.thousands(est, 1) + ' ' + pluralize('hr', est) + ")";
        }
        return html;
    }
@@ -170,9 +186,9 @@ Task.methods({
 
 function updateNow(d) {
     if (d == undefined) {
-        d = new Date().getTime();
+        d = new Date();
     }
-    now = d;
+    now = d.getTime();
 }
 
 function pluralize(base, n) {

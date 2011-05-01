@@ -23,6 +23,8 @@ var TASK = '<div id="{id}" class="task {className}">' +
            '<textarea class="if-edit"></textarea>' +
            '</div>';
            
+var UPDATE_INTERVAL = 1000 * 60;
+           
 function onReady() {
     handleAppCache();
     doc = dom.bindIDs();
@@ -37,6 +39,8 @@ function onReady() {
     
     $(window).keydown(onKey);
     $(document.body).mousedown(onClick);
+    
+    setInterval(taskLib.updateNow, UPDATE_INTERVAL);
 }
 
 function onClick(evt) {
