@@ -1,6 +1,7 @@
 var clientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
 var taskLib = require('com.pandatask.tasks');
+var types = require('org.startpad.types');
 require('org.startpad.string').patch();
 require('org.startpad.funcs').patch();
 
@@ -13,17 +14,17 @@ exports.extend({
 var client;
 var doc;                            // Bound elements here
 var project;
-var addList = [];
+var editedTask;
+var editedText;
+var editedStatus;
 
-var ADD_TASK = '<div id=add{i} class=newTask>' +
-               '<div> What:<input id=description{i} class=desc /></div>' +
-               '<div> Time:<input type=number id=time{i} class=time />hours<input id=ok{i} type=button value=OK />' + 
-               '</div>';
-var TASK = '<div id={id} class=task>' +
-           '<img src="images/left.png" class=left >' +
-           '<div class=content>{description}. {time} {units}</div>' +
-           '<img src="images/right.png" class=right ></div>';
-
+var TASK = '<div id="{id}" class="task {className}">' +
+           '<div class="content if-not-edit">{content}</div>' +
+           '<textarea class="if-edit"></textarea>' +
+           '</div>';
+           
+var UPDATE_INTERVAL = 1000 * 60;
+           
 function onReady() {
     handleAppCache();
     doc = dom.bindIDs();
@@ -33,54 +34,28 @@ function onReady() {
     client.saveInterval = 0;
     client.autoLoad = true;
     
-    
-    $('#r-add').click(onAdd.curry('r'));
-    $('#w-add').click(onAdd.curry('w'));
-    $('#d-add').click(onAdd.curry('d'));
-
-    //$('.header').click(refresh);
-    
     client.addAppBar();
+    refresh();
+    
+    $(window).keydown(onKey);
+    $(document.body).mousedown(onClick);
+    
+    setInterval(taskLib.updateNow, UPDATE_INTERVAL);
 }
 
-//list is r, w, d for ready working done
-function onAdd(list) {
-    var i = addList.length;
-    addList[addList.length] = list;
-    $('div.' + list + '-tasks').append(ADD_TASK.format({i: i}));
-    $('#ok' + i).click(onOk.curry(i));
-}
-
-function onOk(i) {
-  //t[i] = project.addTask({description: "task number " + i, estimated: 0, completed: 0});
-    var d = $('#description' + i).val();
-    var t = $('#time' + i).val();
-    var list = addList[i];
-    var units;
-    t == 1 ? units = 'hour' : units = 'hours';
-    var task = project.addTask({description: d, time: t, list: list, units: units});
-    addList[i] = undefined;
-    $('#add' + i).remove();
-    $('div.' + list + '-tasks').append(TASK.format({id: task.id, description: task.description, time: task.time, units: task.units}));
-    $('div#' + task.id).find()
-    client.setDirty();
-    client.save();
-}
-
-function refresh() {
-    $('.r-tasks').empty();
-    $('.w-tasks').empty();
-    $('.d-tasks').empty();
-    for (var i = 0; i < project.tasks.length; i++) {
-        var task = project.tasks[i];
-        $('div.' + task.list + '-tasks').append(TASK.format({id: task.id, description: task.description, time: task.time, units: task.units}));
+function onClick(evt) {
+    if (evt.target.tagName == 'TEXTAREA') {
+        return;
     }
+    if (editedTask) {
+        saveTask(editedTask);
+    }
+    evt.preventDefault();
 }
 
 function setDoc(json) {
     project = new taskLib.Project(json.blob);
     refresh();
-    //update UI
 }
 
 function getDoc() {
@@ -89,6 +64,99 @@ function getDoc() {
         readers: ['public']
     };
 }
+
+function refresh() {
+    $('#working-tasks').empty();
+    $('#ready-tasks').empty();
+    $('#done-tasks').empty();
+    for (var i = 0; i < project.tasks.length; i++) {
+        var task = project.tasks[i];
+        addTask(task, task.status + '-tasks');
+    }
+    addTemplateTask();
+}
+
+function addTask(task, listName, className) {
+    var top = className == 'top';
+    if (top) {
+        className = undefined;
+    }
+    if (className == undefined) {
+        className = '';
+    }
+    content = task.getContentHTML ? task.getContentHTML() : task.description;
+    $(doc[listName])[top ? 'prepend': 'append'](TASK.format(
+        types.extend({content: content}, task)));
+    $('#' + task.id + ' .content').click(editTask.curry(task));
+}
+
+function addTemplateTask() {
+    addTask({id: 'new', description: "Add new task"}, 'ready-tasks', 'new');
+}
+
+function saveTask(task) {
+    var $taskDiv = $('#' + task.id);
+    $taskDiv.removeClass('edit');
+    var text = $('textarea', $taskDiv).val();
+    editedTask = undefined;
+    if (text == editedText && editedStatus == undefined) {
+        return;
+    }
+    if (task.id == 'new') {
+        task = project.addTask({description: text});
+        $('#new').remove();
+        addTask(task, 'ready-tasks', 'top');
+        addTemplateTask();
+    } else {
+        task.change({description: text});
+        if (editedStatus) {
+            $taskDiv.remove();
+            addTask(task, editedStatus + '-tasks', 'top');
+        } else {
+            $('.content', $taskDiv).text(task.description);
+        }
+    }
+    editedStatus = undefined;
+    client.setDirty();
+    client.save();
+}
+
+function editTask(task, evt) {
+    if (editedTask) {
+        saveTask(editedTask);
+    }
+    $('#' + task.id).addClass('edit');
+    editedText = task.getEditText ? task.getEditText() : task.description;
+    $('textarea', '#' + task.id).val(editedText).focus().select();
+    editedTask = task;
+    evt.stopPropagation();
+}
+
+function onKey(evt) {
+    var right = 39,
+        left = 37,
+        enter = 13,
+        up = 38,
+        down = 40;
+    var toStatus = {37: 'ready', 39: 'done', 38: 'working'};
+
+    switch (evt.keyCode) {
+    case enter:
+    case up:
+    case left:
+    case right:
+        if (editedTask) {
+            var newStatus = toStatus[evt.keyCode];
+            if (editedTask.id != 'new' && newStatus) {
+                editedTask.change({status: newStatus});
+                editedStatus = newStatus;
+            }
+            saveTask(editedTask);
+        }
+        break;
+    }
+}
+
 
 // For offline - capable applications
 function handleAppCache() {

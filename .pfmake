@@ -3,9 +3,13 @@
       "scripts/pandatask-all.js": [
           "scripts/namespace-plus.js",
           { "path": "scripts/random.js", "namespace": "org.startpad.random"},
+          { "path": "scripts/format.js", "namespace": "org.startpad.format"},
           { "path": "scripts/main.js", "namespace": "com.pandatask.main" },
           { "path": "scripts/tasks.js", "namespace": "com.pandatask.tasks"}
-      ]
+      ],
+			"scripts/format-extra.js": [
+          { "path": "scripts/format.js", "namespace": "org.startpad.format"}
+			]
   },
   "minify": false,
   "uploadIndividualFiles": false

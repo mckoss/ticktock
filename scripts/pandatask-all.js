@@ -417,11 +417,366 @@ function randomString(len, chars) {
 };
 });
 
+/* Source: scripts/format.js */
+namespace.module('org.startpad.format', function (exports, require) {
+var base = require('org.startpad.base');
+var string = require('org.startpad.string');
+
+exports.extend({
+    'fixedDigits': fixedDigits,
+    'thousands': thousands,
+    'slugify': slugify,
+    'escapeHTML': escapeHTML,
+    'replaceKeys': replaceKeys,
+    'replaceString': replaceString,
+    'base64ToString': base64ToString,
+    'canvasToPNG': canvasToPNG,
+    'dateFromISO': dateFromISO,
+    'isoFromDate': isoFromDate,
+    'setTimezone': setTimezone,
+    'decodeClass': decodeClass,
+    'shortDate': shortDate,
+    'wordList': wordList,
+    'arrayFromWordList': arrayFromWordList,
+    'repeat': repeat
+});
+
+// Thousands separator
+var comma = ',';
+
+// Return an integer as a string using a fixed number of digits,
+// (require a sign if fSign).
+function fixedDigits(value, digits, fSign) {
+    var s = "";
+    var fNeg = (value < 0);
+    if (digits == undefined) {
+        digits = 0;
+    }
+    if (fNeg) {
+        value = -value;
+    }
+    value = Math.floor(value);
+
+    for (; digits > 0; digits--) {
+        s = (value % 10) + s;
+        value = Math.floor(value / 10);
+    }
+
+    if (fSign || fNeg) {
+        s = (fNeg ? "-" : "+") + s;
+    }
+
+    return s;
+}
+
+// Return integer as string with thousand separators with optional
+// decimal digits.
+function thousands(value, digits) {
+    var integerPart = Math.floor(value);
+    var s = integerPart.toString();
+    var sLast = "";
+    while (s != sLast) {
+        sLast = s;
+        s = s.replace(/(\d+)(\d{3})/, "$1" + comma + "$2");
+    }
+
+    var fractionString = "";
+    if (digits && digits >= 1) {
+        digits = Math.floor(digits);
+        var fraction = value - integerPart;
+        fraction = Math.floor(fraction * Math.pow(10, digits));
+        fractionString = "." + fixedDigits(fraction, digits);
+    }
+    return s + fractionString;
+}
+
+// Converts to lowercase, removes non-alpha chars and converts
+// spaces to hyphens
+function slugify(s) {
+    s = string.strip(s).toLowerCase();
+    s = s.replace(/[^a-zA-Z0-9]/g, '-').
+          replace(/[\-]+/g, '-').
+          replace(/(^-+)|(-+$)/g, '');
+    return s;
+}
+
+function escapeHTML(s) {
+    s = s.toString();
+    s = s.replace(/&/g, '&amp;');
+    s = s.replace(/</g, '&lt;');
+    s = s.replace(/>/g, '&gt;');
+    s = s.replace(/\"/g, '&quot;');
+    s = s.replace(/'/g, '&#39;');
+    return s;
+}
+
+// Replace all instances of pattern, with replacement in string.
+function replaceString(string, pattern, replacement) {
+    var output = "";
+    if (replacement == undefined) {
+        replacement = "";
+    }
+    else {
+        replacement = replacement.toString();
+    }
+    var ich = 0;
+    var ichFind = string.indexOf(pattern, 0);
+    while (ichFind >= 0) {
+        output += string.substring(ich, ichFind) + replacement;
+        ich = ichFind + pattern.length;
+        ichFind = string.indexOf(pattern, ich);
+    }
+    output += string.substring(ich);
+    return output;
+}
+
+// Replace keys in dictionary of for {key} in the text string.
+function replaceKeys(st, keys) {
+    for (var key in keys) {
+        if (keys.hasOwnProperty(key)) {
+            st = replaceString(st, "{" + key + "}", keys[key]);
+        }
+    }
+    // remove unused keys
+    st = st.replace(/\{[^\{\}]*\}/g, "");
+    return st;
+}
+
+//------------------------------------------------------------------
+// ISO 8601 Date Formatting YYYY-MM-DDTHH:MM:SS.sssZ (where Z
+// could be +HH or -HH for non UTC) Note that dates are inherently
+// stored at UTC dates internally. But we infer that they denote
+// local times by default. If the dt.__tz exists, it is assumed to
+// be an integer number of hours offset to the timezone for which
+// the time is to be indicated (e.g., PST = -08). Callers should
+// set dt.__tz = 0 to fix the date at UTC. All other times are
+// adjusted to designate the local timezone.
+// -----------------------------------------------------------------
+
+// Default timezone = local timezone
+// var tzDefault = -(new Date().getTimezoneOffset()) / 60;
+var tzDefault = 0;
+
+function setTimezone(tz) {
+    if (tz == undefined) {
+        tz = -(new Date().getTimezoneOffset()) / 60;
+    }
+    tzDefault = tz;
+}
+
+function isoFromDate(dt, fTime) {
+    var dtT = new Date();
+    dtT.setTime(dt.getTime());
+
+    var tz = dt.__tz;
+    if (tz == undefined) {
+        tz = tzDefault;
+    }
+
+    // Adjust the internal (UTC) time to be the local timezone
+    // (add tz hours) Note that setTime() and getTime() are always
+    // in (internal) UTC time.
+    if (tz != 0) {
+        dtT.setTime(dtT.getTime() + 60 * 60 * 1000 * tz);
+    }
+
+    var s = dtT.getUTCFullYear() + "-" +
+        fixedDigits(dtT.getUTCMonth() + 1, 2) + "-" +
+        fixedDigits(dtT.getUTCDate(), 2);
+    var ms = dtT % (24 * 60 * 60 * 1000);
+
+    if (ms || fTime || tz != 0) {
+        s += "T" + fixedDigits(dtT.getUTCHours(), 2) + ":" +
+            fixedDigits(dtT.getUTCMinutes(), 2);
+        ms = ms % (60 * 1000);
+        if (ms) {
+            s += ":" + fixedDigits(dtT.getUTCSeconds(), 2);
+        }
+        if (ms % 1000) {
+            s += "." + fixedDigits(dtT.getUTCMilliseconds(), 3);
+        }
+        if (tz == 0) {
+            s += "Z";
+        } else {
+            s += fixedDigits(tz, 2, true);
+        }
+    }
+    return s;
+}
+
+var regISO = new RegExp("^(\\d{4})-?(\\d\\d)-?(\\d\\d)" +
+                        "(T(\\d\\d):?(\\d\\d):?((\\d\\d)" +
+                        "(\\.(\\d{0,6}))?)?(Z|[\\+-]\\d\\d))?$");
+
+//--------------------------------------------------------------------
+// Parser is more lenient than formatter. Punctuation between date
+// and time parts is optional. We require at the minimum,
+// YYYY-MM-DD. If a time is given, we require at least HH:MM.
+// YYYY-MM-DDTHH:MM:SS.sssZ as well as YYYYMMDDTHHMMSS.sssZ are
+// both acceptable. Note that YYYY-MM-DD is ambiguous. Without a
+// timezone indicator we don't know if this is a UTC midnight or
+// Local midnight. We default to UTC midnight (the ISOFromDate
+// function always writes out non-UTC times so we can append the
+// time zone). Fractional seconds can be from 0 to 6 digits
+// (microseconds maximum)
+// -------------------------------------------------------------------
+function dateFromISO(sISO) {
+    var e = new base.Enum(1, "YYYY", "MM", "DD", 5, "hh", "mm",
+                           8, "ss", 10, "sss", "tz");
+    var aParts = sISO.match(regISO);
+    if (!aParts) {
+        return undefined;
+    }
+
+    aParts[e.mm] = aParts[e.mm] || 0;
+    aParts[e.ss] = aParts[e.ss] || 0;
+    aParts[e.sss] = aParts[e.sss] || 0;
+
+    // Convert fractional seconds to milliseconds
+    aParts[e.sss] = Math.round(+('0.' + aParts[e.sss]) * 1000);
+    if (!aParts[e.tz] || aParts[e.tz] === "Z") {
+        aParts[e.tz] = 0;
+    } else {
+        aParts[e.tz] = parseInt(aParts[e.tz]);
+    }
+
+    // Out of bounds checking - we don't check days of the month is correct!
+    if (aParts[e.MM] > 59 || aParts[e.DD] > 31 ||
+        aParts[e.hh] > 23 || aParts[e.mm] > 59 || aParts[e.ss] > 59 ||
+        aParts[e.tz] < -23 || aParts[e.tz] > 23) {
+        return undefined;
+    }
+
+    var dt = new Date();
+
+    dt.setUTCFullYear(aParts[e.YYYY], aParts[e.MM] - 1, aParts[e.DD]);
+
+    if (aParts[e.hh]) {
+        dt.setUTCHours(aParts[e.hh], aParts[e.mm],
+                       aParts[e.ss], aParts[e.sss]);
+    } else {
+        dt.setUTCHours(0, 0, 0, 0);
+    }
+
+    // BUG: For best compatibility - could set tz to undefined if
+    // it is our local tz Correct time to UTC standard (utc = t -
+    // tz)
+    dt.__tz = aParts[e.tz];
+    if (aParts[e.tz]) {
+        dt.setTime(dt.getTime() - dt.__tz * (60 * 60 * 1000));
+    }
+    return dt;
+}
+
+// Decode objects of the form:
+// {'__class__': XXX, ...}
+function decodeClass(obj) {
+    if (obj == undefined || obj.__class__ == undefined) {
+        return undefined;
+    }
+
+    if (obj.__class__ == 'Date') {
+        return dateFromISO(obj.isoformat);
+    }
+    return undefined;
+}
+
+// A short date format, that will also parse with Date.parse().
+// Namely, m/d/yyyy h:mm am/pm
+// (time is optional if 12:00 am exactly)
+function shortDate(d) {
+    if (!(d instanceof Date)) {
+        return undefined;
+    }
+    var s = (d.getMonth() + 1) + '/' +
+        (d.getDate()) + '/' +
+        (d.getFullYear());
+    var hr = d.getHours();
+    var ampm = ' am';
+    if (hr >= 12) {
+        ampm = ' pm';
+    }
+    hr = hr % 12;
+    if (hr == 0) {
+        hr = 12;
+    }
+    var sT = hr + ':' + fixedDigits(d.getMinutes(), 2) + ampm;
+    if (sT != '12:00 am') {
+        s += ' ' + sT;
+    }
+    return s;
+}
+
+// Turn an array of strings into a word list
+function wordList(a) {
+    a = base.map(a, string.strip);
+    a = base.filter(a, function(s) {
+        return s != '';
+    });
+    return a.join(', ');
+}
+
+function arrayFromWordList(s) {
+    s = string.strip(s);
+    var a = s.split(/[ ,]+/);
+    a = base.filter(a, function(s) {
+        return s != '';
+    });
+    return a;
+}
+
+var base64map =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+// Convert a base-64 string to a binary-encoded string
+function base64ToString(base64) {
+    var b;
+
+    // Use browser-native function if it exists
+    if (typeof atob == "function") {
+        return atob(base64);
+    }
+
+    // Remove non-base-64 characters
+    base64 = base64.replace(/[^A-Z0-9+\/]/ig, "");
+
+    for (var chars = [], i = 0, imod4 = 0;
+         i < base64.length;
+         imod4 = ++i % 4) {
+        if (imod4 == 0) {
+            continue;
+        }
+        b = ((base64map.indexOf(base64.charAt(i - 1)) &
+              (Math.pow(2, -2 * imod4 + 8) - 1)) << (imod4 * 2)) |
+            (base64map.indexOf(base64.charAt(i)) >>> (6 - imod4 * 2));
+        chars.push(String.fromCharCode(b));
+    }
+
+    return chars.join('');
+
+}
+
+function canvasToPNG(canvas) {
+    var prefix = "data:image/png;base64,";
+    var data = canvas.toDataURL('image/png');
+    if (data.indexOf(prefix) != 0) {
+        return undefined;
+    }
+    //return base64ToString(data.substr(prefix.length));
+    return data.substr(prefix.length);
+}
+
+function repeat(s, times) {
+    return new Array(times + 1).join(s);
+}
+});
+
 /* Source: scripts/main.js */
 namespace.module('com.pandatask.main', function (exports, require) {
 var clientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
 var taskLib = require('com.pandatask.tasks');
+var types = require('org.startpad.types');
 require('org.startpad.string').patch();
 require('org.startpad.funcs').patch();
 
@@ -434,16 +789,16 @@ exports.extend({
 var client;
 var doc;                            // Bound elements here
 var project;
-var addList = [];
+var editedTask;
+var editedText;
+var editedStatus;
 
-var ADD_TASK = '<div id=add{i} class=newTask>' +
-               '<div> What:<input id=description{i} class=desc /></div>' +
-               '<div> Time:<input type=number id=time{i} class=time />hours<input id=ok{i} type=button value=OK />' +
-               '</div>';
-var TASK = '<div id={id} class=task>' +
-           '<img src="images/left.png" class=left >' +
-           '<div class=content>{description}. {time} {units}</div>' +
-           '<img src="images/right.png" class=right ></div>';
+var TASK = '<div id="{id}" class="task {className}">' +
+           '<div class="content if-not-edit">{content}</div>' +
+           '<textarea class="if-edit"></textarea>' +
+           '</div>';
+
+var UPDATE_INTERVAL = 1000 * 60;
 
 function onReady() {
     handleAppCache();
@@ -454,54 +809,28 @@ function onReady() {
     client.saveInterval = 0;
     client.autoLoad = true;
 
-
-    $('#r-add').click(onAdd.curry('r'));
-    $('#w-add').click(onAdd.curry('w'));
-    $('#d-add').click(onAdd.curry('d'));
-
-    //$('.header').click(refresh);
-
     client.addAppBar();
+    refresh();
+
+    $(window).keydown(onKey);
+    $(document.body).mousedown(onClick);
+
+    setInterval(taskLib.updateNow, UPDATE_INTERVAL);
 }
 
-//list is r, w, d for ready working done
-function onAdd(list) {
-    var i = addList.length;
-    addList[addList.length] = list;
-    $('div.' + list + '-tasks').append(ADD_TASK.format({i: i}));
-    $('#ok' + i).click(onOk.curry(i));
-}
-
-function onOk(i) {
-  //t[i] = project.addTask({description: "task number " + i, estimated: 0, completed: 0});
-    var d = $('#description' + i).val();
-    var t = $('#time' + i).val();
-    var list = addList[i];
-    var units;
-    t == 1 ? units = 'hour' : units = 'hours';
-    var task = project.addTask({description: d, time: t, list: list, units: units});
-    addList[i] = undefined;
-    $('#add' + i).remove();
-    $('div.' + list + '-tasks').append(TASK.format({id: task.id, description: task.description, time: task.time, units: task.units}));
-    $('div#' + task.id).find()
-    client.setDirty();
-    client.save();
-}
-
-function refresh() {
-    $('.r-tasks').empty();
-    $('.w-tasks').empty();
-    $('.d-tasks').empty();
-    for (var i = 0; i < project.tasks.length; i++) {
-        var task = project.tasks[i];
-        $('div.' + task.list + '-tasks').append(TASK.format({id: task.id, description: task.description, time: task.time, units: task.units}));
+function onClick(evt) {
+    if (evt.target.tagName == 'TEXTAREA') {
+        return;
     }
+    if (editedTask) {
+        saveTask(editedTask);
+    }
+    evt.preventDefault();
 }
 
 function setDoc(json) {
     project = new taskLib.Project(json.blob);
     refresh();
-    //update UI
 }
 
 function getDoc() {
@@ -510,6 +839,99 @@ function getDoc() {
         readers: ['public']
     };
 }
+
+function refresh() {
+    $('#working-tasks').empty();
+    $('#ready-tasks').empty();
+    $('#done-tasks').empty();
+    for (var i = 0; i < project.tasks.length; i++) {
+        var task = project.tasks[i];
+        addTask(task, task.status + '-tasks');
+    }
+    addTemplateTask();
+}
+
+function addTask(task, listName, className) {
+    var top = className == 'top';
+    if (top) {
+        className = undefined;
+    }
+    if (className == undefined) {
+        className = '';
+    }
+    content = task.getContentHTML ? task.getContentHTML() : task.description;
+    $(doc[listName])[top ? 'prepend': 'append'](TASK.format(
+        types.extend({content: content}, task)));
+    $('#' + task.id + ' .content').click(editTask.curry(task));
+}
+
+function addTemplateTask() {
+    addTask({id: 'new', description: "Add new task"}, 'ready-tasks', 'new');
+}
+
+function saveTask(task) {
+    var $taskDiv = $('#' + task.id);
+    $taskDiv.removeClass('edit');
+    var text = $('textarea', $taskDiv).val();
+    editedTask = undefined;
+    if (text == editedText && editedStatus == undefined) {
+        return;
+    }
+    if (task.id == 'new') {
+        task = project.addTask({description: text});
+        $('#new').remove();
+        addTask(task, 'ready-tasks', 'top');
+        addTemplateTask();
+    } else {
+        task.change({description: text});
+        if (editedStatus) {
+            $taskDiv.remove();
+            addTask(task, editedStatus + '-tasks', 'top');
+        } else {
+            $('.content', $taskDiv).text(task.description);
+        }
+    }
+    editedStatus = undefined;
+    client.setDirty();
+    client.save();
+}
+
+function editTask(task, evt) {
+    if (editedTask) {
+        saveTask(editedTask);
+    }
+    $('#' + task.id).addClass('edit');
+    editedText = task.getEditText ? task.getEditText() : task.description;
+    $('textarea', '#' + task.id).val(editedText).focus().select();
+    editedTask = task;
+    evt.stopPropagation();
+}
+
+function onKey(evt) {
+    var right = 39,
+        left = 37,
+        enter = 13,
+        up = 38,
+        down = 40;
+    var toStatus = {37: 'ready', 39: 'done', 38: 'working'};
+
+    switch (evt.keyCode) {
+    case enter:
+    case up:
+    case left:
+    case right:
+        if (editedTask) {
+            var newStatus = toStatus[evt.keyCode];
+            if (editedTask.id != 'new' && newStatus) {
+                editedTask.change({status: newStatus});
+                editedStatus = newStatus;
+            }
+            saveTask(editedTask);
+        }
+        break;
+    }
+}
+
 
 // For offline - capable applications
 function handleAppCache() {
@@ -532,19 +954,30 @@ namespace.module('com.pandatask.tasks', function (exports, require) {
 var cLientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
 var types = require('org.startpad.types');
+var string = require('org.startpad.string');
 var random = require('org.startpad.random');
+var format = require('org.startpad.format');
 require('org.startpad.funcs').patch();
 
 exports.extend({
     'VERSION': "0.1.0",
     'Project': Project,
-    'updateNow': updateNow
+    'Task': Task,
+    'updateNow': updateNow,
+    'parseDescription': parseDescription
 });
+
+var msPerHour = 1000 * 60 * 60;
+var reTags = /\s*\[([^\]]*)\]\s*/g;
+var rePerson = /\s*@(\S+)\s*/g;
+var reRemain = /\s*\+(\d+(?:\.\d*)?)\s*/g;
 
 var now = new Date().getTime();
 
-var historyProps = {'actual': true, 'remaining': true};
-var taskProps = {'actual': true, 'remaining': true, 'status': true, 'description': true};
+var historyProps = {'actual': true, 'remaining': true, 'status': true};
+var taskProps = {'actual': true, 'remaining': true, 'status': true, 'description': true,
+                 'history': true, 'id': true, 'created': true, 'modified': true,
+                 'start': true, assignedTo: true, tags: true};
 
 function Project(options) {
     this.map = {};
@@ -552,6 +985,8 @@ function Project(options) {
     if (this.tasks == undefined) {
         this.tasks = [];
     }
+
+    this.schema = 1;
 
     for (var i = 0; i < this.tasks.length; i++) {
         var task = this.tasks[i];
@@ -647,6 +1082,10 @@ function Task(options, project) {
     this.id = random.randomString(16);
     this.created = now;
     this.history = [];
+    this.status = 'ready';
+    this.remaining = 0;
+    this.actual = 0;
+    this.description = '';
     this.change(options);
     project.install(this);
 }
@@ -657,8 +1096,20 @@ Task.methods({
        // status *->working: record start time
        // status working->* increment actual time
        if (options.status && options.status != this.status) {
-
+           if (options.status == 'working') {
+               this.start = now;
+           } else if (this.status == 'working') {
+               var hrs = (now - this.start) / msPerHour;
+               delete this.start;
+               if (options.actual == undefined) {
+                   options.actual = 0;
+               }
+               options.actual += hrs;
+           }
        }
+
+       parseDescription(options);
+
        for (var prop in options) {
            if (!taskProps[prop]) {
                throw new Error("Invalid task property: " + prop);
@@ -667,21 +1118,107 @@ Task.methods({
                if (!historyProps[prop]) {
                    continue;
                }
-               this.history.push({prop: prop, when: this.modified,
-                                  oldValue: this[prop] || 0, newValue: options[prop]});
+               var oldValue = this[prop] || 0;
+               var newValue = options[prop];
+               if (oldValue != newValue) {
+                   this.history.push({prop: prop, when: this.modified,
+                       oldValue: oldValue, newValue: newValue});
+                   }
            }
        }
        types.extend(this, options);
        return this;
+   },
+
+   getContentHTML: function () {
+       var html = "";
+       html += format.escapeHTML(this.description);
+       var est = Math.max(this.actual, this.remaining) + 0.05;
+       if (est > 0.05) {
+           html += " (";
+           if (this.actual) {
+               html += format.thousands(this.actual + 0.05, 1) + '/';
+           }
+           html += format.thousands(est, 1) + ' ' + pluralize('hr', est) + ")";
+       }
+       if (this.assignedTo && this.assignedTo.length > 0) {
+           html += '<div class="assigned">' + this.assignedTo.join(', ') + "</div>";
+       }
+       return html;
+   },
+
+   getEditText: function () {
+       var text = "";
+       text += this.description;
+       if (this.tags && this.tags.length > 0) {
+           text += ' [' + this.tags.join(',') + ']';
+       }
+       if (this.assignedTo && this.assignedTo.length > 0) {
+           text += ' @' + this.assignedTo.join(' @');
+       }
+       var remaining = this.remaining + 0.05;
+       if (remaining > 0.5) {
+           text += ' +' + format.thousands(remaining, 1);
+       }
+       return text;
    }
+
 });
 
 function updateNow(d) {
     if (d == undefined) {
-        d = new Date().getTime();
+        d = new Date();
     }
-    now = d;
+    now = d.getTime();
 }
 
+function pluralize(base, n) {
+    return base + (n == 1 ? '' : 's');
+}
 
+// Parse description to exctract:
+// +hrs - remaining
+// [tags] - tags
+// @person - assignedTo
+function parseDescription(options) {
+    if (options.description == undefined) {
+        return;
+    }
+    var assignedTo = [];
+    var tags = [];
+    var remaining = 0;
+    var desc = options.description;
+
+    desc = desc.replace(rePerson, function (whole, key) {
+        assignedTo.push(key);
+        return ' ';
+    });
+
+    desc = desc.replace(reTags, function (whole, key) {
+        var keys = key.split(',');
+        for (var i = 0; i < keys.length; i++) {
+            tags.push(format.slugify(keys[i]));
+        }
+        return ' ';
+    });
+
+    desc = desc.replace(reRemain, function (whole, key) {
+        remaining += parseFloat(key);
+        return ' ';
+    });
+
+    options.description = string.strip(desc);
+
+    if (remaining > 0) {
+        options.remaining = remaining;
+    }
+
+    if (assignedTo.length > 0) {
+        options.assignedTo = assignedTo;
+    }
+
+    if (tags.length > 0) {
+        options.tags = tags;
+    }
+}
 });
