@@ -65,7 +65,7 @@ div.task textarea {
 
 #footer {
   border-top: 2px solid gray;
-  padding-top: 10px;
+  padding: 10px 0;
   margin-top: 10px;
   text-align: center;
 }

@@ -40,7 +40,8 @@
 	
 	<div id="footer" class="row">
 		<a href="http://wiki.pageforest.com/#panda-task-help">Help</a> |
-		<a href="/burndown">Burn Down Chart</a> |
+		<a href="/burndown">Burn Down Chart (NYI)</a> |
+		<a href="https://github.com/mckoss/ticktock">Fork me @ GitHub</a> |
 		<a href="http://www.pageforest.com">Pageforest.com</a>
 	</div>
 </body>
