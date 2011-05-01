@@ -19,7 +19,7 @@ var editedText;
 var editedStatus;
 
 var TASK = '<div id="{id}" class="task {className}">' +
-           '<div class="content if-not-edit">{description} ({remaining} {units})</div>' +
+           '<div class="content if-not-edit">{content}</div>' +
            '<textarea class="if-edit"></textarea>' +
            '</div>';
            
@@ -80,8 +80,7 @@ function addTask(task, listName, className) {
         className = '';
     }
     $(doc[listName])[top ? 'prepend': 'append'](TASK.format(
-        types.extend({units: pluralize('hr', task.remaining),
-                      className: className}, task)));
+        types.extend({content: task.getContentHTML()}, task)));
     $('#' + task.id + ' .content').click(editTask.curry(task));
 }
 
@@ -125,10 +124,6 @@ function editTask(task, evt) {
     $('textarea', '#' + task.id).val(editedText).focus().select();
     editedTask = task;
     evt.stopPropagation();
-}
-
-function pluralize(base, n) {
-    return base + (n == 1 ? '' : 's');
 }
 
 function onKey(evt) {

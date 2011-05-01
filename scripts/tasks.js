@@ -2,11 +2,13 @@ var cLientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
 var types = require('org.startpad.types');
 var random = require('org.startpad.random');
+var format = require('org.startpad.format');
 require('org.startpad.funcs').patch();
 
 exports.extend({
     'VERSION': "0.1.0",
     'Project': Project,
+    'Task': Task,
     'updateNow': updateNow
 });
 
@@ -120,6 +122,9 @@ function Task(options, project) {
     this.created = now;
     this.history = [];
     this.status = 'ready';
+    this.remaining = 0;
+    this.actual = 0;
+    this.description = '';
     this.change(options);
     project.install(this);
 }
@@ -146,6 +151,20 @@ Task.methods({
        }
        types.extend(this, options);
        return this;
+   },
+   
+   getContentHTML: function () {
+       var html = "";
+       html += format.escapeHTML(this.description);
+       var est = this.actual + this.remaining;
+       if (est > 0) {
+           html += " (";
+           if (this.actual) {
+               html += this.actual + '/';
+           }
+           html += pluralize('hr', est) + ")";
+       }
+       return html;
    }
 });
 
@@ -156,4 +175,6 @@ function updateNow(d) {
     now = d;
 }
 
-
+function pluralize(base, n) {
+    return base + (n == 1 ? '' : 's');
+}
