@@ -8,6 +8,10 @@ h1 {
   margin: 18px 5px;
 }
 
+h1, h2 {
+  font-weight: bold;
+}
+
 .done {
   text-decoration: line-through;
   color: #777;
@@ -116,7 +120,7 @@ input[type='checkbox'] {
   display: none;
 }
 
-.if-not-edit:hover .promote,
-.if-not-edit:hover .delete {
+.task:hover .promote,
+.task:hover .delete {
   display: block;
 }

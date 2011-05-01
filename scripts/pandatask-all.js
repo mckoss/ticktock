@@ -794,10 +794,10 @@ var editedText;
 var editedStatus;
 
 var TASK = '<div id="{id}" class="task {className}">' +
-           '<div class="content if-not-edit">{content}' +
            '<div id="action_{id}" class="action"><input type="checkbox" /></div>' +
            '<div id="promote_{id}" class="promote icon"></div>' +
            '<div class="delete icon" id="delete_{id}"></div>' +
+           '<div class="content if-not-edit">{content}' +
            '</div>' +
            '<textarea class="if-edit"></textarea>' +
            '</div>';

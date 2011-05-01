@@ -61,16 +61,20 @@ div.task:not(.edit) .if-edit { display: none; }
   background-color: #c0ffac;
 }
 
-div.task .content {
+div.task {
   position: relative;
   background-color: #f9f6a8;
   height: 50px;
   padding: 5px 24px;
-  margin: 5px;
+  margin-bottom: 14px;
   -webkit-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
   box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
   -webkit-transition: -webkit-transform 1.0s ease-out;
+}
+
+.task-list {
+  padding: 14px 7px;
 }
 
 div.task .assigned {
