@@ -16,7 +16,7 @@ var doc;                            // Bound elements here
 var project;
 
 var TASK = '<div id={id} class="task {className}">' +
-           '<div class="content not-if-edit">{description} ({remaining} {units})</div>' +
+           '<div class="content if-not-edit">{description} ({remaining} {units})</div>' +
            '<textarea class="if-edit"></textarea>' +
            '</div>';
            

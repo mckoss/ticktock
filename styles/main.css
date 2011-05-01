@@ -16,3 +16,24 @@ a:hover { color: #000; }
 li { line-height: 120%; margin-bottom: 8px; }
 
 div.task-list-header { text-align: center; border-bottom: 2px solid gray; }
+
+div.task.edit .if-not-edit { display: none; }
+div.task:not(.edit) .if-edit { display: none; }
+
+div.task .content {
+  background-color: #f9f6a8;
+  height: 50px;
+  padding: 5px;
+  margin: 5px;
+  box-shadow: 4px 4px 4px #ddd;
+  -webkit-transition: -webkit-transform 1.0s ease-out;
+}
+
+div.task textarea {
+  width: 95%;
+  height: 50px;
+  padding: 5px;
+  margin: 5px;
+  font-family: inherit;
+  font-size: inherit;
+}
