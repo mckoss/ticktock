@@ -73,6 +73,12 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
             task = project.tasks[i];
             ut.equal(task.description, "Task #" + reorder[i]);
         }
+        project.moveAfter(project.tasks[9]);
+        reorder = [10, 1, 2, 3, 4, 6, 5, 7, 8, 9];
+        for (var i = 0; i < 10; i++) {
+            task = project.tasks[i];
+            ut.equal(task.description, "Task #" + reorder[i]);
+        }
     });
     
     ut.test("parseDescription", function () {
