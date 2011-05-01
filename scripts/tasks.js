@@ -13,7 +13,8 @@ exports.extend({
 var now = new Date().getTime();
 
 var historyProps = {'actual': true, 'remaining': true};
-var taskProps = {'actual': true, 'remaining': true, 'status': true, 'description': true};
+var taskProps = {'actual': true, 'remaining': true, 'status': true, 'description': true,
+                 'history': true, 'id': true, 'created': true, 'modified': true};
 
 function Project(options) {
     this.map = {};

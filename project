@@ -25,24 +25,24 @@
 	<div class="row">
 		<div class="column grid_4">
 		  <div class=header>Ready</div>
-		  <div class=r-tasks>
+		  <div class=ready-tasks>
 		    
 		  </div>
-		  <div class=footer><input id=r-add type=button value=+ /></div>
+		  <div class=footer><input id=ready-add type=button value=+ /></div>
 		</div>
 		<div class="column grid_4">
 		  <div class=header>Working</div>
-		  <div class=w-tasks>
+		  <div class=working-tasks>
 
 		  </div>
-		  <div class=footer><input id=w-add type=button value=+ /></div>
+		  <div class=footer><input id=working-add type=button value=+ /></div>
 		</div>
 		<div class="column grid_4">
 		  <div class=header>Done</div>
-		  <div class=d-tasks>
+		  <div class=done-tasks>
 
 		  </div>
-		  <div class=footer><input id=d-add type=button value=+ /></div>
+		  <div class=footer><input id=done-add type=button value=+ /></div>
 		</div>
 	</div>
   </div>

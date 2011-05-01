@@ -438,7 +438,8 @@ var addList = [];
 
 var ADD_TASK = '<div id=add{i} class=newTask>' +
                '<div> What:<input id=description{i} class=desc /></div>' +
-               '<div> Time:<input type=number id=time{i} class=time />hours<input id=ok{i} type=button value=OK />' +
+               '<div> Time:<input type=number id=time{i} class=time /> hours' +
+               '<input id=ok{i} type=button value=OK />' +
                '</div>';
 var TASK = '<div id={id} class=task>' +
            '<img src="images/left.png" class=left >' +
@@ -454,47 +455,50 @@ function onReady() {
     client.saveInterval = 0;
     client.autoLoad = true;
 
-
-    $('#r-add').click(onAdd.curry('r'));
-    $('#w-add').click(onAdd.curry('w'));
-    $('#d-add').click(onAdd.curry('d'));
+    $('#ready-add').click(onAdd.curry('ready'));
+    $('#working-add').click(onAdd.curry('working'));
+    $('#done-add').click(onAdd.curry('done'));
 
     //$('.header').click(refresh);
 
     client.addAppBar();
 }
 
-//list is r, w, d for ready working done
-function onAdd(list) {
+function onAdd(listName) {
     var i = addList.length;
-    addList[addList.length] = list;
-    $('div.' + list + '-tasks').append(ADD_TASK.format({i: i}));
+    addList[i] = listName;
+    $('div.' + listName + '-tasks').append(ADD_TASK.format({i: i}));
+    $('div.' + listName + '-tasks .desc').focus();
+
     $('#ok' + i).click(onOk.curry(i));
 }
 
 function onOk(i) {
-  //t[i] = project.addTask({description: "task number " + i, estimated: 0, completed: 0});
     var d = $('#description' + i).val();
     var t = $('#time' + i).val();
-    var list = addList[i];
+    var listName = addList[i];
     var units;
-    t == 1 ? units = 'hour' : units = 'hours';
-    var task = project.addTask({description: d, time: t, list: list, units: units});
+    units = t == 1 ? 'hour' : 'hours';
+    var task = project.addTask({description: d, remaining: t, status: listName});
     addList[i] = undefined;
     $('#add' + i).remove();
-    $('div.' + list + '-tasks').append(TASK.format({id: task.id, description: task.description, time: task.time, units: task.units}));
-    $('div#' + task.id).find()
+    $('div.' + listName + '-tasks').append(TASK.format({
+            id: task.id, description: task.description, time: task.remaining,
+            units: task.units}));
+    $('div#' + task.id).find();
     client.setDirty();
     client.save();
 }
 
 function refresh() {
-    $('.r-tasks').empty();
-    $('.w-tasks').empty();
-    $('.d-tasks').empty();
+    $('.ready-tasks').empty();
+    $('.working-tasks').empty();
+    $('.done-tasks').empty();
     for (var i = 0; i < project.tasks.length; i++) {
         var task = project.tasks[i];
-        $('div.' + task.list + '-tasks').append(TASK.format({id: task.id, description: task.description, time: task.time, units: task.units}));
+        $('div.' + task.status + '-tasks').append(TASK.format({
+            id: task.id, description: task.description, time: task.remaining,
+            units: task.units}));
     }
 }
 
@@ -544,7 +548,8 @@ exports.extend({
 var now = new Date().getTime();
 
 var historyProps = {'actual': true, 'remaining': true};
-var taskProps = {'actual': true, 'remaining': true, 'status': true, 'description': true};
+var taskProps = {'actual': true, 'remaining': true, 'status': true, 'description': true,
+                 'history': true, 'id': true, 'created': true, 'modified': true};
 
 function Project(options) {
     this.map = {};
