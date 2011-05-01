@@ -37,17 +37,18 @@ h1 {
   margin: 18px 12px;
 }
 
-.task {
-  margin-left: 24px;
-}
-
 .done {
   text-decoration: line-through;
   color: #777;
 }
 
 .action {
-  float: left;
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  line-height: 16px;
+  width: 16px;
+  height: 16px;
 }
 
 #add-task {
@@ -60,6 +61,10 @@ h1 {
   height: 16px;
   background: url('../images/up-arrow.png');
   display: block;
+}
+
+.icon {
+  cursor: pointer;
 }
 
 .icon, 
@@ -98,6 +103,39 @@ a.icon:hover {
 .delete {
   width: 16px;
   height: 16px;
-  float: right;
+  position: absolute;
+  top: 6px;
+  right: 6px;
   background: url('/images/remove.png');
+}
+
+.if-not-edit {
+  position: relative;
+  margin: 0px;
+}
+
+input[type='checkbox'] {
+  margin: 0px 0px 0px 2px;
+}
+
+.promote {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+}
+
+#working-tasks .promote {
+  background: url('/images/down-arrow.png');
+}
+
+#ready-tasks .promote {
+  background: url('/images/up-arrow.png');
+}
+
+#done-tasks .promote {
+  display: none;
+}
+
+.task {
+  position: relative;
 }

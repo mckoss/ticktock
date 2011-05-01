@@ -32,8 +32,10 @@ div.task .content {
   position: relative;
   background-color: #f9f6a8;
   height: 50px;
-  padding: 5px;
+  padding: 5px 24px;
   margin: 5px;
+  -webkit-box-shadow: 4px 4px 4px #ddd;
+  -moz-box-shadow: 4px 4px 4px #ddd;
   box-shadow: 4px 4px 4px #ddd;
   -webkit-transition: -webkit-transform 1.0s ease-out;
 }
