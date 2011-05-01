@@ -14,38 +14,22 @@
 <script type="text/javascript" src="/scripts/pandatask-all.js"></script>
 
 <script type="text/javascript">
-  $(document).ready(namespace.com.pandatask.main.onReady);
+  var panda = namespace.com.pandatask.main;
+  $(document).ready(panda.onReady);
 </script>
 
 </head>
 
 <body>
-
-  <div class=main>
 	<div class="row">
-		<div class="column grid_4">
-		  <div class=header>Ready</div>
-		  <div class=ready-tasks>
-		    
-		  </div>
-		  <div class=footer><input id=ready-add type=button value=+ /></div>
+		<div class="column grid_6">
+			<div class="task-list-header"><h2>Ready</h2></div>
+			<div id="ready-tasks" class="task-list"></div>
 		</div>
-		<div class="column grid_4">
-		  <div class=header>Working</div>
-		  <div class=working-tasks>
-
-		  </div>
-		  <div class=footer><input id=working-add type=button value=+ /></div>
-		</div>
-		<div class="column grid_4">
-		  <div class=header>Done</div>
-		  <div class=done-tasks>
-
-		  </div>
-		  <div class=footer><input id=done-add type=button value=+ /></div>
+		<div class="column grid_6">
+			<div class="task-list-header"><h2>Complete</h2></div>
+			<div id="done-tasks" class="task-list"></div>
 		</div>
 	</div>
-  </div>
-
 </body>
 </html>
