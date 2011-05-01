@@ -85,3 +85,12 @@ h1 {
 a.icon:hover {
   text-decoration: none;
 }
+
+#new-task {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+#new-task-container {
+  margin-right: 12px;
+}

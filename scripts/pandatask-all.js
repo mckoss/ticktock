@@ -825,7 +825,6 @@ function onClick(evt) {
     if (editedTask) {
         saveTask(editedTask);
     }
-    evt.preventDefault();
 }
 
 function setDoc(json) {

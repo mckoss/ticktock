@@ -69,3 +69,21 @@ a:focus {
   margin-top: 10px;
   text-align: center;
 }
+
+input[type='text'] {
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  padding: 4px 5px;
+  margin: 0px;
+  font-size: 14px;
+}
+
+input[type='text']:focus {
+  -webkit-box-shadow: 0 0 12px rgba(51, 204, 255, 0.5);
+  -moz-box-shadow: 0 0 12px rgba(51, 204, 255, 0.5);
+  box-shadow: 0 0 12px rgba(51, 204, 255, 0.5);
+  border: 1px solid rgba(51, 204, 255, 0.75);
+  outline: 0;
+}
