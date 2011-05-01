@@ -29,6 +29,10 @@ div.task .content {
   -webkit-transition: -webkit-transform 1.0s ease-out;
 }
 
+div.task.new .content {
+  color: #aaa;
+}
+
 div.task textarea {
   width: 95%;
   height: 50px;

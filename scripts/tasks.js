@@ -22,6 +22,8 @@ function Project(options) {
     if (this.tasks == undefined) {
         this.tasks = [];
     }
+    
+    this.schema = 1;
 
     for (var i = 0; i < this.tasks.length; i++) {
         var task = this.tasks[i];

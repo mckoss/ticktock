@@ -15,7 +15,7 @@ var client;
 var doc;                            // Bound elements here
 var project;
 
-var TASK = '<div id={id} class="task {className}">' +
+var TASK = '<div id="{id}" class="task {className}">' +
            '<div class="content if-not-edit">{description} ({remaining} {units})</div>' +
            '<textarea class="if-edit"></textarea>' +
            '</div>';
@@ -45,15 +45,6 @@ function getDoc() {
     };
 }
 
-function onAdd(listName) {
-    var i = addList.length;
-    addList[i] = listName;
-    $('div.' + listName + '-tasks').append(ADD_TASK.format({i: i}));
-    $('div.' + listName + '-tasks .desc').focus();
-    
-    $('#ok' + i).click(onOk.curry(i));
-}
-
 function onOk(i) {
     var d = $('#description' + i).val();
     var t = $('#time' + i).val();
@@ -78,6 +69,7 @@ function refresh() {
         var task = project.tasks[i];
         addTask(task, task.status + '-tasks');
     }
+    addTask({id: 'new', description: "Add new task"}, 'ready-tasks', 'new');
 }
 
 function addTask(task, listName, className) {
@@ -88,6 +80,12 @@ function addTask(task, listName, className) {
         types.extend({units: pluralize('hr', task.remaining),
                       className: className}, task)));
     $('#' + task.id + ' .content').click(onTaskClick.curry(task));
+}
+
+function saveTask(task) {
+    $('#' + task.id).removeClass('edit');
+    client.setDirty();
+    client.save();
 }
 
 function onTaskClick(task) {
