@@ -20,6 +20,14 @@ div.task-list-header { text-align: center; border-bottom: 2px solid gray; }
 div.task.edit .if-not-edit { display: none; }
 div.task:not(.edit) .if-edit { display: none; }
 
+#working-tasks {
+  min-height: 50px;
+}
+
+#working-tasks div.task .content {
+  background-color: #c0ffac;
+}
+
 div.task .content {
   background-color: #f9f6a8;
   height: 50px;

@@ -94,7 +94,7 @@ function saveTask(task) {
     $taskDiv.removeClass('edit');
     var text = $('textarea', $taskDiv).val();
     editedTask = undefined;
-    if (text == editedText) {
+    if (text == editedText && editedStatus == undefined) {
         return;
     }
     if (task.id == 'new') {
@@ -134,11 +134,14 @@ function pluralize(base, n) {
 function onKey(evt) {
     var right = 39,
         left = 37,
-        enter = 13;
-    var toStatus = {37: 'ready', 39: 'done'};
+        enter = 13,
+        up = 38,
+        down = 40;
+    var toStatus = {37: 'ready', 39: 'done', 38: 'working'};
 
     switch (evt.keyCode) {
     case enter:
+    case up:
     case left:
     case right:
         if (editedTask) {

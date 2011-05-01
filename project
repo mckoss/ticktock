@@ -22,6 +22,12 @@
 
 <body>
 	<div class="row">
+		<div class="column grid_12">
+			<div class="task-list-header"><h2>Working</h2></div>
+			<div id="working-tasks" class="task-list"></div>
+		</div>
+	</div>
+	<div class="row">
 		<div class="column grid_6">
 			<div class="task-list-header"><h2>Ready</h2></div>
 			<div id="ready-tasks" class="task-list"></div>
