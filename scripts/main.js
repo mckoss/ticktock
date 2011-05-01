@@ -133,44 +133,37 @@ function editTask(task, evt) {
     editedText = task.getEditText ? task.getEditText() : task.description;
     $('textarea', '#' + task.id).val(editedText).focus().select();
     editedTask = task;
+    // We don't want the body click event to cancel enter edit mode.
     evt.stopPropagation();
 }
 
 function onKey(evt) {
-    console.log('')
     var right = 39,
         left = 37,
-        enter = 13,
         up = 38,
-        down = 40;
-    var toStatus = {37: 'ready', 39: 'done', 38: 'working'};
+        down = 40,
+        enter = 13;
+
+    if (!editedTask) {
+        return;
+    }
 
     if (event.keyCode == enter) {
-        if (editedTask) {
-            var newStatus = toStatus[evt.keyCode];
-            if (editedTask.id != 'new' && newStatus) {
-                editedTask.change({status: newStatus});
-                editedStatus = newStatus;
-            }
-            saveTask(editedTask);
-        }
+        saveTask(editedTask);
         return;
     }
-    if (!evt.ctrlKey) {
-        return;
-    }
+
     switch (evt.keyCode) {
     case up:
-    case left:
-    case right:
-        if (editedTask) {
-            var newStatus = toStatus[evt.keyCode];
-            if (editedTask.id != 'new' && newStatus) {
-                editedTask.change({status: newStatus});
-                editedStatus = newStatus;
-            }
-            saveTask(editedTask);
+    case down:
+        if (!evt.ctrlKey || editTask.id == 'new') {
+            evt.preventDefault();
+            return;
         }
+        var taskSave = editedTask;
+        saveTask(editedTask);
+        project.move(taskSave, evt.keyCode == up ? -1 : 1);
+        refresh();
         break;
     }
 }

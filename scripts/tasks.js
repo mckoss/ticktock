@@ -84,6 +84,18 @@ Project.methods({
        this.tasks.splice(iBefore + 1, 0, mover);
    },
    
+   // Move task by n positions up or down - but should not move
+   // above it's own same-status section. TODO
+   move: function (task, n) {
+       var iTask = this.findIndex(task);
+       var iMove = iTask + n;
+       if (iMove < 0 || iMove >= this.tasks.length) {
+           return;
+       }
+       task = this.tasks.splice(iTask, 1)[0];
+       this.tasks.splice(iMove, 0, task);
+   },
+   
    toJSON: function () {
        return {tasks: this.tasks};
    },
