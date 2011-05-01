@@ -14,7 +14,7 @@ exports.extend({
 var client;
 var doc;                            // Bound elements here
 var project;
-var editTask;
+var editedTask;
 var editText;
 
 var TASK = '<div id="{id}" class="task {className}">' +
@@ -35,7 +35,17 @@ function onReady() {
     refresh();
     
     $(window).keydown(onKey);
-    $(window).click(onClick);
+    $(document.body).mousedown(onClick);
+}
+
+function onClick(evt) {
+    if (evt.target.tagName == 'TEXTAREA') {
+        return;
+    }
+    if (editedTask) {
+        saveTask(editedTask);
+    }
+    evt.preventDefault();
 }
 
 function setDoc(json) {
@@ -88,19 +98,19 @@ function addTask(task, listName, className) {
 }
 
 function addTemplateTask() {
-    $('#new').remove();
     addTask({id: 'new', description: "Add new task"}, 'ready-tasks', 'new');
 }
 
 function saveTask(task) {
     $('#' + task.id).removeClass('edit');
     var text = $('textarea', '#' + task.id).val();
-    editTask = undefined;
+    editedTask = undefined;
     if (text == editText) {
         return;
     }
     if (task.id == 'new') {
         task = project.addTask({description: text});
+        $('#new').remove();
         addTask(task, 'ready-tasks');
         addTemplateTask();
     } else {
@@ -111,14 +121,15 @@ function saveTask(task) {
     client.save();
 }
 
-function editTask(task) {
-    if (editTask) {
-        saveTask(editTask);
+function editTask(task, evt) {
+    if (editedTask) {
+        saveTask(editedTask);
     }
     $('#' + task.id).addClass('edit');
     editText = task.description;
     $('textarea', '#' + task.id).val(editText).focus().select();
-    editTask = task;
+    editedTask = task;
+    evt.stopPropagation();
 }
 
 function pluralize(base, n) {
@@ -129,11 +140,18 @@ function onKey(evt) {
     var right = 39,
         left = 37,
         enter = 13;
+    var toStatus = {37: 'ready', 39: 'done'};
 
     switch (evt.keyCode) {
     case enter:
-        if (editTask) {
-            saveTask(editTask);
+    case left:
+    case right:
+        if (editedTask) {
+            var newStatus = toStatus[evt.keyCode];
+            if (editedTask.id != 'new' && newStatus) {
+                editedTask.change({status: newStatus});
+            }
+            saveTask(editedTask);
         }
         break;
     case left:
