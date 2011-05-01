@@ -11,4 +11,7 @@ Design Goals
 - Multiple people can edit in real time
 - Burn down charts to predict completion date
 
+- [Try It](http://pandatask.pageforest.com/project)
+- [Help](http://wiki.pageforest.com/#pandatask)
+- [Our Task List](http://pandatask.pageforest.com/project/#panda-task-list)
 
