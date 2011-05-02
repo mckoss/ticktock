@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html manifest="/app.manifest">
 <head>
-<title>Tick Tock Task</title>
+<title>PandaTask</title>
 
 <link rel="icon" type="image/png" href="/images/icon.png" />
 <link rel="apple-touch-icon" href="/images/touch.png" />
