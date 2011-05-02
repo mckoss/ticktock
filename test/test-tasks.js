@@ -106,6 +106,10 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         }
     });
 
+    ut.test("Task", function () {
+        var project = new taskLib.Project();
+    });
+
     coverage.testCoverage();
 
 });
