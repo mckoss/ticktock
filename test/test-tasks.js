@@ -15,9 +15,9 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
     });
 
     ut.test("project", function () {
-       var project = new taskLib.Project();
-       ut.ok(project != undefined);
-       ut.ok(types.isArray(project.tasks));
+        var project = new taskLib.Project();
+        ut.ok(project != undefined);
+        ut.ok(types.isArray(project.tasks));
     });
 
     ut.test("tasks", function () {
@@ -56,7 +56,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.ok(task.modified > task.created, "modified date update");
     });
 
-    ut.test("move after", function () {
+    ut.test("move", function () {
         var task;
         var project = new taskLib.Project();
 
@@ -81,7 +81,15 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         project.moveAfter(project.tasks[1], project.tasks[3]);
         testOrder([10, 2, 3, 1, 4, 6, 5, 7, 8, 9]);
 
- });
+        project.move(project.tasks[1], 4);
+        testOrder([10, 3, 1, 4, 6, 2, 5, 7, 8, 9]);
+
+        project.move(project.tasks[1], 0);
+        testOrder([10, 3, 1, 4, 6, 2, 5, 7, 8, 9]);
+
+        project.move(project.tasks[1], -1);
+        testOrder([3, 10, 1, 4, 6, 2, 5, 7, 8, 9]);
+    });
 
     ut.test("parseDescription", function () {
         var tests = [
@@ -108,6 +116,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
 
     ut.test("Task", function () {
         var project = new taskLib.Project();
+        var tags = new taskLib.Task({}, project);
     });
 
     coverage.testCoverage();
