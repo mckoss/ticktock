@@ -1,4 +1,4 @@
-var cLientLib = require('com.pageforest.client');
+var clientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
 var types = require('org.startpad.types');
 var string = require('org.startpad.string');
@@ -209,6 +209,9 @@ Task.methods({
        }
        if (this.assignedTo && this.assignedTo.length > 0) {
            html += '<div class="assigned">' + this.assignedTo.join(', ') + "</div>";
+       }
+       if (this.tags && this.tags.length > 0) {
+           html += '<div class="tags">' + this.tags.join(', ') + "</div>";
        }
        return html;
    },
