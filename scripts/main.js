@@ -8,7 +8,8 @@ require('org.startpad.funcs').patch();
 exports.extend({
     'onReady': onReady,
     'getDoc': getDoc,
-    'setDoc': setDoc
+    'setDoc': setDoc,
+    'onSaveSuccess': onSaveSuccess
 });
 
 var client;
@@ -18,16 +19,16 @@ var editedTask;
 var editedText;
 var editedStatus;
 
-var TASK = '<div id="{id}" class="task {className}">' +
-           '<div id="action_{id}" class="action"><input type="checkbox" id="check_{id}"/></div>' +
-           '<div id="promote_{id}" class="promote icon"></div>' +
-           '<div class="delete icon" id="delete_{id}"></div>' +
-           '<div class="content if-not-edit">{content}' + 
-           '</div>' +
-           '<div class="edit-container">' +
-           '<textarea class="if-edit"></textarea>' +
-           '</div></div>';
-           
+var TASK =
+    '<div id="{id}" class="task {className}">' +
+    // REVIEW: Why do we need a div wrapper?
+    '<div id="action_{id}" class="action"><input type="checkbox" id="check_{id}"/></div>' +
+    '<div id="promote_{id}" class="promote icon"></div>' +
+    '<div class="delete icon" id="delete_{id}"></div>' +
+    '<div class="content if-not-edit">{content}</div>' +
+    '<div class="edit-container if-edit"><textarea></textarea></div>' +
+    '</div>';
+
 var UPDATE_INTERVAL = 1000 * 60;
 
 function onReady() {
@@ -38,13 +39,13 @@ function onReady() {
     client = new clientLib.Client(exports);
     client.saveInterval = 0;
     client.autoLoad = true;
-    
+
     client.addAppBar();
     refresh();
-    
+
     $(window).keydown(onKey);
     $(document.body).mousedown(onClick);
-    
+
     setInterval(taskLib.updateNow, UPDATE_INTERVAL);
 }
 
@@ -60,6 +61,7 @@ function onClick(evt) {
 
 function setDoc(json) {
     project = new taskLib.Project(json.blob);
+    $(doc["project-title"]).text(json.title);
     refresh();
 }
 
@@ -68,6 +70,10 @@ function getDoc() {
         blob: project.toJSON(),
         readers: ['public']
     };
+}
+
+function onSaveSuccess() {
+    $(doc["project-title"]).text(client.meta.title);
 }
 
 function refresh() {
@@ -93,6 +99,9 @@ function addTask(task, listName, className) {
     $(doc[listName])[top ? 'prepend': 'append'](TASK.format(
         types.extend({content: content}, task)));
     $('#' + task.id).click(editTask.curry(task));
+    if (listName == 'done-tasks') {
+        $('#check_' + task.id)[0].checked = true;
+    }
 }
 
 function addTemplateTask() {
@@ -130,14 +139,14 @@ function editTask(task, evt) {
     if (editedTask) {
         saveTask(editedTask);
     }
-    
+
     $('#' + task.id).addClass('edit');
     editedText = task.getEditText ? task.getEditText() : task.description;
     $('textarea', '#' + task.id).val(editedText).focus().select();
     editedTask = task;
     // We don't want the body click event to cancel enter edit mode.
     evt.stopPropagation();
-    
+
     function moveIt(status) {
         if (editedTask.id != 'new') {
             editedStatus = status;
@@ -145,7 +154,7 @@ function editTask(task, evt) {
         }
         saveTask(editedTask);
     }
-    
+
     var id = $(evt.target).attr('id');
     if (id.length && id.split('_').length) {
         var type = id.split('_')[0];
@@ -173,10 +182,10 @@ function editTask(task, evt) {
 
 function onKey(evt) {
     var right = 39,
-        left = 37,
-        up = 38,
-        down = 40,
-        enter = 13;
+    left = 37,
+    up = 38,
+    down = 40,
+    enter = 13;
 
     if (!editedTask) {
         return;

@@ -1,51 +1,51 @@
 <!DOCTYPE html>
 <html manifest="/app.manifest">
-<head>
-<title>PandaTask</title>
+  <head>
+    <title>PandaTask</title>
 
-<link rel="icon" type="image/png" href="/images/icon.png" />
-<link rel="apple-touch-icon" href="/images/touch.png" />
+    <link rel="icon" type="image/png" href="/images/icon.png" />
+    <link rel="apple-touch-icon" href="/images/touch.png" />
 
-<link rel="stylesheet" type="text/css" href="/styles/main.css" />
-<link rel="stylesheet" type="text/css" href="/styles/grid.css" />
-<link rel="stylesheet" type="text/css" href="/lib/beta/css/client.css" />
-<link rel="stylesheet" type="text/css" href="/styles/project.css" />
+    <link rel="stylesheet" type="text/css" href="/styles/main.css" />
+    <link rel="stylesheet" type="text/css" href="/styles/grid.css" />
+    <link rel="stylesheet" type="text/css" href="/lib/beta/css/client.css" />
+    <link rel="stylesheet" type="text/css" href="/styles/project.css" />
 
-<script type="text/javascript" src="/lib/beta/js/pf-client.js"></script>
-<script type="text/javascript" src="/scripts/pandatask-all.js"></script>
+    <script type="text/javascript" src="/lib/beta/js/pf-client.js"></script>
+    <script type="text/javascript" src="/scripts/pandatask-all.js"></script>
 
-<script type="text/javascript">
-  var panda = namespace.com.pandatask.main;
-  $(document).ready(panda.onReady);
-</script>
+    <script type="text/javascript">
+      var panda = namespace.com.pandatask.main;
+      $(document).ready(panda.onReady);
+    </script>
 
-</head>
+  </head>
 
-<body>
-	<div class="row">
-		<div class="column grid_12">
-		  <div class='logo'>PandaTask</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="column grid_6">
-			<h2 class='task-header'>Working</h2>
-			<div id="working-tasks" class="task-list"></div>
-      
-			<h2 class='task-header'>Ready</h2>
-			<div id="ready-tasks" class="task-list"></div>
-		</div>
-		<div class="column grid_6">
-			<h2 class='task-header'>Complete</h2>
-			<div id="done-tasks" class="task-list"></div>
-		</div>
-	</div>
-	
-	<div id="footer" class="row">
-		<a href="http://wiki.pageforest.com/#panda-task-help">Help</a> |
-		<a href="/burndown">Burn Down Chart (NYI)</a> |
-		<a href="https://github.com/mckoss/ticktock">Fork me @ GitHub</a> |
-		<a href="http://www.pageforest.com">Pageforest.com</a>
-	</div>
-</body>
+  <body>
+    <div class="row">
+      <div class="column grid_12">
+        <div class='logo'><span id="project-title">Tick Tock Task</span></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="column grid_6">
+        <h2 class='task-header'>Working</h2>
+        <div id="working-tasks" class="task-list"></div>
+
+        <h2 class='task-header'>Ready</h2>
+        <div id="ready-tasks" class="task-list"></div>
+      </div>
+      <div class="column grid_6">
+        <h2 class='task-header'>Complete</h2>
+        <div id="done-tasks" class="task-list"></div>
+      </div>
+    </div>
+
+    <div id="footer" class="row">
+      <a href="http://wiki.pageforest.com/#panda-task-help">Help</a> |
+      <a href="/burndown">Burn Down Chart (NYI)</a> |
+      <a href="https://github.com/mckoss/ticktock">Fork me @ GitHub</a> |
+      <a href="http://www.pageforest.com">Pageforest.com</a>
+    </div>
+  </body>
 </html>

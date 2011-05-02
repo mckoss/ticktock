@@ -50,10 +50,6 @@ namespace.module('org.startpad.qunit.coverage', function (exports, require) {
             }
             var fullName = prefix + name;
 
-            if (this.calls[fullName] != undefined) {
-                throw new Error("Function already wrapped: " + fullName);
-            }
-
             this.calls[fullName] = 0;
             parent[name] = function covered() {
                 self.calls[fullName]++;
@@ -62,6 +58,9 @@ namespace.module('org.startpad.qunit.coverage', function (exports, require) {
 
             for (var method in func.prototype) {
                 parent[name].prototype[method] = func.prototype[method];
+                // Wrap BOTH the internal prototype methods and the wrapped constructor's
+                // prototype - catch coverge of both internal and external (test) calls.
+                this.wrapFunction(func.prototype, method, fullName + ':');
                 this.wrapFunction(parent[name].prototype, method, fullName + ':');
             }
         },

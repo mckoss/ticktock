@@ -783,7 +783,8 @@ require('org.startpad.funcs').patch();
 exports.extend({
     'onReady': onReady,
     'getDoc': getDoc,
-    'setDoc': setDoc
+    'setDoc': setDoc,
+    'onSaveSuccess': onSaveSuccess
 });
 
 var client;
@@ -793,15 +794,15 @@ var editedTask;
 var editedText;
 var editedStatus;
 
-var TASK = '<div id="{id}" class="task {className}">' +
-           '<div id="action_{id}" class="action"><input type="checkbox" id="check_{id}"/></div>' +
-           '<div id="promote_{id}" class="promote icon"></div>' +
-           '<div class="delete icon" id="delete_{id}"></div>' +
-           '<div class="content if-not-edit">{content}' +
-           '</div>' +
-           '<div class="edit-container">' +
-           '<textarea class="if-edit"></textarea>' +
-           '</div></div>';
+var TASK =
+    '<div id="{id}" class="task {className}">' +
+    // REVIEW: Why do we need a div wrapper?
+    '<div id="action_{id}" class="action"><input type="checkbox" id="check_{id}"/></div>' +
+    '<div id="promote_{id}" class="promote icon"></div>' +
+    '<div class="delete icon" id="delete_{id}"></div>' +
+    '<div class="content if-not-edit">{content}</div>' +
+    '<div class="edit-container if-edit"><textarea></textarea></div>' +
+    '</div>';
 
 var UPDATE_INTERVAL = 1000 * 60;
 
@@ -835,6 +836,7 @@ function onClick(evt) {
 
 function setDoc(json) {
     project = new taskLib.Project(json.blob);
+    $(doc["project-title"]).text(json.title);
     refresh();
 }
 
@@ -843,6 +845,10 @@ function getDoc() {
         blob: project.toJSON(),
         readers: ['public']
     };
+}
+
+function onSaveSuccess() {
+    $(doc["project-title"]).text(client.meta.title);
 }
 
 function refresh() {
@@ -868,6 +874,9 @@ function addTask(task, listName, className) {
     $(doc[listName])[top ? 'prepend': 'append'](TASK.format(
         types.extend({content: content}, task)));
     $('#' + task.id).click(editTask.curry(task));
+    if (listName == 'done-tasks') {
+        $('#check_' + task.id)[0].checked = true;
+    }
 }
 
 function addTemplateTask() {
@@ -948,10 +957,10 @@ function editTask(task, evt) {
 
 function onKey(evt) {
     var right = 39,
-        left = 37,
-        up = 38,
-        down = 40,
-        enter = 13;
+    left = 37,
+    up = 38,
+    down = 40,
+    enter = 13;
 
     if (!editedTask) {
         return;
@@ -1023,6 +1032,10 @@ var taskProps = {'actual': true, 'remaining': true, 'status': true, 'description
                  'history': true, 'id': true, 'created': true, 'modified': true,
                  'start': true, assignedTo: true, tags: true};
 
+/* ==========================================================
+   Project
+   ========================================================== */
+
 function Project(options) {
     this.map = {};
     types.extend(this, options);
@@ -1068,17 +1081,12 @@ Project.methods({
 
    // Move the first tasks to a position just after the second task
    // If no 2nd task is given, more the first task to position 0.
-   moveAfter: function (after, before) {
-       var iAfter, iBefore;
-       iAfter = this.findIndex(after);
-       if (before) {
-           iBefore = this.findIndex(before);
-       } else {
-           iBefore = -1;
+   moveAfter: function (mover, target) {
+       var n = this.findIndex(target) - this.findIndex(mover);
+       if (n < 0) {
+           n++;
        }
-
-       var mover = this.tasks.splice(iAfter, 1)[0];
-       this.tasks.splice(iBefore + 1, 0, mover);
+       this.move(mover, n);
    },
 
    // Move task by n positions up or down - but should not move
@@ -1086,7 +1094,7 @@ Project.methods({
    move: function (task, n) {
        var iTask = this.findIndex(task);
        var iMove = iTask + n;
-       if (iMove < 0 || iMove >= this.tasks.length) {
+       if (n == 0 || iMove < 0 || iMove >= this.tasks.length) {
            return;
        }
        task = this.tasks.splice(iTask, 1)[0];
@@ -1137,6 +1145,10 @@ Project.methods({
    }
 
 });
+
+/* ==========================================================
+   Task
+   ========================================================== */
 
 function Task(options, project) {
     this.id = random.randomString(16);
@@ -1192,7 +1204,7 @@ Task.methods({
 
    getContentHTML: function () {
        var html = "";
-       html += format.escapeHTML(this.description);
+       html += '<span class="description">{0}</span>'.format(format.escapeHTML(this.description));
        var est = Math.max(this.actual, this.remaining) + 0.05;
        if (est > 0.05) {
            html += " (";
@@ -1224,6 +1236,10 @@ Task.methods({
    }
 
 });
+
+/* ==========================================================
+   Helper functions
+   ========================================================== */
 
 function updateNow(d) {
     if (d == undefined) {
