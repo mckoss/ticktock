@@ -5,7 +5,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
     var taskLib = require('com.pandatask.tasks');
 
     ut.module('com.pandatask.tasks');
-    
+
     var coverage = new utCoverage.Coverage('com.pandatask.tasks');
 
     ut.test("version", function () {
@@ -13,13 +13,13 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.equal(version.length, 3, "VERSION has 3 parts");
         ut.ok(version[0] == 0 && version[1] == 1, "tests for version 0.1");
     });
-    
+
     ut.test("project", function () {
        var project = new taskLib.Project();
-       ut.ok(project != undefined); 
+       ut.ok(project != undefined);
        ut.ok(types.isArray(project.tasks));
     });
-    
+
     ut.test("tasks", function () {
         var project = new taskLib.Project();
         var task = project.addTask({description: "hello"});
@@ -27,11 +27,11 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.ok(task.id.length > 10, "task id is " + task.id);
         ut.equal(types.typeOf(task.modified), 'number', 'modified');
         ut.equal(types.typeOf(task.created), 'number', 'created');
-        
+
         var other = project.getTask(task.id);
         ut.strictEqual(task, other, "id lookup");
     });
-    
+
     ut.test("toJSON", function () {
         var project = new taskLib.Project();
         project.addTask({description: "foo"});
@@ -39,14 +39,14 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.equal(json.tasks.length, 1);
         ut.equal(json.tasks[0].description, "foo");
     });
-    
+
     ut.test("task change", function () {
         var project = new taskLib.Project();
         var task = project.addTask({description: "foo"});
         task.change({description: "bar"});
         ut.equal(task.description, "bar");
         ut.equal(task.history.length, 0);
-        
+
         taskLib.updateNow(new Date(new Date().getTime() + 1000));
         task.change({actual: 8});
         ut.equal(task.history.length, 1);
@@ -55,32 +55,34 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.equal(task.history[0].prop, 'actual');
         ut.ok(task.modified > task.created, "modified date update");
     });
-    
+
     ut.test("move after", function () {
         var task;
         var project = new taskLib.Project();
-        
+
+        function testOrder(reorder) {
+            for (var i = 0; i < 10; i++) {
+                task = project.tasks[i];
+                ut.equal(task.description, "Task #" + reorder[i]);
+            }
+        }
+
         for (var i = 0; i < 10; i++) {
             project.addTask({description: "Task #" + (i + 1)});
         }
-        for (var i = 0; i < 10; i++) {
-            task = project.tasks[i];
-            ut.equal(task.description, "Task #" + (i + 1));
-        }
+        testOrder([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+
         project.moveAfter(project.tasks[5], project.tasks[3]);
-        var reorder = [1, 2, 3, 4, 6, 5, 7, 8, 9, 10];
-        for (var i = 0; i < 10; i++) {
-            task = project.tasks[i];
-            ut.equal(task.description, "Task #" + reorder[i]);
-        }
+        testOrder([1, 2, 3, 4, 6, 5, 7, 8, 9, 10]);
+
         project.moveAfter(project.tasks[9]);
-        reorder = [10, 1, 2, 3, 4, 6, 5, 7, 8, 9];
-        for (var i = 0; i < 10; i++) {
-            task = project.tasks[i];
-            ut.equal(task.description, "Task #" + reorder[i]);
-        }
-    });
-    
+        testOrder([10, 1, 2, 3, 4, 6, 5, 7, 8, 9]);
+
+        project.moveAfter(project.tasks[1], project.tasks[3]);
+        testOrder([10, 2, 3, 1, 4, 6, 5, 7, 8, 9]);
+
+ });
+
     ut.test("parseDescription", function () {
         var tests = [
             ["nothing here", "nothing here", {}],
@@ -93,7 +95,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
             ["kitchen sink @mike [sink, kitchen] +1.3", "kitchen sink",
              {assignedTo: ['mike'], tags: ['sink', 'kitchen'], remaining: 1.3}]
         ];
-        
+
         for (var i = 0; i < tests.length; i++) {
             var test = tests[i];
             var options = {description: test[0]};
@@ -105,5 +107,5 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
     });
 
     coverage.testCoverage();
-    
+
 });

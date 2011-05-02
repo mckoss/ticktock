@@ -1071,17 +1071,12 @@ Project.methods({
 
    // Move the first tasks to a position just after the second task
    // If no 2nd task is given, more the first task to position 0.
-   moveAfter: function (after, before) {
-       var iAfter, iBefore;
-       iAfter = this.findIndex(after);
-       if (before) {
-           iBefore = this.findIndex(before);
-       } else {
-           iBefore = -1;
+   moveAfter: function (mover, target) {
+       var n = this.findIndex(target) - this.findIndex(mover);
+       if (n < 0) {
+           n++;
        }
-
-       var mover = this.tasks.splice(iAfter, 1)[0];
-       this.tasks.splice(iBefore + 1, 0, mover);
+       this.move(mover, n);
    },
 
    // Move task by n positions up or down - but should not move
@@ -1089,7 +1084,7 @@ Project.methods({
    move: function (task, n) {
        var iTask = this.findIndex(task);
        var iMove = iTask + n;
-       if (iMove < 0 || iMove >= this.tasks.length) {
+       if (n == 0 || iMove < 0 || iMove >= this.tasks.length) {
            return;
        }
        task = this.tasks.splice(iTask, 1)[0];

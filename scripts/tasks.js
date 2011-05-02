@@ -32,7 +32,7 @@ function Project(options) {
     if (this.tasks == undefined) {
         this.tasks = [];
     }
-    
+
     this.schema = 1;
 
     for (var i = 0; i < this.tasks.length; i++) {
@@ -47,15 +47,15 @@ Project.methods({
        this.tasks.push(task);
        return task;
    },
-   
+
    install: function(task) {
        this.map[task.id] = task;
    },
-   
+
    getTask: function (id) {
         return this.map[id];
    },
-   
+
    // Search for target - either a task or task.id - return index in array
    findIndex: function (target) {
        for (var i = 0; i < this.tasks.length; i++) {
@@ -68,45 +68,40 @@ Project.methods({
            }
        }
    },
-   
+
    // Move the first tasks to a position just after the second task
    // If no 2nd task is given, more the first task to position 0.
-   moveAfter: function (after, before) {
-       var iAfter, iBefore;
-       iAfter = this.findIndex(after);
-       if (before) {
-           iBefore = this.findIndex(before);
-       } else {
-           iBefore = -1;
+   moveAfter: function (mover, target) {
+       var n = this.findIndex(target) - this.findIndex(mover);
+       if (n < 0) {
+           n++;
        }
-       
-       var mover = this.tasks.splice(iAfter, 1)[0];
-       this.tasks.splice(iBefore + 1, 0, mover);
+       this.move(mover, n);
    },
-   
+
    // Move task by n positions up or down - but should not move
    // above it's own same-status section. TODO
    move: function (task, n) {
        var iTask = this.findIndex(task);
        var iMove = iTask + n;
-       if (iMove < 0 || iMove >= this.tasks.length) {
+       if (n == 0 || iMove < 0 || iMove >= this.tasks.length) {
            return;
        }
        task = this.tasks.splice(iTask, 1)[0];
        this.tasks.splice(iMove, 0, task);
    },
-   
+
    toJSON: function () {
        return {tasks: this.tasks};
    },
-   
+
    // Calculate cumulative remaining, and actual
    // by Day.
    cumulativeData: function(prop) {
        var minDate, maxDate;
        var buckets = {};
        var bucket, i, j;
-       
+
        for (i = 0; i < this.tasks.length; i++) {
            var task = this.tasks[i];
            var hist = task.history;
@@ -138,7 +133,7 @@ Project.methods({
        }
        return results;
    }
-   
+
 });
 
 function Task(options, project) {
@@ -192,7 +187,7 @@ Task.methods({
        types.extend(this, options);
        return this;
    },
-   
+
    getContentHTML: function () {
        var html = "";
        html += format.escapeHTML(this.description);
@@ -209,7 +204,7 @@ Task.methods({
        }
        return html;
    },
-   
+
    getEditText: function () {
        var text = "";
        text += this.description;
@@ -225,7 +220,7 @@ Task.methods({
        }
        return text;
    }
-   
+
 });
 
 function updateNow(d) {
@@ -267,7 +262,7 @@ function parseDescription(options) {
 
     desc = desc.replace(reRemain, function (whole, key) {
         remaining += parseFloat(key);
-        return ' '; 
+        return ' ';
     });
 
     options.description = string.strip(desc);
