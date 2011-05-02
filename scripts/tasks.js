@@ -198,7 +198,7 @@ Task.methods({
 
    getContentHTML: function () {
        var html = "";
-       html += format.escapeHTML(this.description);
+       html += '<span class="description">{0}</span>'.format(format.escapeHTML(this.description));
        var est = Math.max(this.actual, this.remaining) + 0.05;
        if (est > 0.05) {
            html += " (";

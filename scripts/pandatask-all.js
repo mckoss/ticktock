@@ -783,7 +783,8 @@ require('org.startpad.funcs').patch();
 exports.extend({
     'onReady': onReady,
     'getDoc': getDoc,
-    'setDoc': setDoc
+    'setDoc': setDoc,
+    'onSaveSuccess': onSaveSuccess
 });
 
 var client;
@@ -793,15 +794,15 @@ var editedTask;
 var editedText;
 var editedStatus;
 
-var TASK = '<div id="{id}" class="task {className}">' +
-           '<div id="action_{id}" class="action"><input type="checkbox" id="check_{id}"/></div>' +
-           '<div id="promote_{id}" class="promote icon"></div>' +
-           '<div class="delete icon" id="delete_{id}"></div>' +
-           '<div class="content if-not-edit">{content}' +
-           '</div>' +
-           '<div class="edit-container">' +
-           '<textarea class="if-edit"></textarea>' +
-           '</div></div>';
+var TASK =
+    '<div id="{id}" class="task {className}">' +
+    // REVIEW: Why do we need a div wrapper?
+    '<div id="action_{id}" class="action"><input type="checkbox" id="check_{id}"/></div>' +
+    '<div id="promote_{id}" class="promote icon"></div>' +
+    '<div class="delete icon" id="delete_{id}"></div>' +
+    '<div class="content if-not-edit">{content}</div>' +
+    '<div class="edit-container if-edit"><textarea></textarea></div>' +
+    '</div>';
 
 var UPDATE_INTERVAL = 1000 * 60;
 
@@ -835,6 +836,7 @@ function onClick(evt) {
 
 function setDoc(json) {
     project = new taskLib.Project(json.blob);
+    $(doc["project-title"]).text(json.title);
     refresh();
 }
 
@@ -843,6 +845,10 @@ function getDoc() {
         blob: project.toJSON(),
         readers: ['public']
     };
+}
+
+function onSaveSuccess() {
+    $(doc["project-title"]).text(client.meta.title);
 }
 
 function refresh() {
@@ -951,10 +957,10 @@ function editTask(task, evt) {
 
 function onKey(evt) {
     var right = 39,
-        left = 37,
-        up = 38,
-        down = 40,
-        enter = 13;
+    left = 37,
+    up = 38,
+    down = 40,
+    enter = 13;
 
     if (!editedTask) {
         return;
@@ -1198,7 +1204,7 @@ Task.methods({
 
    getContentHTML: function () {
        var html = "";
-       html += format.escapeHTML(this.description);
+       html += '<span class="description">{0}</span>'.format(format.escapeHTML(this.description));
        var est = Math.max(this.actual, this.remaining) + 0.05;
        if (est > 0.05) {
            html += " (";

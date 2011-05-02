@@ -8,7 +8,8 @@ require('org.startpad.funcs').patch();
 exports.extend({
     'onReady': onReady,
     'getDoc': getDoc,
-    'setDoc': setDoc
+    'setDoc': setDoc,
+    'onSaveSuccess': onSaveSuccess
 });
 
 var client;
@@ -18,15 +19,15 @@ var editedTask;
 var editedText;
 var editedStatus;
 
-var TASK = '<div id="{id}" class="task {className}">' +
+var TASK =
+    '<div id="{id}" class="task {className}">' +
+    // REVIEW: Why do we need a div wrapper?
     '<div id="action_{id}" class="action"><input type="checkbox" id="check_{id}"/></div>' +
     '<div id="promote_{id}" class="promote icon"></div>' +
     '<div class="delete icon" id="delete_{id}"></div>' +
-    '<div class="content if-not-edit">{content}' +
-    '</div>' +
-    '<div class="edit-container">' +
-    '<textarea class="if-edit"></textarea>' +
-    '</div></div>';
+    '<div class="content if-not-edit">{content}</div>' +
+    '<div class="edit-container if-edit"><textarea></textarea></div>' +
+    '</div>';
 
 var UPDATE_INTERVAL = 1000 * 60;
 
@@ -60,6 +61,7 @@ function onClick(evt) {
 
 function setDoc(json) {
     project = new taskLib.Project(json.blob);
+    $(doc["project-title"]).text(json.title);
     refresh();
 }
 
@@ -68,6 +70,10 @@ function getDoc() {
         blob: project.toJSON(),
         readers: ['public']
     };
+}
+
+function onSaveSuccess() {
+    $(doc["project-title"]).text(client.meta.title);
 }
 
 function refresh() {
