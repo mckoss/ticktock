@@ -19,15 +19,15 @@ var editedText;
 var editedStatus;
 
 var TASK = '<div id="{id}" class="task {className}">' +
-           '<div id="action_{id}" class="action"><input type="checkbox" id="check_{id}"/></div>' +
-           '<div id="promote_{id}" class="promote icon"></div>' +
-           '<div class="delete icon" id="delete_{id}"></div>' +
-           '<div class="content if-not-edit">{content}' + 
-           '</div>' +
-           '<div class="edit-container">' +
-           '<textarea class="if-edit"></textarea>' +
-           '</div></div>';
-           
+    '<div id="action_{id}" class="action"><input type="checkbox" id="check_{id}"/></div>' +
+    '<div id="promote_{id}" class="promote icon"></div>' +
+    '<div class="delete icon" id="delete_{id}"></div>' +
+    '<div class="content if-not-edit">{content}' +
+    '</div>' +
+    '<div class="edit-container">' +
+    '<textarea class="if-edit"></textarea>' +
+    '</div></div>';
+
 var UPDATE_INTERVAL = 1000 * 60;
 
 function onReady() {
@@ -38,13 +38,13 @@ function onReady() {
     client = new clientLib.Client(exports);
     client.saveInterval = 0;
     client.autoLoad = true;
-    
+
     client.addAppBar();
     refresh();
-    
+
     $(window).keydown(onKey);
     $(document.body).mousedown(onClick);
-    
+
     setInterval(taskLib.updateNow, UPDATE_INTERVAL);
 }
 
@@ -133,14 +133,14 @@ function editTask(task, evt) {
     if (editedTask) {
         saveTask(editedTask);
     }
-    
+
     $('#' + task.id).addClass('edit');
     editedText = task.getEditText ? task.getEditText() : task.description;
     $('textarea', '#' + task.id).val(editedText).focus().select();
     editedTask = task;
     // We don't want the body click event to cancel enter edit mode.
     evt.stopPropagation();
-    
+
     function moveIt(status) {
         if (editedTask.id != 'new') {
             editedStatus = status;
@@ -148,7 +148,7 @@ function editTask(task, evt) {
         }
         saveTask(editedTask);
     }
-    
+
     var id = $(evt.target).attr('id');
     if (id.length && id.split('_').length) {
         var type = id.split('_')[0];
@@ -176,10 +176,10 @@ function editTask(task, evt) {
 
 function onKey(evt) {
     var right = 39,
-        left = 37,
-        up = 38,
-        down = 40,
-        enter = 13;
+    left = 37,
+    up = 38,
+    down = 40,
+    enter = 13;
 
     if (!editedTask) {
         return;
