@@ -1,7 +1,7 @@
 h2.task-header {
   background: #333;
   background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#414141), to(#1d1d1d));
-  background: -moz-linear-gradient(0% 100% 90deg,#6B4020, #AD6734);
+  background: -moz-linear-gradient(0% 100% 90deg, #1d1d1d, #414141);
   color: #fff;
   padding: 6px 14px;
   -webkit-border-radius: 5px;
