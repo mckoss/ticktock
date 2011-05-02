@@ -7,9 +7,9 @@
           { "path": "scripts/main.js", "namespace": "com.pandatask.main" },
           { "path": "scripts/tasks.js", "namespace": "com.pandatask.tasks"}
       ],
-			"scripts/format-extra.js": [
+      "scripts/format-extra.js": [
           { "path": "scripts/format.js", "namespace": "org.startpad.format"}
-			]
+      ]
   },
   "minify": false,
   "uploadIndividualFiles": false
