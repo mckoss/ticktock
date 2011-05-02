@@ -1026,6 +1026,10 @@ var taskProps = {'actual': true, 'remaining': true, 'status': true, 'description
                  'history': true, 'id': true, 'created': true, 'modified': true,
                  'start': true, assignedTo: true, tags: true};
 
+/* ==========================================================
+   Project
+   ========================================================== */
+
 function Project(options) {
     this.map = {};
     types.extend(this, options);
@@ -1136,6 +1140,10 @@ Project.methods({
 
 });
 
+/* ==========================================================
+   Task
+   ========================================================== */
+
 function Task(options, project) {
     this.id = random.randomString(16);
     this.created = now;
@@ -1222,6 +1230,10 @@ Task.methods({
    }
 
 });
+
+/* ==========================================================
+   Helper functions
+   ========================================================== */
 
 function updateNow(d) {
     if (d == undefined) {
