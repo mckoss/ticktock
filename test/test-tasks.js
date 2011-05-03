@@ -103,7 +103,10 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
              {tags: ['this-is-tagged', 'milestone']}],
             ["kitchen sink @mike #sink #kitchen +1.3", "kitchen sink",
              {assignedTo: ['mike'], tags: ['sink', 'kitchen'], remaining: 1.3}],
-            ["Not a #1 tag", "Not a #1 tag", {}]
+            ["Not a #1 tag", "Not a #1 tag", {}],
+            ["hours +2h", "hours", {remaining: 2.0}],
+            ["days +2d", "days", {remaining: 48.0}],
+            ["minutes +15m", "minutes", {remaining: 0.25}]
         ];
 
         for (var i = 0; i < tests.length; i++) {

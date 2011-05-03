@@ -81,7 +81,7 @@ function refresh() {
     $('#ready-tasks').empty();
     $('#done-tasks').empty();
     addTemplateTask();
-    
+
     for (var i = 0; i < project.tasks.length; i++) {
         var task = project.tasks[i];
         addTask(task, task.status + '-tasks');
@@ -200,7 +200,7 @@ function onKey(evt) {
     switch (evt.keyCode) {
     case up:
     case down:
-        if (!evt.ctrlKey || editTask.id == 'new') {
+        if (!evt.ctrlKey || editedTask.id == 'new') {
             evt.preventDefault();
             return;
         }

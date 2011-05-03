@@ -975,7 +975,7 @@ function onKey(evt) {
     switch (evt.keyCode) {
     case up:
     case down:
-        if (!evt.ctrlKey || editTask.id == 'new') {
+        if (!evt.ctrlKey || editedTask.id == 'new') {
             evt.preventDefault();
             return;
         }
@@ -1024,7 +1024,7 @@ exports.extend({
 var msPerHour = 1000 * 60 * 60;
 var reTag = /\s+#([a-zA-Z]\S+)/g;
 var rePerson = /\s+@(\S+)/g;
-var reRemain = /\s+\+(\d+(?:\.\d*)?)/g;
+var reRemain = /\s+\+(\d+(?:\.\d*)?)([dhm]?)/g;
 
 var now = new Date().getTime();
 
@@ -1233,8 +1233,8 @@ Task.methods({
            text += ' @' + this.assignedTo.join(' @');
        }
        var remaining = this.remaining + 0.05;
-       if (remaining > 0.5) {
-           text += ' +' + format.thousands(remaining, 1);
+       if (remaining > 0.05) {
+           text += ' +' + timeString(remaining);
        }
        return text;
    }
@@ -1256,8 +1256,23 @@ function pluralize(base, n) {
     return base + (n == 1 ? '' : 's');
 }
 
+function timeString(hrs) {
+    if (hrs > 48) {
+        return format.thousands(hrs / 24 + 0.05, 1) + 'd';
+    }
+
+    var min = hrs * 60;
+
+    // Fractional hours
+    if (min > 15) {
+        return format.thousands(hrs + 0.05, 1) + 'h';
+    }
+
+    return format.thousands(min + 0.5, 0) + 'm';
+}
+
 // Parse description to exctract:
-// +hrs - remaining
+// +hrs - remaining (optional 'h', 'd', or 'm' suffix)
 // [tags] - tags
 // @person - assignedTo
 function parseDescription(options) {
@@ -1279,8 +1294,17 @@ function parseDescription(options) {
         return '';
     });
 
-    desc = desc.replace(reRemain, function (whole, key) {
-        remaining += parseFloat(key);
+    desc = desc.replace(reRemain, function (whole, key, units) {
+        var factor = 1;
+        switch (units) {
+        case 'd':
+            factor = 24;
+            break;
+        case 'm':
+            factor = 1 / 60;
+            break;
+        }
+        remaining += parseFloat(key) * factor;
         return '';
     });
 
