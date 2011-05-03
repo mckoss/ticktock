@@ -167,10 +167,7 @@ Task.methods({
            } else if (this.status == 'working') {
                var hrs = (now - this.start) / msPerHour;
                delete this.start;
-               if (options.actual == undefined) {
-                   options.actual = 0;
-               }
-               options.actual += hrs;
+               this.actual += hrs;
            }
        }
 
@@ -199,13 +196,19 @@ Task.methods({
    getContentHTML: function () {
        var html = "";
        html += '<span class="description">{0}</span>'.format(format.escapeHTML(this.description));
-       var est = Math.max(this.actual, this.remaining) + 0.05;
-       if (est > 0.05) {
+       if (this.actual || this.remaining) {
            html += " (";
            if (this.actual) {
-               html += format.thousands(this.actual + 0.05, 1) + '/';
+               html += timeString(this.actual);
+               if (this.remaining) {
+                   html += '/';
+               }
+
            }
-           html += format.thousands(est, 1) + ' ' + pluralize('hr', est) + ")";
+           if (this.remaining) {
+               html += timeString(this.remaining);
+           }
+           html += ")";
        }
        if (this.assignedTo && this.assignedTo.length > 0) {
            html += '<div class="assigned">' + this.assignedTo.join(', ') + "</div>";
@@ -225,9 +228,8 @@ Task.methods({
        if (this.assignedTo && this.assignedTo.length > 0) {
            text += ' @' + this.assignedTo.join(' @');
        }
-       var remaining = this.remaining + 0.05;
-       if (remaining > 0.05) {
-           text += ' +' + timeString(remaining);
+       if (this.remaining > 0) {
+           text += ' +' + timeString(this.remaining);
        }
        return text;
    }
@@ -243,10 +245,6 @@ function updateNow(d) {
         d = new Date();
     }
     now = d.getTime();
-}
-
-function pluralize(base, n) {
-    return base + (n == 1 ? '' : 's');
 }
 
 function timeString(hrs) {

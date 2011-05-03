@@ -127,7 +127,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.ok(html.indexOf("test task") != -1, "html description");
         ut.ok(html.indexOf(">tag<") != -1, "html tag: " + html);
         ut.ok(html.indexOf(">mike<") != -1, "html assignedTo: " + html);
-        ut.ok(html.indexOf("2.0 hrs") != -1, "html hours: " + html);
+        ut.ok(html.indexOf("2.0h") != -1, "html hours: " + html);
 
         var text = task.getEditText();
         ut.ok(text.indexOf("test task") != -1, "text description");
