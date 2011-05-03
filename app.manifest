@@ -19,34 +19,26 @@ NETWORK:
 #!EXLCUDE: images/featurebg
 #!EXCLUDE: images/panda-home
 #!EXCLUDE: images/footerbg
+#!EXCLUDE: images/featurebg
 #!EXCLUDE: images/footerli
-# TOTAL FILES: 42 (835,264 bytes)
-# SIGNATURE: af5b85391d1d5476575524979a7248f604bb9886
+#!EXCLUDE: images/t9panda
+#!EXCLUDE: images/bamboo
+#!EXCLUDE: README
+# TOTAL FILES: 30 (233,056 bytes)
+# SIGNATURE: b59e8ab01546431eefa020d0b7296a0cc97b4c6f
 CACHE:
-README.md
-grid.html
 images/add.png
-images/bamboo-001152-simple-silver.jpg
 images/bodybg.jpg
 images/contentbg.jpg
 images/down-arrow.png
 images/drag-and-drop.png
-images/featurebg.jpg
-images/gradient.jpg
 images/icon.png
-images/left.jpg
-images/left.png
 images/logo.png
 images/panda-header.png
-images/pencil.png
 images/remove.png
 images/right.png
 images/style.css
-images/t9panda_trans.png
-images/t9panda_trans132x192.png
 images/touch.png
-images/trash.png
-images/trashicon.png
 images/tryitbutton.jpg
 images/up-arrow.png
 index.html
