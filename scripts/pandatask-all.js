@@ -819,7 +819,7 @@ function onReady() {
     refresh();
 
     $(window).keydown(onKey);
-    $(document.body).mousedown(onClick);
+    $(document).mousedown(onClick);
 
     setInterval(taskLib.updateNow, UPDATE_INTERVAL);
 }
@@ -1005,7 +1005,7 @@ function handleAppCache() {
 
 /* Source: scripts/tasks.js */
 namespace.module('com.pandatask.tasks', function (exports, require) {
-var cLientLib = require('com.pageforest.client');
+var clientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
 var types = require('org.startpad.types');
 var string = require('org.startpad.string');
@@ -1216,6 +1216,9 @@ Task.methods({
        }
        if (this.assignedTo && this.assignedTo.length > 0) {
            html += '<div class="assigned">' + this.assignedTo.join(', ') + "</div>";
+       }
+       if (this.tags && this.tags.length > 0) {
+           html += '<div class="tags">' + this.tags.join(', ') + "</div>";
        }
        return html;
    },

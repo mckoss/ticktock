@@ -123,17 +123,23 @@ div.task {
 .task-list { padding: 14px 7px; }
 
 div.task .assigned {
+  position: absolute;
+  width: 100px;
+  bottom: 2px;
+  right: 7px;
   font-size: 75%;
   color: red;
-  width: 100px;
   text-align: right;
-  position: absolute;
-  padding-right: 7px;
-  padding-bottom: 2px;
-  bottom: 0;
-  right: 0;
 }
 
+div.task .tags {
+  position: absolute;
+  width: 100px;
+  bottom: 2px;
+  left: 24px;
+  font-size: 75%;
+  color: green;
+}
 
 div.task textarea {
   width: 100%;

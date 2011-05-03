@@ -44,7 +44,7 @@ function onReady() {
     refresh();
 
     $(window).keydown(onKey);
-    $(document.body).mousedown(onClick);
+    $(document).mousedown(onClick);
 
     setInterval(taskLib.updateNow, UPDATE_INTERVAL);
 }
