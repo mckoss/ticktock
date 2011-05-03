@@ -27,9 +27,8 @@ NETWORK:
 #!EXCLUDE: images/bamboo
 #!EXCLUDE: images/tryit
 #!EXCLUDE: README
-#!EXCLUDE: scripts
-# TOTAL FILES: 20 (129,827 bytes)
-# SIGNATURE: e1f36824a347a95afec18856bb6211013a5c4364
+# TOTAL FILES: 28 (214,064 bytes)
+# SIGNATURE: 51d0bd49f84b6f7b7534ccbabde2caf789db0595
 CACHE:
 images/add.png
 images/bodybg.jpg
@@ -46,6 +45,14 @@ images/touch.png
 images/up-arrow.png
 index.html
 project
+scripts/format-extra.js
+scripts/format.js
+scripts/main.js
+scripts/namespace-plus.js
+scripts/namespace.js
+scripts/pandatask-all.js
+scripts/random.js
+scripts/tasks.js
 styles/ie.css
 styles/ie7.css
 styles/main.css
