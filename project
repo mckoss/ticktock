@@ -22,13 +22,8 @@
 
   <body>
     <div class="row">
-<<<<<<< HEAD
       <div class="column grid_16">
-        <div class='logo'><span id="project-title">Tick Tock Task</span></div>
-=======
-      <div class="column grid_12">
         <div class='logo'><span id="project-title">Panda Task</span></div>
->>>>>>> 07fe793ff525dc133208ca813c42502ec0e78eed
       </div>
     </div>
     <div class="row">
