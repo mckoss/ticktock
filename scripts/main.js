@@ -80,11 +80,12 @@ function refresh() {
     $('#working-tasks').empty();
     $('#ready-tasks').empty();
     $('#done-tasks').empty();
+    addTemplateTask();
+    
     for (var i = 0; i < project.tasks.length; i++) {
         var task = project.tasks[i];
         addTask(task, task.status + '-tasks');
     }
-    addTemplateTask();
 }
 
 function addTask(task, listName, className) {
@@ -105,7 +106,7 @@ function addTask(task, listName, className) {
 }
 
 function addTemplateTask() {
-    addTask({id: 'new', description: "Add new task"}, 'ready-tasks', 'new');
+    addTask({id: 'new', description: "Add new task"}, 'ready-tasks', 'top');
 }
 
 function saveTask(task) {

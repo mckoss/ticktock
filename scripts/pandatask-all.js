@@ -855,11 +855,12 @@ function refresh() {
     $('#working-tasks').empty();
     $('#ready-tasks').empty();
     $('#done-tasks').empty();
+    addTemplateTask();
+
     for (var i = 0; i < project.tasks.length; i++) {
         var task = project.tasks[i];
         addTask(task, task.status + '-tasks');
     }
-    addTemplateTask();
 }
 
 function addTask(task, listName, className) {
