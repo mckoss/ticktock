@@ -7,7 +7,6 @@
     <link rel="apple-touch-icon" href="/images/touch.png" />
 
     <link rel="stylesheet" type="text/css" href="/styles/main.css" />
-    <link rel="stylesheet" type="text/css" href="/styles/grid.css" />
     <link rel="stylesheet" type="text/css" href="/lib/beta/css/client.css" />
     <link rel="stylesheet" type="text/css" href="/styles/project.css" />
 
@@ -23,7 +22,7 @@
 
   <body>
     <div class="row">
-      <div class="column grid_12">
+      <div class="column grid_16">
         <div class='logo'><span id="project-title">Tick Tock Task</span></div>
       </div>
     </div>
@@ -38,6 +37,23 @@
       <div class="column grid_6">
         <h2 class='task-header'>Done</h2>
         <div id="done-tasks" class="task-list"></div>
+      </div>
+      <div class='column grid_4'>
+        <div class='box' id='cheat'>
+          <h3>CHEAT SHEET</h3>
+          <div class='cheats'>
+            <div>Assign task: @person</div>
+            <div>Tag keyword: #keyword</div>
+            <div>Estimate hours: +2</div>
+          </div>
+          
+          <h3>EXAMPLES</h3>
+          <div class='cheats'>
+            <div>Save pandas</div>
+            <div>Find new bamboo tree @mike</div>
+            <div>Escape zoo @sam #bug +2</div>
+          </div>
+        </div>
       </div>
     </div>
 
