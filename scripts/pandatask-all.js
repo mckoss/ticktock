@@ -881,7 +881,7 @@ function addTask(task, listName, className) {
 }
 
 function addTemplateTask() {
-    addTask({id: 'new', description: "Add new task"}, 'ready-tasks', 'new');
+    addTask({id: 'new', description: "Add new task"}, 'ready-tasks', 'top');
 }
 
 function saveTask(task) {

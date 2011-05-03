@@ -29,14 +29,14 @@
     </div>
     <div class="row">
       <div class="column grid_6">
-        <h2 class='task-header'>Working</h2>
+        <h2 class='task-header'>Active</h2>
         <div id="working-tasks" class="task-list"></div>
 
-        <h2 class='task-header'>Ready</h2>
+        <h2 class='task-header'>Queue</h2>
         <div id="ready-tasks" class="task-list"></div>
       </div>
       <div class="column grid_6">
-        <h2 class='task-header'>Complete</h2>
+        <h2 class='task-header'>Done</h2>
         <div id="done-tasks" class="task-list"></div>
       </div>
     </div>
