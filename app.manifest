@@ -9,6 +9,8 @@ CACHE MANIFEST
 /static/images/appbar/down.png
 /static/images/appbar/logo.png
 
+scripts/pandatask-all.js
+
 NETWORK:
 *
 
@@ -23,9 +25,11 @@ NETWORK:
 #!EXCLUDE: images/footerli
 #!EXCLUDE: images/t9panda
 #!EXCLUDE: images/bamboo
+#!EXCLUDE: images/tryit
 #!EXCLUDE: README
-# TOTAL FILES: 30 (233,075 bytes)
-# SIGNATURE: 7b9483f505d03c39b05e98c2fa53a1f4805734dd
+#!EXCLUDE: scripts
+# TOTAL FILES: 20 (129,827 bytes)
+# SIGNATURE: e1f36824a347a95afec18856bb6211013a5c4364
 CACHE:
 images/add.png
 images/bodybg.jpg
@@ -39,19 +43,9 @@ images/remove.png
 images/right.png
 images/style.css
 images/touch.png
-images/tryitbutton.jpg
 images/up-arrow.png
 index.html
-landing.html
 project
-scripts/format-extra.js
-scripts/format.js
-scripts/main.js
-scripts/namespace-plus.js
-scripts/namespace.js
-scripts/pandatask-all.js
-scripts/random.js
-scripts/tasks.js
 styles/ie.css
 styles/ie7.css
 styles/main.css
