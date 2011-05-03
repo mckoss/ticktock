@@ -97,11 +97,13 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
             ["  extra space  ", "extra space", {}],
             ["my task @mike", "my task", {assignedTo: ['mike']}],
             ["our @mike task @bobby", "our task", {assignedTo: ['mike', 'bobby']}],
+            ["Two people @sam @mike", "Two people", {assignedTo: ['sam', 'mike']}],
             ["more work +2", "more work", {remaining: 2.0}],
-            ["tagged task [this is tagged, milestone]", "tagged task",
+            ["tagged task #this-is-tagged #milestone", "tagged task",
              {tags: ['this-is-tagged', 'milestone']}],
-            ["kitchen sink @mike [sink, kitchen] +1.3", "kitchen sink",
-             {assignedTo: ['mike'], tags: ['sink', 'kitchen'], remaining: 1.3}]
+            ["kitchen sink @mike #sink #kitchen +1.3", "kitchen sink",
+             {assignedTo: ['mike'], tags: ['sink', 'kitchen'], remaining: 1.3}],
+            ["Not a #1 tag", "Not a #1 tag", {}]
         ];
 
         for (var i = 0; i < tests.length; i++) {
@@ -116,7 +118,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
 
     ut.test("Task", function () {
         var project = new taskLib.Project();
-        var task = new taskLib.Task({description: "test task @mike [tag] +2"}, project);
+        var task = new taskLib.Task({description: "test task @mike #tag +2"}, project);
 
         var html = task.getContentHTML();
         ut.ok(html.indexOf("test task") != -1, "html description");
@@ -126,7 +128,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
 
         var text = task.getEditText();
         ut.ok(text.indexOf("test task") != -1, "text description");
-        ut.ok(text.indexOf("[tag]") != -1, "text tag: " + text);
+        ut.ok(text.indexOf("#tag") != -1, "text tag: " + text);
         ut.ok(text.indexOf("@mike") != -1, "text assignedTo: " + text);
         ut.ok(text.indexOf("+2") != -1, "text hours: " + text);
     });

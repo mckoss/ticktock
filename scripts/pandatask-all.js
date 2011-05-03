@@ -1022,9 +1022,9 @@ exports.extend({
 });
 
 var msPerHour = 1000 * 60 * 60;
-var reTags = /\s*\[([^\]]*)\]\s*/g;
-var rePerson = /\s*@(\S+)\s*/g;
-var reRemain = /\s*\+(\d+(?:\.\d*)?)\s*/g;
+var reTag = /\s+#([a-zA-Z]\S+)/g;
+var rePerson = /\s+@(\S+)/g;
+var reRemain = /\s+\+(\d+(?:\.\d*)?)/g;
 
 var now = new Date().getTime();
 
@@ -1227,7 +1227,7 @@ Task.methods({
        var text = "";
        text += this.description;
        if (this.tags && this.tags.length > 0) {
-           text += ' [' + this.tags.join(',') + ']';
+           text += ' #' + this.tags.join(' #');
        }
        if (this.assignedTo && this.assignedTo.length > 0) {
            text += ' @' + this.assignedTo.join(' @');
@@ -1271,20 +1271,17 @@ function parseDescription(options) {
 
     desc = desc.replace(rePerson, function (whole, key) {
         assignedTo.push(key);
-        return ' ';
+        return '';
     });
 
-    desc = desc.replace(reTags, function (whole, key) {
-        var keys = key.split(',');
-        for (var i = 0; i < keys.length; i++) {
-            tags.push(format.slugify(keys[i]));
-        }
-        return ' ';
+    desc = desc.replace(reTag, function (whole, key) {
+        tags.push(key);
+        return '';
     });
 
     desc = desc.replace(reRemain, function (whole, key) {
         remaining += parseFloat(key);
-        return ' ';
+        return '';
     });
 
     options.description = string.strip(desc);
