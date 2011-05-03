@@ -788,7 +788,7 @@ exports.extend({
 });
 
 var client;
-var doc;                            // Bound elements here
+var $doc;                            // Bound elements here
 var project;
 var editedTask;
 var editedText;
@@ -808,7 +808,11 @@ var UPDATE_INTERVAL = 1000 * 60;
 
 function onReady() {
     handleAppCache();
-    doc = dom.bindIDs();
+    $doc = dom.bindIDs();
+    // REVIEW: This should be the native behavior of bindIDs.
+    for (var id in $doc) {
+        $doc[id] = $($doc[id]);
+    }
 
     project = new taskLib.Project();
     client = new clientLib.Client(exports);
@@ -821,7 +825,15 @@ function onReady() {
     $(window).keydown(onKey);
     $(document).mousedown(onClick);
 
-    setInterval(taskLib.updateNow, UPDATE_INTERVAL);
+    setInterval(onTimer, UPDATE_INTERVAL);
+}
+
+function onTimer() {
+    taskLib.updateNow();
+    $('div.task', $doc['working-tasks']).each(function () {
+        var task = project.getTask(this.id);
+        $('.content', this).html(task.getContentHTML());
+    });
 }
 
 function onClick(evt) {
@@ -836,7 +848,7 @@ function onClick(evt) {
 
 function setDoc(json) {
     project = new taskLib.Project(json.blob);
-    $(doc["project-title"]).text(json.title);
+    $doc["project-title"].text(json.title);
     refresh();
 }
 
@@ -848,7 +860,7 @@ function getDoc() {
 }
 
 function onSaveSuccess() {
-    $(doc["project-title"]).text(client.meta.title);
+    $doc["project-title"].text(client.meta.title);
 }
 
 function refresh() {
@@ -861,6 +873,7 @@ function refresh() {
         var task = project.tasks[i];
         addTask(task, task.status + '-tasks');
     }
+    onTimer();
 }
 
 function addTask(task, listName, className) {
@@ -872,7 +885,7 @@ function addTask(task, listName, className) {
         className = '';
     }
     content = task.getContentHTML ? task.getContentHTML() : task.description;
-    $(doc[listName])[top ? 'prepend': 'append'](TASK.format(
+    $doc[listName][top ? 'prepend': 'append'](TASK.format(
         types.extend({content: content}, task)));
     $('#' + task.id).click(editTask.curry(task));
     if (listName == 'done-tasks') {
@@ -1203,14 +1216,18 @@ Task.methods({
    getContentHTML: function () {
        var html = "";
        html += '<span class="description">{0}</span>'.format(format.escapeHTML(this.description));
-       if (this.actual || this.remaining) {
-           html += " (";
-           if (this.actual) {
-               html += timeString(this.actual);
-               if (this.remaining) {
-                   html += '/';
-               }
+       if (this.actual || this.remaining || this.start) {
+           var actual = this.actual;
+           if (this.start) {
+               actual += (now - this.start) / msPerHour;
+           }
 
+           html += " (";
+           if (actual) {
+               html += "<span{0}>{1}</span>{2}".format(
+                   this.remaining && actual > this.remaining ? ' class="overdue"' : '',
+                   timeString(actual),
+                   this.remaining ? '/' : '');
            }
            if (this.remaining) {
                html += timeString(this.remaining);

@@ -27,8 +27,8 @@ NETWORK:
 #!EXCLUDE: images/bamboo
 #!EXCLUDE: images/tryit
 #!EXCLUDE: README
-# TOTAL FILES: 28 (214,814 bytes)
-# SIGNATURE: 5d7e4642372744040e02fb07a589dd1f48644492
+# TOTAL FILES: 28 (216,030 bytes)
+# SIGNATURE: 0a0eccc4579578e47a64c245774815590489cf55
 CACHE:
 images/add.png
 images/bodybg.jpg

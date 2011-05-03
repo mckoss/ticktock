@@ -196,14 +196,18 @@ Task.methods({
    getContentHTML: function () {
        var html = "";
        html += '<span class="description">{0}</span>'.format(format.escapeHTML(this.description));
-       if (this.actual || this.remaining) {
-           html += " (";
-           if (this.actual) {
-               html += timeString(this.actual);
-               if (this.remaining) {
-                   html += '/';
-               }
+       if (this.actual || this.remaining || this.start) {
+           var actual = this.actual;
+           if (this.start) {
+               actual += (now - this.start) / msPerHour;
+           }
 
+           html += " (";
+           if (actual) {
+               html += "<span{0}>{1}</span>{2}".format(
+                   this.remaining && actual > this.remaining ? ' class="overdue"' : '',
+                   timeString(actual),
+                   this.remaining ? '/' : '');
            }
            if (this.remaining) {
                html += timeString(this.remaining);

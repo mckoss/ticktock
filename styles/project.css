@@ -150,6 +150,11 @@ div.task textarea {
   box-sizing: border-box;
 }
 
+.overdue {
+  color: red;
+  font-weight: bold;
+}
+
 #new .content { color: #aaa; }
 
 #cheat div {
