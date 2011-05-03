@@ -20,8 +20,8 @@ NETWORK:
 #!EXCLUDE: images/panda-home
 #!EXCLUDE: images/footerbg
 #!EXCLUDE: images/footerli
-# TOTAL FILES: 43 (834,419 bytes)
-# SIGNATURE: f66d6ea7b6eea637c7b7c8f655bd65ea81e8f58a
+# TOTAL FILES: 42 (835,264 bytes)
+# SIGNATURE: af5b85391d1d5476575524979a7248f604bb9886
 CACHE:
 README.md
 grid.html
@@ -60,7 +60,6 @@ scripts/namespace.js
 scripts/pandatask-all.js
 scripts/random.js
 scripts/tasks.js
-styles/grid.css
 styles/ie.css
 styles/ie7.css
 styles/main.css

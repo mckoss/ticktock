@@ -18,6 +18,51 @@ blockquote, q {quotes:"" "";}
 a img {border:none;}
 a:focus{outline:1px dotted;}
 
+/* ================ */
+/* = The 1Kb Grid = */     /* 16 columns, 40 pixels each, with 20 pixel gutter */
+/* ================ */
+
+.grid_1 { width:40px; }
+.grid_2 { width:100px; }
+.grid_3 { width:160px; }
+.grid_4 { width:220px; }
+.grid_5 { width:280px; }
+.grid_6 { width:340px; }
+.grid_7 { width:400px; }
+.grid_8 { width:460px; }
+.grid_9 { width:520px; }
+.grid_10 { width:580px; }
+.grid_11 { width:640px; }
+.grid_12 { width:700px; }
+.grid_13 { width:760px; }
+.grid_14 { width:820px; }
+.grid_15 { width:880px; }
+.grid_16 { width:940px; }
+
+.column {
+	margin: 0 10px;
+	overflow: hidden;
+	float: left;
+	display: inline;
+}
+.row {
+	width: 960px;
+	margin: 0 auto;
+	overflow: hidden;
+}
+.row .row {
+	margin: 0 -10px;
+	width: auto;
+	display: inline-block;
+}
+
+.row#top,
+#top .column {
+  overflow: visible;
+}
+
+/* End 1kb Grid */
+
 body {
   font-family:  helvetica, arial, sans-serif;
   font-size: 14px;
@@ -27,8 +72,8 @@ body {
 
 h1 { font-size: 24px; margin: 18px 5px; color: #777; }
 h2 { font-size: 18px; }
-h1, h2 { font-weight: bold; }
-
+h3 { margin-bottom: 1em;}
+h1, h2, h3 { font-weight: bold; }
 
 a { color: #069; text-decoration: none; }
 a:hover, a:focus { text-decoration: underline; }
@@ -51,4 +96,14 @@ li { line-height: 120%; margin-bottom: 8px; }
   padding: 10px 0;
   margin-top: 10px;
   text-align: center;
+}
+
+.box {
+  padding: 7px;
+  margin: 0px 4px 4px 0px;
+  background: #fafafa;
+  background: rgba(255, 255, 255, 0.7);
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
 }

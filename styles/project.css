@@ -102,8 +102,6 @@ input[type='checkbox'] {
   width: 100%;
 }
 
-div.task-list-header { text-align: center; border-bottom: 2px solid gray; }
-
 div.task.edit .if-not-edit { display: none; }
 div.task:not(.edit) .if-edit { display: none; }
 
@@ -119,7 +117,7 @@ div.task {
 }
 
 #working-tasks div.task { background-color: #c0ffac; }
-
+#done-tasks div.task { background-color: #D5EDF8; }
 .task-list { padding: 14px 7px; }
 
 div.task .assigned {
@@ -152,3 +150,12 @@ div.task textarea {
 }
 
 #new .content { color: #aaa; }
+
+#cheat div {
+  font-size: 12px; 
+  color: #666;
+}
+
+.cheats {
+  margin-bottom: 1em;
+}
