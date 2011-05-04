@@ -788,7 +788,7 @@ exports.extend({
 });
 
 var client;
-var doc;                            // Bound elements here
+var $doc;                            // Bound elements here
 var project;
 var editedTask;
 var editedText;
@@ -808,7 +808,11 @@ var UPDATE_INTERVAL = 1000 * 60;
 
 function onReady() {
     handleAppCache();
-    doc = dom.bindIDs();
+    $doc = dom.bindIDs();
+    // REVIEW: This should be the native behavior of bindIDs.
+    for (var id in $doc) {
+        $doc[id] = $($doc[id]);
+    }
 
     project = new taskLib.Project();
     client = new clientLib.Client(exports);
@@ -821,7 +825,15 @@ function onReady() {
     $(window).keydown(onKey);
     $(document).mousedown(onClick);
 
-    setInterval(taskLib.updateNow, UPDATE_INTERVAL);
+    setInterval(onTimer, UPDATE_INTERVAL);
+}
+
+function onTimer() {
+    taskLib.updateNow();
+    $('div.task', $doc['working-tasks']).each(function () {
+        var task = project.getTask(this.id);
+        $('.content', this).html(task.getContentHTML());
+    });
 }
 
 function onClick(evt) {
@@ -836,7 +848,7 @@ function onClick(evt) {
 
 function setDoc(json) {
     project = new taskLib.Project(json.blob);
-    $(doc["project-title"]).text(json.title);
+    $doc["project-title"].text(json.title);
     refresh();
 }
 
@@ -848,7 +860,7 @@ function getDoc() {
 }
 
 function onSaveSuccess() {
-    $(doc["project-title"]).text(client.meta.title);
+    $doc["project-title"].text(client.meta.title);
 }
 
 function refresh() {
@@ -861,6 +873,7 @@ function refresh() {
         var task = project.tasks[i];
         addTask(task, task.status + '-tasks');
     }
+    onTimer();
 }
 
 function addTask(task, listName, className) {
@@ -872,7 +885,7 @@ function addTask(task, listName, className) {
         className = '';
     }
     content = task.getContentHTML ? task.getContentHTML() : task.description;
-    $(doc[listName])[top ? 'prepend': 'append'](TASK.format(
+    $doc[listName][top ? 'prepend': 'append'](TASK.format(
         types.extend({content: content}, task)));
     $('#' + task.id).click(editTask.curry(task));
     if (listName == 'done-tasks') {
@@ -975,7 +988,7 @@ function onKey(evt) {
     switch (evt.keyCode) {
     case up:
     case down:
-        if (!evt.ctrlKey || editTask.id == 'new') {
+        if (!evt.ctrlKey || editedTask.id == 'new') {
             evt.preventDefault();
             return;
         }
@@ -1022,9 +1035,9 @@ exports.extend({
 });
 
 var msPerHour = 1000 * 60 * 60;
-var reTags = /\s*\[([^\]]*)\]\s*/g;
-var rePerson = /\s*@(\S+)\s*/g;
-var reRemain = /\s*\+(\d+(?:\.\d*)?)\s*/g;
+var reTag = /\s+#([a-zA-Z]\S+)/g;
+var rePerson = /\s+@(\S+)/g;
+var reRemain = /\s+\+(\d+(?:\.\d*)?)([dhm]?)/g;
 
 var now = new Date().getTime();
 
@@ -1174,10 +1187,7 @@ Task.methods({
            } else if (this.status == 'working') {
                var hrs = (now - this.start) / msPerHour;
                delete this.start;
-               if (options.actual == undefined) {
-                   options.actual = 0;
-               }
-               options.actual += hrs;
+               this.actual += hrs;
            }
        }
 
@@ -1206,13 +1216,23 @@ Task.methods({
    getContentHTML: function () {
        var html = "";
        html += '<span class="description">{0}</span>'.format(format.escapeHTML(this.description));
-       var est = Math.max(this.actual, this.remaining) + 0.05;
-       if (est > 0.05) {
-           html += " (";
-           if (this.actual) {
-               html += format.thousands(this.actual + 0.05, 1) + '/';
+       if (this.actual || this.remaining || (this.start && now > this.start)) {
+           var actual = this.actual;
+           if (this.start) {
+               actual += (now - this.start) / msPerHour;
            }
-           html += format.thousands(est, 1) + ' ' + pluralize('hr', est) + ")";
+
+           html += " (";
+           if (actual) {
+               html += "<span{0}>{1}</span>{2}".format(
+                   this.remaining && actual > this.remaining ? ' class="overdue"' : '',
+                   timeString(actual),
+                   this.remaining ? '/' : '');
+           }
+           if (this.remaining) {
+               html += timeString(this.remaining);
+           }
+           html += ")";
        }
        if (this.assignedTo && this.assignedTo.length > 0) {
            html += '<div class="assigned">' + this.assignedTo.join(', ') + "</div>";
@@ -1227,14 +1247,13 @@ Task.methods({
        var text = "";
        text += this.description;
        if (this.tags && this.tags.length > 0) {
-           text += ' [' + this.tags.join(',') + ']';
+           text += ' #' + this.tags.join(' #');
        }
        if (this.assignedTo && this.assignedTo.length > 0) {
            text += ' @' + this.assignedTo.join(' @');
        }
-       var remaining = this.remaining + 0.05;
-       if (remaining > 0.5) {
-           text += ' +' + format.thousands(remaining, 1);
+       if (this.remaining > 0) {
+           text += ' +' + timeString(this.remaining);
        }
        return text;
    }
@@ -1252,12 +1271,23 @@ function updateNow(d) {
     now = d.getTime();
 }
 
-function pluralize(base, n) {
-    return base + (n == 1 ? '' : 's');
+function timeString(hrs) {
+    if (hrs > 48) {
+        return format.thousands(hrs / 24 + 0.05, 1) + 'd';
+    }
+
+    var min = hrs * 60;
+
+    // Fractional hours
+    if (min > 15) {
+        return format.thousands(hrs + 0.05, 1) + 'h';
+    }
+
+    return format.thousands(min + 0.5, 0) + 'm';
 }
 
 // Parse description to exctract:
-// +hrs - remaining
+// +hrs - remaining (optional 'h', 'd', or 'm' suffix)
 // [tags] - tags
 // @person - assignedTo
 function parseDescription(options) {
@@ -1271,20 +1301,26 @@ function parseDescription(options) {
 
     desc = desc.replace(rePerson, function (whole, key) {
         assignedTo.push(key);
-        return ' ';
+        return '';
     });
 
-    desc = desc.replace(reTags, function (whole, key) {
-        var keys = key.split(',');
-        for (var i = 0; i < keys.length; i++) {
-            tags.push(format.slugify(keys[i]));
+    desc = desc.replace(reTag, function (whole, key) {
+        tags.push(key);
+        return '';
+    });
+
+    desc = desc.replace(reRemain, function (whole, key, units) {
+        var factor = 1;
+        switch (units) {
+        case 'd':
+            factor = 24;
+            break;
+        case 'm':
+            factor = 1 / 60;
+            break;
         }
-        return ' ';
-    });
-
-    desc = desc.replace(reRemain, function (whole, key) {
-        remaining += parseFloat(key);
-        return ' ';
+        remaining += parseFloat(key) * factor;
+        return '';
     });
 
     options.description = string.strip(desc);

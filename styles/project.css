@@ -114,6 +114,7 @@ div.task {
   -webkit-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
   box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
 }
 
 #working-tasks div.task { background-color: #c0ffac; }
@@ -149,10 +150,15 @@ div.task textarea {
   box-sizing: border-box;
 }
 
+.overdue {
+  color: red;
+  font-weight: bold;
+}
+
 #new .content { color: #aaa; }
 
 #cheat div {
-  font-size: 12px; 
+  font-size: 12px;
   color: #666;
 }
 

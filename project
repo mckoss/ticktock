@@ -10,7 +10,7 @@
     <link rel="stylesheet" type="text/css" href="/lib/beta/css/client.css" />
     <link rel="stylesheet" type="text/css" href="/styles/project.css" />
 
-    <script type="text/javascript" src="/lib/beta/js/pf-client.js"></script>
+    <script type="text/javascript" src="/lib/beta/js/pf-client.min.js"></script>
     <script type="text/javascript" src="/scripts/pandatask-all.js"></script>
 
     <script type="text/javascript">
@@ -46,7 +46,7 @@
             <div>Tag keyword: #keyword</div>
             <div>Estimate hours: +2</div>
           </div>
-          
+
           <h3>EXAMPLES</h3>
           <div class='cheats'>
             <div>Save pandas</div>
