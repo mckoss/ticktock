@@ -63,5 +63,14 @@
       <a href="https://github.com/mckoss/ticktock">Fork me @ GitHub</a> |
       <a href="http://www.pageforest.com">Pageforest.com</a>
     </div>
+    
+    <!-- UserVoice widget -->
+    <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/SJvkyqBI9V9Xmm96XB14yQ.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+    </script>
   </body>
 </html>
