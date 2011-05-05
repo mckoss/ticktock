@@ -41,6 +41,8 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.equal(json.schema, 2, "schema");
         ut.equal(json.ready.length, 1);
         ut.equal(json.ready[0].description, "foo");
+        ut.equal(json.working.length, 0);
+        ut.equal(json.done.length, 0);
     });
 
     ut.test("task change", function () {

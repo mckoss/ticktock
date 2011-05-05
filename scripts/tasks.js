@@ -130,7 +130,7 @@ Project.methods({
 
     // Object to use for JSON persistence
     toJSON: function () {
-        return types.extend({schema: 2}, types.project(this, ['ready', 'working', 'don']));
+        return types.extend({schema: 2}, types.project(this, ['ready', 'working', 'done']));
     },
 
     // Calculate cumulative remaining, and actual
