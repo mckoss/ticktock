@@ -227,6 +227,7 @@ function Task(options, project) {
 
 Task.methods({
     change: function (options, quiet) {
+        var changed = false;
         parseDescription(options);
         validateProperties(options, taskValidation);
 
@@ -245,15 +246,21 @@ Task.methods({
             this._getProject().removeTask(this);
             this.status = options.status;
             this._getProject().insertTask(this);
+            changed = true;
         }
 
         for (var prop in options) {
             if (options.hasOwnProperty(prop)) {
+                if (this[prop] == options[prop]) {
+                    continue;
+                }
+                changed = true;
+                var oldValue = this[prop] || 0;
+                var newValue = options[prop];
+                this[prop] = options[prop];
                 if (!historyProps[prop]) {
                     continue;
                 }
-                var oldValue = this[prop] || 0;
-                var newValue = options[prop];
                 if (oldValue != newValue) {
                     if (!this.history) {
                         this.history = [];
@@ -263,8 +270,7 @@ Task.methods({
                 }
             }
         }
-        types.extend(this, options);
-        if (!quiet) {
+        if (changed && !quiet) {
             this._getProject()._notify('change', this, {properties: Object.keys(options)});
         }
         return this;
