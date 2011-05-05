@@ -68,7 +68,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         }
 
         for (var i = 0; i < 10; i++) {
-            project.addTask({description: "Task #" + (i + 1)});
+            project.addTask({description: "Task #" + (10 - i)});
         }
         testOrder([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
@@ -149,18 +149,23 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
 
         function onTaskChange(event) {
             var expect = expects.shift();
+            var prop;
             if (expect == undefined) {
                 ut.ok(false, "No event expected: " + event.action);
             }
-            ut.equal(event.action, expect.action, expect.action);
             if (expect.target) {
                 ut.strictEqual(event.target, expect.target);
             }
             if (expect.task) {
-                for (var prop in expect.task) {
+                for (prop in expect.task) {
                     ut.equal(event.target[prop], expect.task[prop],
                              prop + ' == ' + expect.task[prop]);
                 }
+            }
+            delete expect.target;
+            delete expect.task;
+            for (prop in expect) {
+                ut.equal(event[prop], expect[prop], prop + " == " + expect[prop]);
             }
         }
 
@@ -175,7 +180,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
 
         expects.push({action: 'move', target: task,
                       from: 0, to: 1, fromList: 'ready', toList: 'ready'});
-        project.move(task.id, -1);
+        project.move(task.id, 1);
 
         ut.equal(expects.length, 0, "Processed all expected notifications: " +
                  expects.map(function (x) { return x.action; }).join(', '));

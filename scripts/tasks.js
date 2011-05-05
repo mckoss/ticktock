@@ -44,15 +44,14 @@ Project.methods({
         if (!tasks) {
             return;
         }
-        for (var i = 0; i < tasks.length; i++) {
-            var task = tasks[i];
-            this.tasks.unshift(new Task(task, this));
+        for (var i = tasks.length - 1; i >= 0; i--) {
+            this.addTask(tasks[i]);
         }
     },
 
     addTask: function(task) {
         task = new Task(task, this);
-        this.tasks.push(task);
+        this.tasks.unshift(task);
         return task;
     },
 
