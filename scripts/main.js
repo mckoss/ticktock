@@ -39,7 +39,7 @@ function onReady() {
         $doc[id] = $($doc[id]);
     }
 
-    project = new taskLib.Project();
+    project = new taskLib.Project({onTaskChange: onTaskChange});
     client = new clientLib.Client(exports);
     client.saveInterval = 0;
     client.autoLoad = true;
@@ -72,7 +72,7 @@ function onClick(evt) {
 }
 
 function setDoc(json) {
-    project = new taskLib.Project(json.blob);
+    project = new taskLib.Project(types.extend({}, json.blob, {onTaskChange: onTaskChange}));
     $doc["project-title"].text(json.title);
     refresh();
 }
@@ -82,6 +82,10 @@ function getDoc() {
         blob: project.toJSON(),
         readers: ['public']
     };
+}
+
+function onTaskChange(taskChange) {
+    console.log("Task {action}: {target.id} in {target.status}".format(taskChange));
 }
 
 function onSaveSuccess() {

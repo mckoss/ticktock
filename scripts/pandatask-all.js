@@ -63,7 +63,7 @@
 /* Source: src/types.js */
 namespace.module('org.startpad.types', function (exports, require) {
 exports.extend({
-    'VERSION': '0.1.0',
+    'VERSION': '0.2.1',
     'isArguments': function (value) { return isType(value, 'arguments'); },
     'isArray': function (value) { return isType(value, 'array'); },
     'copyArray': copyArray,
@@ -71,8 +71,15 @@ exports.extend({
     'typeOf': typeOf,
     'extend': extend,
     'project': project,
-    'getFunctionName': getFunctionName
+    'getFunctionName': getFunctionName,
+    'keys': Object.keys || keys,
+    'patch': patch
 });
+
+function patch() {
+    Object.keys = Object.keys || keys;  // JavaScript 1.8.5
+    return exports;
+}
 
 // Can be used to copy Arrays and Arguments into an Array
 function copyArray(arg) {
@@ -163,6 +170,17 @@ function getFunctionName(fn) {
     }
     return result[1];
 }
+
+function keys(obj) {
+    var list = [];
+
+    for (var prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+            list.push(prop);
+        }
+    }
+    return list;
+}
 });
 
 /* Source: src/funcs.js */
@@ -170,7 +188,7 @@ namespace.module('org.startpad.funcs', function (exports, require) {
 var types = require('org.startpad.types');
 
 exports.extend({
-    'VERSION': '0.3.0',
+    'VERSION': '0.3.1',
     'methods': methods,
     'bind': bind,
     'decorate': decorate,
@@ -207,6 +225,10 @@ function monkeyPatch(ctor, by, version, patchMethods) {
 }
 
 function patch() {
+    if (!Object.create) {
+        Object.create = create;
+    }
+
     monkeyPatch(Function, 'org.startpad.funcs', exports.VERSION, {
         'methods': function (obj) { methods(this, obj); },
         'curry': function () {
@@ -393,6 +415,7 @@ function strip(s) {
     return (s || "").replace(/^\s+|\s+$/g, "");
 }
 });
+
 /* Source: scripts/random.js */
 namespace.module('org.startpad.random', function (exports, require) {
 exports.randomString = randomString;
@@ -814,7 +837,7 @@ function onReady() {
         $doc[id] = $($doc[id]);
     }
 
-    project = new taskLib.Project();
+    project = new taskLib.Project({onTaskChange: onTaskChange});
     client = new clientLib.Client(exports);
     client.saveInterval = 0;
     client.autoLoad = true;
@@ -847,7 +870,7 @@ function onClick(evt) {
 }
 
 function setDoc(json) {
-    project = new taskLib.Project(json.blob);
+    project = new taskLib.Project(types.extend({}, json.blob, {onTaskChange: onTaskChange}));
     $doc["project-title"].text(json.title);
     refresh();
 }
@@ -857,6 +880,10 @@ function getDoc() {
         blob: project.toJSON(),
         readers: ['public']
     };
+}
+
+function onTaskChange(taskChange) {
+    console.log("Task {action}: {target.id} in {target.status}".format(taskChange));
 }
 
 function onSaveSuccess() {
@@ -1020,7 +1047,7 @@ function handleAppCache() {
 namespace.module('com.pandatask.tasks', function (exports, require) {
 var clientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
-var types = require('org.startpad.types');
+var types = require('org.startpad.types').patch();
 var string = require('org.startpad.string');
 var random = require('org.startpad.random');
 var format = require('org.startpad.format');
@@ -1066,97 +1093,105 @@ function Project(options) {
 }
 
 Project.methods({
-   addTask: function(task) {
-       task = new Task(task, this);
-       this.tasks.push(task);
-       return task;
-   },
+    addTask: function(task) {
+        task = new Task(task, this);
+        this.tasks.push(task);
+        this._notify('add', task);
+        return task;
+    },
 
-   install: function(task) {
-       this.map[task.id] = task;
-   },
+    _notify: function (action, target, options) {
+        if (this.onTaskChange) {
+            this.onTaskChange(types.extend({action: action, target: target}, options));
+        }
+    },
 
-   getTask: function (id) {
+    install: function(task) {
+        this.map[task.id] = task;
+    },
+
+    getTask: function (id) {
         return this.map[id];
-   },
+    },
 
-   // Search for target - either a task or task.id - return index in array
-   findIndex: function (target) {
-       for (var i = 0; i < this.tasks.length; i++) {
-           var task = this.tasks[i];
-           if (typeof target == 'string') {
-               task = task.id;
-           }
-           if (task === target) {
-               return i;
-           }
-       }
-   },
+    // Search for target - either a task or task.id - return index in array
+    findIndex: function (target) {
+        for (var i = 0; i < this.tasks.length; i++) {
+            var task = this.tasks[i];
+            if (typeof target == 'string') {
+                task = task.id;
+            }
+            if (task === target) {
+                return i;
+            }
+        }
+    },
 
-   // Move the first tasks to a position just after the second task
-   // If no 2nd task is given, more the first task to position 0.
-   moveAfter: function (mover, target) {
-       var n = this.findIndex(target) - this.findIndex(mover);
-       if (n < 0) {
-           n++;
-       }
-       this.move(mover, n);
-   },
+    // Move the first tasks to a position just after the second task
+    // If no 2nd task is given, more the first task to position 0.
+    moveAfter: function (mover, target) {
+        var n = this.findIndex(target) - this.findIndex(mover);
+        if (n < 0) {
+            n++;
+        }
+        this.move(mover, n);
+    },
 
-   // Move task by n positions up or down - but should not move
-   // above it's own same-status section. TODO
-   move: function (task, n) {
-       var iTask = this.findIndex(task);
-       var iMove = iTask + n;
-       if (n == 0 || iMove < 0 || iMove >= this.tasks.length) {
-           return;
-       }
-       task = this.tasks.splice(iTask, 1)[0];
-       this.tasks.splice(iMove, 0, task);
-   },
+    // Move task by n positions up or down
+    // TODO: do not move outside its own same-status section.
+    move: function (task, n) {
+        var iTask = this.findIndex(task);
+        var iMove = iTask + n;
+        if (n == 0 || iMove < 0 || iMove >= this.tasks.length) {
+            return;
+        }
+        task = this.tasks.splice(iTask, 1)[0];
+        this.tasks.splice(iMove, 0, task);
+        this._notify('move', task, {from: iTask, to: iMove});
+    },
 
-   toJSON: function () {
-       return {tasks: this.tasks};
-   },
+    toJSON: function () {
+        return {tasks: this.tasks};
+    },
 
-   // Calculate cumulative remaining, and actual
-   // by Day.
-   cumulativeData: function(prop) {
-       var minDate, maxDate;
-       var buckets = {};
-       var bucket, i, j;
+    // Calculate cumulative remaining, and actual
+    // by Day.
+    cumulativeData: function(prop) {
+        var minDate, maxDate;
+        var buckets = {};
+        var bucket, i, j;
 
-       for (i = 0; i < this.tasks.length; i++) {
-           var task = this.tasks[i];
-           var hist = task.history;
-           for (j = 0; j < hist.length; j++) {
-               var change = hist[j];
-               if (minDate == undefined || change.when < minDate) {
-                   minDate = change.when;
-               }
-               if (maxDate == undefined || change.when > maxDate) {
-                   maxDate = change.when;
-               }
-               bucket = buckets[change.when];
-               if (bucket == undefined) {
-                   bucket = {actual: 0, remaining: 0};
-                   buckets[change.when] = bucket;
-               }
-               bucket[change.prop] += change.newValue - change.oldValue;
-           }
-       }
-       var results = [];
-       var cumulative = {actual: 0, remaining: 0};
-       for (var curDate = minDate; curDate <= maxDate; curDate = tomorrow(curDate)) {
-           bucket = buckets[curDate];
-           if (bucket != undefined) {
-               cumulative.actual += bucket.actual;
-               cumulative.remaining += bucket.remaining;
-           }
-           results[curDate] = types.extend({date: curDate}, cumulative);
-       }
-       return results;
-   }
+        for (i = 0; i < this.tasks.length; i++) {
+            var task = this.tasks[i];
+            var hist = task.history || [];
+            for (j = 0; j < hist.length; j++) {
+                var change = hist[j];
+                if (minDate == undefined || change.when < minDate) {
+                    minDate = change.when;
+                }
+                if (maxDate == undefined || change.when > maxDate) {
+                    maxDate = change.when;
+                }
+                bucket = buckets[change.when];
+                if (bucket == undefined) {
+                    bucket = {actual: 0, remaining: 0};
+                    buckets[change.when] = bucket;
+                }
+                bucket[change.prop] += change.newValue - change.oldValue;
+            }
+        }
+        var results = [];
+        var cumulative = {actual: 0, remaining: 0};
+        for (var curDate = minDate; curDate <= maxDate; curDate = tomorrow(curDate)) {
+            bucket = buckets[curDate];
+            if (bucket != undefined) {
+                cumulative.actual += bucket.actual;
+                cumulative.remaining += bucket.remaining;
+            }
+            results[curDate] = types.extend({date: curDate}, cumulative);
+        }
+        return results;
+    }
 
 });
 
@@ -1165,98 +1200,106 @@ Project.methods({
    ========================================================== */
 
 function Task(options, project) {
+    this._getProject = function () { return project; };
+
     this.id = random.randomString(16);
     this.created = now;
-    this.history = [];
     this.status = 'ready';
     this.remaining = 0;
     this.actual = 0;
     this.description = '';
     this.change(options);
+    if (this.history && this.history.length == 0) {
+        delete this.history;
+    }
     project.install(this);
 }
 
 Task.methods({
-   change: function (options) {
-       this.modified = now;
-       // status *->working: record start time
-       // status working->* increment actual time
-       if (options.status && options.status != this.status) {
-           if (options.status == 'working') {
-               this.start = now;
-           } else if (this.status == 'working') {
-               var hrs = (now - this.start) / msPerHour;
-               delete this.start;
-               this.actual += hrs;
-           }
-       }
+    change: function (options) {
+        this.modified = now;
+        // status *->working: record start time
+        // status working->* increment actual time
+        if (options.status && options.status != this.status) {
+            if (options.status == 'working') {
+                this.start = now;
+            } else if (this.status == 'working') {
+                var hrs = (now - this.start) / msPerHour;
+                delete this.start;
+                this.actual += hrs;
+            }
+        }
 
-       parseDescription(options);
+        parseDescription(options);
 
-       for (var prop in options) {
-           if (!taskProps[prop]) {
-               throw new Error("Invalid task property: " + prop);
-           }
-           if (options.hasOwnProperty(prop)) {
-               if (!historyProps[prop]) {
-                   continue;
-               }
-               var oldValue = this[prop] || 0;
-               var newValue = options[prop];
-               if (oldValue != newValue) {
-                   this.history.push({prop: prop, when: this.modified,
-                       oldValue: oldValue, newValue: newValue});
-                   }
-           }
-       }
-       types.extend(this, options);
-       return this;
-   },
+        for (var prop in options) {
+            if (!taskProps[prop]) {
+                throw new Error("Invalid task property: " + prop);
+            }
+            if (options.hasOwnProperty(prop)) {
+                if (!historyProps[prop]) {
+                    continue;
+                }
+                var oldValue = this[prop] || 0;
+                var newValue = options[prop];
+                if (oldValue != newValue) {
+                    if (!this.history) {
+                        this.history = [];
+                    }
+                    this.history.push({prop: prop, when: this.modified,
+                                       oldValue: oldValue, newValue: newValue});
+                }
+            }
+        }
+        types.extend(this, options);
+        this._getProject()._notify('change', this, {properties: Object.keys(options)});
+        return this;
+    },
 
-   getContentHTML: function () {
-       var html = "";
-       html += '<span class="description">{0}</span>'.format(format.escapeHTML(this.description));
-       if (this.actual || this.remaining || (this.start && now > this.start)) {
-           var actual = this.actual;
-           if (this.start) {
-               actual += (now - this.start) / msPerHour;
-           }
+    getContentHTML: function () {
+        var html = "";
+        html += '<span class="description">{0}</span>'.format(format.escapeHTML(this.description));
+        if (this.actual || this.remaining || (this.start && now > this.start)) {
+            var actual = this.actual;
+            if (this.start) {
+                actual += (now - this.start) / msPerHour;
+            }
 
-           html += " (";
-           if (actual) {
-               html += "<span{0}>{1}</span>{2}".format(
-                   this.remaining && actual > this.remaining ? ' class="overdue"' : '',
-                   timeString(actual),
-                   this.remaining ? '/' : '');
-           }
-           if (this.remaining) {
-               html += timeString(this.remaining);
-           }
-           html += ")";
-       }
-       if (this.assignedTo && this.assignedTo.length > 0) {
-           html += '<div class="assigned">' + this.assignedTo.join(', ') + "</div>";
-       }
-       if (this.tags && this.tags.length > 0) {
-           html += '<div class="tags">' + this.tags.join(', ') + "</div>";
-       }
-       return html;
-   },
+            html += " (";
+            if (actual) {
+                html += "<span{0}>{1}</span>{2}".format(
+                    this.remaining && actual > this.remaining ? ' class="overdue"' : '',
+                    timeString(actual),
+                    this.remaining ? '/' : '');
+            }
+            if (this.remaining) {
+                html += timeString(this.remaining);
+            }
+            html += ")";
+        }
+        if (this.assignedTo && this.assignedTo.length > 0) {
+            html += '<div class="assigned">' + this.assignedTo.join(', ') + "</div>";
+        }
+        if (this.tags && this.tags.length > 0) {
+            html += '<div class="tags">' + this.tags.join(', ') + "</div>";
+        }
+        return html;
+    },
 
-   getEditText: function () {
-       var text = "";
-       text += this.description;
-       if (this.tags && this.tags.length > 0) {
-           text += ' #' + this.tags.join(' #');
-       }
-       if (this.assignedTo && this.assignedTo.length > 0) {
-           text += ' @' + this.assignedTo.join(' @');
-       }
-       if (this.remaining > 0) {
-           text += ' +' + timeString(this.remaining);
-       }
-       return text;
-   }
+    getEditText: function () {
+        var text = "";
+        text += this.description;
+        if (this.tags && this.tags.length > 0) {
+            text += ' #' + this.tags.join(' #');
+        }
+        if (this.assignedTo && this.assignedTo.length > 0) {
+            text += ' @' + this.assignedTo.join(' @');
+        }
+        if (this.remaining > 0) {
+            text += ' +' + timeString(this.remaining);
+        }
+        return text;
+    }
 
 });
 
@@ -1338,3 +1381,4 @@ function parseDescription(options) {
     }
 }
 });
+

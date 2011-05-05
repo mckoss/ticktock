@@ -45,7 +45,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         var task = project.addTask({description: "foo"});
         task.change({description: "bar"});
         ut.equal(task.description, "bar");
-        ut.equal(task.history.length, 0);
+        ut.equal(task.history, undefined);
 
         taskLib.updateNow(new Date(new Date().getTime() + 1000));
         task.change({actual: 8});
