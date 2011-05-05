@@ -145,6 +145,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
     ut.test("onTaskChange", function () {
         var project = new taskLib.Project({onTaskChange: onTaskChange});
         var expects = [];
+        var task;
 
         function onTaskChange(event) {
             var expect = expects.shift();
@@ -152,11 +153,28 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
                 ut.ok(false, "No event expected: " + event.action);
             }
             ut.equal(event.action, expect.action, expect.action);
+            if (expect.target) {
+                ut.strictEqual(event.target, expect.target);
+            }
+            if (expect.task) {
+                for (var prop in expect.task) {
+                    ut.equal(event.target[prop], expect.task[prop],
+                             prop + ' == ' + expect.task[prop]);
+                }
+            }
         }
 
-        expects.push({action: 'add'});
-        project.addTask({description: "test"});
-        ut.equal(expects.length, 0, "Processed all expected notifications");
+        expects.push({action: 'add', task: {description: "test 1"}});
+        project.addTask({description: "test 1"});
+
+
+        expects.push({action: 'add', task: {description: "test 2"}});
+        task = project.addTask({description: "test 2"});
+
+        expects.push({action: 'change', target: task, task: {description: "task 2 prime"}});
+        task.change({description: "task 2 prime"});
+
+        ut.equal(expects.length, 0, "Processed all expected notifications: " + expects.join(', '));
     });
 
     coverage.testCoverage();
