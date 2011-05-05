@@ -17,7 +17,9 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
     ut.test("project", function () {
         var project = new taskLib.Project();
         ut.ok(project != undefined);
-        ut.ok(types.isArray(project.tasks));
+        ut.ok(types.isArray(project.ready));
+        ut.ok(types.isArray(project.working));
+        ut.ok(types.isArray(project.done));
     });
 
     ut.test("tasks", function () {
@@ -36,8 +38,9 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         var project = new taskLib.Project();
         project.addTask({description: "foo"});
         var json = project.toJSON();
-        ut.equal(json.tasks.length, 1);
-        ut.equal(json.tasks[0].description, "foo");
+        ut.equal(json.schema, 2, "schema");
+        ut.equal(json.ready.length, 1);
+        ut.equal(json.ready[0].description, "foo");
     });
 
     ut.test("task change", function () {
@@ -69,32 +72,33 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
 
         function testOrder(reorder) {
             for (var i = 0; i < 10; i++) {
-                task = project.tasks[i];
+                task = project.ready[i];
                 ut.equal(task.description, "Task #" + reorder[i]);
             }
         }
 
         for (var i = 0; i < 10; i++) {
+            // addTask inserts at the head of the ready list
             project.addTask({description: "Task #" + (10 - i)});
         }
         testOrder([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
-        project.moveAfter(project.tasks[5], project.tasks[3]);
+        project.moveAfter(project.ready[5], project.ready[3]);
         testOrder([1, 2, 3, 4, 6, 5, 7, 8, 9, 10]);
 
-        project.moveAfter(project.tasks[9]);
+        project.moveAfter(project.ready[9]);
         testOrder([10, 1, 2, 3, 4, 6, 5, 7, 8, 9]);
 
-        project.moveAfter(project.tasks[1], project.tasks[3]);
+        project.moveAfter(project.ready[1], project.ready[3]);
         testOrder([10, 2, 3, 1, 4, 6, 5, 7, 8, 9]);
 
-        project.move(project.tasks[1], 4);
+        project.move(project.ready[1], 4);
         testOrder([10, 3, 1, 4, 6, 2, 5, 7, 8, 9]);
 
-        project.move(project.tasks[1], 0);
+        project.move(project.ready[1], 0);
         testOrder([10, 3, 1, 4, 6, 2, 5, 7, 8, 9]);
 
-        project.move(project.tasks[1], -1);
+        project.move(project.ready[1], -1);
         testOrder([3, 10, 1, 4, 6, 2, 5, 7, 8, 9]);
     });
 

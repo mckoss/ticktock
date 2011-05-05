@@ -28,16 +28,23 @@ var now = new Date().getTime();
 
    - Working tasks (new tasks added to top).
    - Ready tasks (new tasks added to top).
-   - Completed
+   - Completed (reverse chronological by completion date)
    ========================================================== */
 
 function Project(options) {
     options = options || {};
     this.map = {};
     types.extend(this, types.project(options, 'onTaskChange'));
-    this.tasks = [];
-    this.schema = 1;
-    this.mergeTasks(options.tasks);
+    this.ready = [];
+    this.working = [];
+    this.done = [];
+    if (!options.schema || options.schema == 1) {
+        this.mergeTasks(options.tasks);
+    } else {
+        this.mergeTasks(options.ready);
+        this.mergeTasks(options.working);
+        this.mergeTasks(options.done);
+    }
 }
 
 Project.methods({
@@ -52,7 +59,9 @@ Project.methods({
 
     addTask: function(task) {
         task = new Task(task, this);
-        this.tasks.unshift(task);
+        var list = task.getList();
+        // Add to top of list
+        list.unshift(task);
         return task;
     },
 
@@ -68,17 +77,22 @@ Project.methods({
     },
 
     getTask: function (id) {
-        return this.map[id];
+        if (typeof id == 'string') {
+            return this.map[id];
+        }
+        return id;
     },
 
-    // Search for target - either a task or task.id - return index in array
-    findIndex: function (target) {
-        for (var i = 0; i < this.tasks.length; i++) {
-            var task = this.tasks[i];
-            if (typeof target == 'string') {
-                task = task.id;
-            }
-            if (task === target) {
+    // Search for target - either a task or task.id - return position
+    // it's list
+    getListPosition: function (target) {
+        target = this.getTask(target);
+        if (target == undefined) {
+            return -1;
+        }
+        var list = target.getList();
+        for (var i = 0; i < list.length; i++) {
+            if (list[i] === target) {
                 return i;
             }
         }
@@ -87,7 +101,12 @@ Project.methods({
     // Move the first tasks to a position just after the second task
     // If no 2nd task is given, more the first task to position 0.
     moveAfter: function (mover, target) {
-        var n = this.findIndex(target) - this.findIndex(mover);
+        target = this.getTask(target);
+        mover = this.getTask(mover);
+        if (target && mover.status != target.status) {
+            mover.change({status: target.status});
+        }
+        var n = this.getListPosition(target) - this.getListPosition(mover);
         if (n < 0) {
             n++;
         }
@@ -95,21 +114,23 @@ Project.methods({
     },
 
     // Move task by n positions up or down
-    // TODO: do not move outside its own same-status section.
     move: function (task, n) {
-        var iTask = this.findIndex(task);
+        task = this.getTask(task);
+        var list = task.getList();
+        var iTask = this.getListPosition(task);
         var iMove = iTask + n;
-        if (n == 0 || iMove < 0 || iMove >= this.tasks.length) {
+        if (n == 0 || iMove < 0 || iMove >= list.length) {
             return;
         }
-        task = this.tasks.splice(iTask, 1)[0];
-        this.tasks.splice(iMove, 0, task);
+        task = list.splice(iTask, 1)[0];
+        list.splice(iMove, 0, task);
         this._notify('move', task, {from: iTask, to: iMove,
                                     fromList: task.status, toList: task.status});
     },
 
+    // Object to use for JSON persistence
     toJSON: function () {
-        return {tasks: this.tasks};
+        return types.extend({schema: 2}, types.project(this, ['ready', 'working', 'don']));
     },
 
     // Calculate cumulative remaining, and actual
@@ -119,8 +140,10 @@ Project.methods({
         var buckets = {};
         var bucket, i, j;
 
-        for (i = 0; i < this.tasks.length; i++) {
-            var task = this.tasks[i];
+        var tasks = this.ready.concat(this.working, this.done);
+
+        for (i = 0; i < tasks.length; i++) {
+            var task = tasks[i];
             var hist = task.history || [];
             for (j = 0; j < hist.length; j++) {
                 var change = hist[j];
@@ -158,11 +181,12 @@ Project.methods({
    ========================================================== */
 
 // Properties we allow to be changed (id and history are internal).
-var taskValidation = {'actual': 'number', 'remaining': 'number',
-                      'status': ['ready', 'working', 'done'],
-                      'description': 'string',
-                      'created': 'number', 'modified': 'number',
-                      'start': 'number', assignedTo: 'array', tags: 'array'};
+var taskValidation = {id: 'string', history: 'array',
+                      actual: 'number', remaining: 'number',
+                      status: ['ready', 'working', 'done'],
+                      description: 'string',
+                      created: 'number', modified: 'number',
+                      start: 'number', assignedTo: 'array', tags: 'array'};
 // Record history for changes to these properties.
 var historyProps = {'actual': true, 'remaining': true, 'status': true};
 
@@ -222,6 +246,10 @@ Task.methods({
             this._getProject()._notify('change', this, {properties: Object.keys(options)});
         }
         return this;
+    },
+
+    getList: function () {
+        return this._getProject()[this.status];
     },
 
     getContentHTML: function () {

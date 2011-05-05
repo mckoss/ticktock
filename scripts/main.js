@@ -93,15 +93,18 @@ function onSaveSuccess() {
 }
 
 function refresh() {
-    $('#working-tasks').empty();
-    $('#ready-tasks').empty();
-    $('#done-tasks').empty();
-    addTemplateTask();
+    var listNames = ['ready', 'working', 'done'];
 
-    for (var i = 0; i < project.tasks.length; i++) {
-        var task = project.tasks[i];
-        addTask(task, task.status + '-tasks');
+    for (var i = 0; i < listNames.length; i++) {
+        var listName = listNames[i];
+        $('#' + listName + '-tasks').empty();
+        var list = project[listName];
+        for (var j = 0; j < list.length; j++) {
+            var task = list[j];
+            addTask(task, listName + '-tasks');
+        }
     }
+    addTemplateTask();
     onTimer();
 }
 
