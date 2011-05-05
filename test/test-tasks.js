@@ -167,14 +167,18 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         expects.push({action: 'add', task: {description: "test 1"}});
         project.addTask({description: "test 1"});
 
-
         expects.push({action: 'add', task: {description: "test 2"}});
         task = project.addTask({description: "test 2"});
 
         expects.push({action: 'change', target: task, task: {description: "task 2 prime"}});
         task.change({description: "task 2 prime"});
 
-        ut.equal(expects.length, 0, "Processed all expected notifications: " + expects.join(', '));
+        expects.push({action: 'move', target: task,
+                      from: 0, to: 1, fromList: 'ready', toList: 'ready'});
+        project.move(task.id, -1);
+
+        ut.equal(expects.length, 0, "Processed all expected notifications: " +
+                 expects.map(function (x) { return x.action; }).join(', '));
     });
 
     coverage.testCoverage();
