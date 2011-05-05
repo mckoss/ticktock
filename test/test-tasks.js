@@ -54,6 +54,13 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.equal(task.history[0].oldValue, 0);
         ut.equal(task.history[0].prop, 'actual');
         ut.ok(task.modified > task.created, "modified date update");
+
+        ut.raises(function () { task.change({noSuchProperty: 1}); },
+                  /Invalid property/, "Unknown property");
+        ut.raises(function () { task.change({status: 'what'}); },
+                  /'what' is not one of/, "Invalid value");
+        ut.raises(function () { task.change({actual: 'not a number'}); },
+                  /actual is a string \(expected a number\)/, "Require a number");
     });
 
     ut.test("move", function () {

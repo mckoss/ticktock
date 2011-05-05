@@ -21,13 +21,14 @@ var reRemain = /\s+\+(\d+(?:\.\d*)?)([dhm]?)/g;
 
 var now = new Date().getTime();
 
-var historyProps = {'actual': true, 'remaining': true, 'status': true};
-var taskProps = {'actual': true, 'remaining': true, 'status': true, 'description': true,
-                 'history': true, 'id': true, 'created': true, 'modified': true,
-                 'start': true, assignedTo: true, tags: true};
-
 /* ==========================================================
    Project
+
+   tasks array is maintained in the following order:
+
+   - Working tasks (new tasks added to top).
+   - Ready tasks (new tasks added to top).
+   - Completed
    ========================================================== */
 
 function Project(options) {
@@ -156,6 +157,16 @@ Project.methods({
    Task
    ========================================================== */
 
+// Properties we allow to be changed (id and history are internal).
+var taskValidation = {'actual': 'number', 'remaining': 'number',
+                      'status': ['ready', 'working', 'done'],
+                      'description': 'string',
+                      'created': 'number', 'modified': 'number',
+                      'start': 'number', assignedTo: 'array', tags: 'array'};
+// Record history for changes to these properties.
+var historyProps = {'actual': true, 'remaining': true, 'status': true};
+
+
 function Task(options, project) {
     this._getProject = function () { return project; };
 
@@ -188,11 +199,9 @@ Task.methods({
         }
 
         parseDescription(options);
+        validateProperties(options, taskValidation);
 
         for (var prop in options) {
-            if (!taskProps[prop]) {
-                throw new Error("Invalid task property: " + prop);
-            }
             if (options.hasOwnProperty(prop)) {
                 if (!historyProps[prop]) {
                     continue;
@@ -337,5 +346,33 @@ function parseDescription(options) {
 
     if (tags.length > 0) {
         options.tags = tags;
+    }
+}
+
+function validateProperties(obj, validation) {
+    var prop;
+    for (prop in obj) {
+        if (!validation[prop]) {
+            throw new Error("Invalid property: " + prop);
+        }
+        if (types.typeOf(validation[prop]) == 'array') {
+            var allowed = validation[prop];
+            var found = false;
+            for (var i = 0; i < allowed.length; i++) {
+                if (obj[prop] == allowed[i]) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                throw new Error("Invalid property: '{0}' is not one of '{1}'".format(
+                    obj[prop], allowed.join(', ')));
+            }
+            continue;
+        }
+        if (types.typeOf(obj[prop]) != validation[prop]) {
+            throw new Error("Invalid property: {0} is a {1} (expected a {2})".format(
+                prop, types.typeOf(obj[prop]), validation[prop]));
+        }
     }
 }
