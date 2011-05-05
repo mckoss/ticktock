@@ -103,7 +103,8 @@ Project.methods({
         }
         task = this.tasks.splice(iTask, 1)[0];
         this.tasks.splice(iMove, 0, task);
-        this._notify('move', task, {from: iTask, to: iMove});
+        this._notify('move', task, {from: iTask, to: iMove,
+                                    fromList: task.status, toList: task.status});
     },
 
     toJSON: function () {
