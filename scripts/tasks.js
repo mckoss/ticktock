@@ -53,7 +53,6 @@ Project.methods({
     addTask: function(task) {
         task = new Task(task, this);
         this.tasks.push(task);
-        this._notify('add', task);
         return task;
     },
 
@@ -65,6 +64,7 @@ Project.methods({
 
     install: function(task) {
         this.map[task.id] = task;
+        this._notify('add', task);
     },
 
     getTask: function (id) {
@@ -165,7 +165,7 @@ function Task(options, project) {
     this.remaining = 0;
     this.actual = 0;
     this.description = '';
-    this.change(options);
+    this.change(options, true);
     if (this.history && this.history.length == 0) {
         delete this.history;
     }
@@ -173,7 +173,7 @@ function Task(options, project) {
 }
 
 Task.methods({
-    change: function (options) {
+    change: function (options, quiet) {
         this.modified = now;
         // status *->working: record start time
         // status working->* increment actual time
@@ -209,7 +209,9 @@ Task.methods({
             }
         }
         types.extend(this, options);
-        this._getProject()._notify('change', this, {properties: Object.keys(options)});
+        if (!quiet) {
+            this._getProject()._notify('change', this, {properties: Object.keys(options)});
+        }
         return this;
     },
 

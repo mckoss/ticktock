@@ -84,8 +84,8 @@ function getDoc() {
     };
 }
 
-function onTaskChange(taskChange) {
-    console.log("Task {action}: {target.id} in {target.status}".format(taskChange));
+function onTaskChange(event) {
+    console.log("Task {action}: {target.id} in {target.status}".format(event));
 }
 
 function onSaveSuccess() {

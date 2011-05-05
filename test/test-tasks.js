@@ -143,6 +143,20 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
     });
 
     ut.test("onTaskChange", function () {
+        var project = new taskLib.Project({onTaskChange: onTaskChange});
+        var expects = [];
+
+        function onTaskChange(event) {
+            var expect = expects.shift();
+            if (expect == undefined) {
+                ut.ok(false, "No event expected: " + event.action);
+            }
+            ut.equal(event.action, expect.action, expect.action);
+        }
+
+        expects.push({action: 'add'});
+        project.addTask({description: "test"});
+        ut.equal(expects.length, 0, "Processed all expected notifications");
     });
 
     coverage.testCoverage();
