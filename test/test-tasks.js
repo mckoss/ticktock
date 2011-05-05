@@ -142,6 +142,9 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.ok(types.isArray(data), "data array");
     });
 
+    ut.test("onTaskChange", function () {
+    });
+
     coverage.testCoverage();
 
 });

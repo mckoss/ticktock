@@ -1078,21 +1078,25 @@ var taskProps = {'actual': true, 'remaining': true, 'status': true, 'description
    ========================================================== */
 
 function Project(options) {
+    options = options || {};
     this.map = {};
-    types.extend(this, options);
-    if (this.tasks == undefined) {
-        this.tasks = [];
-    }
-
+    types.extend(this, types.project(options, 'onTaskChange'));
+    this.tasks = [];
     this.schema = 1;
-
-    for (var i = 0; i < this.tasks.length; i++) {
-        var task = this.tasks[i];
-        this.tasks[i] = new Task(task, this);
-    }
+    this.mergeTasks(options.tasks);
 }
 
 Project.methods({
+    mergeTasks: function (tasks) {
+        if (!tasks) {
+            return;
+        }
+        for (var i = 0; i < tasks.length; i++) {
+            var task = tasks[i];
+            this.tasks.unshift(new Task(task, this));
+        }
+    },
+
     addTask: function(task) {
         task = new Task(task, this);
         this.tasks.push(task);
