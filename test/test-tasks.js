@@ -60,6 +60,10 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.equal(task.history[0].prop, 'actual');
         ut.ok(task.modified > task.created, "modified date update");
 
+        ut.strictEqual(project.ready, task.getList(), "task in ready");
+        task.change({status: 'working'});
+        ut.strictEqual(project.working, task.getList(), "task in done");
+
         ut.raises(function () { task.change({noSuchProperty: 1}); },
                   /Invalid property/, "Unknown property");
         ut.raises(function () { task.change({status: 'what'}); },

@@ -1112,9 +1112,23 @@ Project.methods({
 
     addTask: function(task) {
         task = new Task(task, this);
+        return this.insertTask(task);
+    },
+
+    insertTask: function (task) {
         var list = task.getList();
         // Add to top of list
         list.unshift(task);
+        return task;
+    },
+
+    removeTask: function (task) {
+        task = this.getTask(task);
+        var i = this.getListPosition(task);
+        if (i != -1) {
+            task.getList().splice(i, 1);
+            return undefined;
+        }
         return task;
     },
 
@@ -1245,6 +1259,10 @@ var historyProps = {'actual': true, 'remaining': true, 'status': true};
 
 
 function Task(options, project) {
+    // Don't migrate other tasks project over
+    if (options._getProject) {
+        delete options._getProject;
+    }
     this._getProject = function () { return project; };
 
     this.id = random.randomString(16);
@@ -1262,6 +1280,9 @@ function Task(options, project) {
 
 Task.methods({
     change: function (options, quiet) {
+        parseDescription(options);
+        validateProperties(options, taskValidation);
+
         this.modified = now;
         // status *->working: record start time
         // status working->* increment actual time
@@ -1273,10 +1294,11 @@ Task.methods({
                 delete this.start;
                 this.actual += hrs;
             }
+            // Move between lists
+            this._getProject().removeTask(this);
+            this.status = options.status;
+            this._getProject().insertTask(this);
         }
-
-        parseDescription(options);
-        validateProperties(options, taskValidation);
 
         for (var prop in options) {
             if (options.hasOwnProperty(prop)) {
@@ -1433,27 +1455,29 @@ function parseDescription(options) {
 function validateProperties(obj, validation) {
     var prop;
     for (prop in obj) {
-        if (!validation[prop]) {
-            throw new Error("Invalid property: " + prop);
-        }
-        if (types.typeOf(validation[prop]) == 'array') {
-            var allowed = validation[prop];
-            var found = false;
-            for (var i = 0; i < allowed.length; i++) {
-                if (obj[prop] == allowed[i]) {
-                    found = true;
-                    break;
+        if (obj.hasOwnProperty(prop)) {
+            if (!validation[prop]) {
+                throw new Error("Invalid property: " + prop);
+            }
+            if (types.typeOf(validation[prop]) == 'array') {
+                var allowed = validation[prop];
+                var found = false;
+                for (var i = 0; i < allowed.length; i++) {
+                    if (obj[prop] == allowed[i]) {
+                        found = true;
+                        break;
+                    }
                 }
+                if (!found) {
+                    throw new Error("Invalid property: '{0}' is not one of '{1}'".format(
+                        obj[prop], allowed.join(', ')));
+                }
+                continue;
             }
-            if (!found) {
-                throw new Error("Invalid property: '{0}' is not one of '{1}'".format(
-                    obj[prop], allowed.join(', ')));
+            if (types.typeOf(obj[prop]) != validation[prop]) {
+                throw new Error("Invalid property: {0} is a {1} (expected a {2})".format(
+                    prop, types.typeOf(obj[prop]), validation[prop]));
             }
-            continue;
-        }
-        if (types.typeOf(obj[prop]) != validation[prop]) {
-            throw new Error("Invalid property: {0} is a {1} (expected a {2})".format(
-                prop, types.typeOf(obj[prop]), validation[prop]));
         }
     }
 }
