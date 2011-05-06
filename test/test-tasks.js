@@ -196,7 +196,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         task.change({description: "task 2 prime"});
 
         expects.push({action: 'move', target: task,
-                      from: 0, to: 1, fromList: 'ready', toList: 'ready'});
+                      from: 0, to: 1});
         project.move(task.id, 1);
 
         ut.equal(expects.length, 0, "Processed all expected notifications: " +

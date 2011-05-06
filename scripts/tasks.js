@@ -59,6 +59,7 @@ Project.methods({
 
     addTask: function(task) {
         task = new Task(task, this);
+        this._notify('add', task);
         return this.insertTask(task);
     },
 
@@ -66,6 +67,7 @@ Project.methods({
         var list = task.getList();
         // Add to top of list
         list.unshift(task);
+        this.map[task.id] = task;
         return task;
     },
 
@@ -76,6 +78,7 @@ Project.methods({
             task.getList().splice(i, 1);
             return undefined;
         }
+        delete this.map[task.id];
         return task;
     },
 
@@ -83,11 +86,6 @@ Project.methods({
         if (this.onTaskEvent) {
             this.onTaskEvent(types.extend({action: action, target: target}, options));
         }
-    },
-
-    install: function(task) {
-        this.map[task.id] = task;
-        this._notify('add', task);
     },
 
     getTask: function (id) {
@@ -138,7 +136,7 @@ Project.methods({
         }
         task = list.splice(iTask, 1)[0];
         list.splice(iMove, 0, task);
-        this._notify('move', task, {from: iTask, to: iMove,});
+        this._notify('move', task, {from: iTask, to: iMove});
     },
 
     // Object to use for JSON persistence
@@ -221,7 +219,6 @@ function Task(options, project) {
     if (this.history && this.history.length == 0) {
         delete this.history;
     }
-    project.install(this);
 }
 
 Task.methods({
