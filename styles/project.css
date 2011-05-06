@@ -24,7 +24,7 @@ h2.task-header {
    Side-bar Styles
    ====================================================== */
 
-#cheat h3 { margin-bottom: 05.em; }
+#cheat h3 { margin-bottom: 0; }
 #cheat .cheats { margin-bottom: 1em; }
 
 #cheat div {
@@ -41,6 +41,7 @@ div.task:not(.edit) .if-edit { display: none; }
 
 #working-tasks div.task { background-color: #C0FFAC; }
 #working-tasks .promote { background: url('/images/down-arrow.png'); }
+#new-tasks .check, #new-tasks .icon { display: none; }
 #new-tasks .content { color: #aaa; }
 #done-tasks div.task { background-color: #D5EDF8; }
 
@@ -56,36 +57,34 @@ div.task {
   overflow: hidden;
 }
 
-div.task .icon { cursor: pointer; opacity: 0.5; }
-div.task:hover .promote, div.task:hover .delete { display: block; }
-div.task .icon:hover, div.task .icon:focus { opacity: 0.8; }
-
-div.task .check {
+div.task .icon {
   position: absolute;
-  top: 6px;
-  left: 6px;
-  width: 16px;
-  height: 16px;
-}
-
-div.task .promote {
-  background: url('/images/up-arrow.png');
   display: none;
   width: 16px;
   height: 16px;
-  position: absolute;
+  opacity: 0.5;
+  cursor: pointer;
+}
+div.task:hover .promote, div.task:hover .delete { display: block; }
+div.task .icon:hover, div.task .icon:focus { opacity: 0.8; }
+
+div.task .promote {
+  background: url('/images/up-arrow.png');
   bottom: 6px;
   left: 6px;
 }
 
 div.task .delete {
   background: url('/images/remove.png');
-  display: none;
-  width: 16px;
-  height: 16px;
-  position: absolute;
   top: 6px;
   right: 6px;
+}
+
+div.task .check {
+  position: absolute;
+  margin: 0;
+  top: 7px;
+  left: 6px;
 }
 
 /* REVIEW: Need do we need edit-container? */
@@ -130,4 +129,3 @@ div.task .overdue {
   color: red;
   font-weight: bold;
 }
-
