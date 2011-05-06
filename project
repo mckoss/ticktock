@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html manifest="/app.manifest">
+<html manifest="/app.manifest_disable">
   <head>
     <title>PandaTask</title>
 
@@ -43,9 +43,11 @@
         <div class='box' id='cheat'>
           <h3>CHEAT SHEET</h3>
           <div class='cheats'>
-            <div>Assign task: @person</div>
-            <div>Tag keyword: #keyword</div>
-            <div>Estimate hours: +2</div>
+            <div>@person - assign task</div>
+            <div>#keyword - add tags</div>
+            <div>+2 - estimate (hrs)</div>
+            <div>+1d - estimate (days)</div>
+            <div>+30m - estimate (minutes)</div>
           </div>
 
           <h3>EXAMPLES</h3>
@@ -53,6 +55,12 @@
             <div>Save pandas</div>
             <div>Find new bamboo tree @mike</div>
             <div>Escape zoo @sam #bug +2</div>
+          </div>
+          <h3>SHORTCUTS</h3>
+          <div class='cheats'>
+            <div>Ctrl-Up Arrow - Move task up</div>
+            <div>Ctrl-Down Arrow - Move task down</div>
+            <div>Ctrl-N - Create new task</div>
           </div>
         </div>
       </div>
