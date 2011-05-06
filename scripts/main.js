@@ -45,7 +45,7 @@ function onReady() {
     client.addAppBar();
 
     // Add the template new task
-    onTaskEvent({action: 'add', task: {description: "Add new task", status: 'new'}});
+    onTaskEvent({action: 'add', target: {id: "new", description: "Add new task", status: 'new'}});
 
     $(window).keydown(onKey);
     $(document).mousedown(onClick);
@@ -148,20 +148,20 @@ function onKey(evt) {
 
 function onTaskEvent(event) {
     console.log("Task {action}: {target.id} in {target.status}".format(event));
-    var task = event.task;
-    var $taskDiv = getTaskDiv(task);
+    var task = event.target;
     var listName = task.status + '-tasks';
 
     function updateTask() {
-        $('.content', $taskDiv).html(task.getContentHTML());
+        var $taskDiv = getTaskDiv(task);
+        var content = task.getContentHTML ? task.getContentHTML() : task.description;
+        $('.content', $taskDiv).html(content);
         $('.check', $taskDiv)[0].checked = (task.status == 'done');
         client.setDirty();
     }
 
     switch (event.action) {
     case 'add':
-        content = task.getContentHTML ? task.getContentHTML() : task.description;
-        $doc[listName].prepend(TASK.format(types.extend({content: content}, task)));
+        $doc[listName].prepend(TASK.format(task));
         updateTask();
         break;
     case 'change':
@@ -218,5 +218,8 @@ function handleAppCache() {
 }
 
 function getTaskDiv(task) {
+    if (task.id == 'new') {
+        return $('#new');
+    }
     return $('#' + project.getTask(task).id);
 }
