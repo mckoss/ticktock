@@ -841,13 +841,12 @@ function onReady() {
 
     project = new taskLib.Project({onTaskEvent: onTaskEvent});
     client = new clientLib.Client(exports);
-    client.saveInterval = 0;
     client.autoLoad = true;
 
     client.addAppBar();
 
     // Add the template new task
-    onTaskEvent({action: 'add', target: {id: "new", description: "Add new task", status: 'new'}});
+    $doc['new-tasks'].append(TASK.format({id: "new", content: "Add new task"}));
 
     $(window).keydown(onKey);
     $(document).mousedown(onClick);
@@ -979,14 +978,10 @@ function onTaskEvent(event) {
     case 'change':
         updateTask();
         break;
-    case 'remove':
-
-        break;
     default:
-        console.error("Unhandled event", event);
+        console.error("Unhandled event: {action} on {target.id}".format(event));
         break;
     }
-    client.save();
 }
 
 function saveTask(id) {
