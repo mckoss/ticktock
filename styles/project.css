@@ -1,106 +1,53 @@
+/* ======================================================
+   Task List Styles
+   ====================================================== */
+
 h2.task-header {
   background: #333;
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#414141), to(#1d1d1d));
-  background: -moz-linear-gradient(0% 100% 90deg, #1d1d1d, #414141);
-  color: #fff;
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#414141), to(#1D1D1D));
+  background: -moz-linear-gradient(0% 100% 90deg, #1D1D1D, #414141);
+  color: #FFF;
   padding: 6px 14px;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;
 }
 
+.task-list { padding: 14px 7px; }
 #working-tasks { min-height: 50px; }
-
+#new-tasks { padding-bottom: 0; }
+#ready-tasks { padding-top: 0; }
 #done-tasks .description { text-decoration: line-through; color: #777; }
 
-.icon { cursor: pointer; }
-.icon, .add-button {
-  opacity: 0.5;
+
+/* ======================================================
+   Side-bar Styles
+   ====================================================== */
+
+#cheat h3 { margin-bottom: 05.em; }
+#cheat .cheats { margin-bottom: 1em; }
+
+#cheat div {
+  font-size: 90%;
+  color: #666;
 }
 
-.icon:hover, .icon:focus,
-#add-task:hover .add-button,
-#add-task:hover .add-button:focus {
-  opacity: 0.8;
-}
-
-.task-group { line-height: 16px; }
-
-a.icon:hover { text-decoration: none; }
-
-#new-task {
-  box-sizing: border-box;
-  width: 100%;
-}
-
-#new-task-container {
-  margin-right: 12px;
-}
-
-.delete {
-  width: 16px;
-  height: 16px;
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  background: url('/images/remove.png');
-}
-
-.if-not-edit {
-  margin: 0px;
-}
-
-.check {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  width: 16px;
-  height: 16px;
-}
-
-.promote {
-  width: 16px;
-  height: 16px;
-  background: url('../images/up-arrow.png');
-  display: block;
-  position: absolute;
-  bottom: 6px;
-  left: 6px;
-}
-
-/* Styles for tasks and parts of tasks */
-
-.task {
-  position: relative;
-}
-
-#working-tasks .promote { background: url('/images/down-arrow.png'); }
-#ready-tasks .promote { background: url('/images/up-arrow.png'); }
-
-.promote, .delete {
-  display: none;
-}
-
-.task:hover .promote,
-.task:hover .delete {
-  display: block;
-}
-
-.edit-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding-right: 7px;
-  width: 100%;
-}
+/* ======================================================
+   Individual Task Styles
+   ====================================================== */
 
 div.task.edit .if-not-edit { display: none; }
 div.task:not(.edit) .if-edit { display: none; }
 
+#working-tasks div.task { background-color: #C0FFAC; }
+#working-tasks .promote { background: url('/images/down-arrow.png'); }
+#new-tasks .content { color: #aaa; }
+#done-tasks div.task { background-color: #D5EDF8; }
+
 div.task {
   position: relative;
-  background-color: #f9f6a8;
-  height: 50px;
+  background-color: #F9F6A8;
+  min-height: 50px;
   padding: 5px 24px 5px 24px;
   margin-bottom: 14px;
   -webkit-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
@@ -109,9 +56,56 @@ div.task {
   overflow: hidden;
 }
 
-#working-tasks div.task { background-color: #c0ffac; }
-#done-tasks div.task { background-color: #D5EDF8; }
-.task-list { padding: 14px 7px; }
+div.task .icon { cursor: pointer; opacity: 0.5; }
+div.task:hover .promote, div.task:hover .delete { display: block; }
+div.task .icon:hover, div.task .icon:focus { opacity: 0.8; }
+
+div.task .check {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 16px;
+  height: 16px;
+}
+
+div.task .promote {
+  background: url('/images/up-arrow.png');
+  display: none;
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+}
+
+div.task .delete {
+  background: url('/images/remove.png');
+  display: none;
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+
+/* REVIEW: Need do we need edit-container? */
+div.task .edit-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding-right: 7px;
+  width: 100%;
+}
+
+div.task textarea {
+  width: 100%;
+  height: 60px;
+  padding: 5px 24px 15px 24px;
+  font-family: inherit;
+  font-size: inherit;
+  resize: none;
+  box-sizing: border-box;
+}
 
 div.task .assigned {
   position: absolute;
@@ -132,28 +126,8 @@ div.task .tags {
   color: green;
 }
 
-div.task textarea {
-  width: 100%;
-  height: 60px;
-  padding: 5px 24px 15px 24px;
-  font-family: inherit;
-  font-size: inherit;
-  resize: none;
-  box-sizing: border-box;
-}
-
-.overdue {
+div.task .overdue {
   color: red;
   font-weight: bold;
 }
 
-#new .content { color: #aaa; }
-
-#cheat div {
-  font-size: 12px;
-  color: #666;
-}
-
-.cheats {
-  margin-bottom: 1em;
-}

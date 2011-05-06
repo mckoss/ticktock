@@ -825,6 +825,7 @@ var TASK =
     '<div class="promote icon"></div>' +
     '<div class="delete icon"></div>' +
     '<div class="content if-not-edit">{content}</div>' +
+    // REVIEW: Need edit-container?
     '<div class="edit-container if-edit"><textarea></textarea></div>' +
     '</div>';
 
