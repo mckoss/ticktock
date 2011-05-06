@@ -818,14 +818,12 @@ var $doc;                            // Bound elements here
 var project;
 var editedTask;
 var editedText;
-var editedStatus;
 
 var TASK =
-    '<div id="{id}" class="task {className}">' +
-    // REVIEW: Why do we need a div wrapper?
-    '<div id="action_{id}" class="action"><input type="checkbox" id="check_{id}"/></div>' +
-    '<div id="promote_{id}" class="promote icon"></div>' +
-    '<div class="delete icon" id="delete_{id}"></div>' +
+    '<div id="{id}" class="task">' +
+    '<input class="check" type="checkbox"/>' +
+    '<div class="promote icon"></div>' +
+    '<div class="delete icon"></div>' +
     '<div class="content if-not-edit">{content}</div>' +
     '<div class="edit-container if-edit"><textarea></textarea></div>' +
     '</div>';
@@ -840,18 +838,36 @@ function onReady() {
         $doc[id] = $($doc[id]);
     }
 
-    project = new taskLib.Project({onTaskChange: onTaskChange});
+    project = new taskLib.Project({onTaskEvent: onTaskEvent});
     client = new clientLib.Client(exports);
     client.saveInterval = 0;
     client.autoLoad = true;
 
     client.addAppBar();
-    refresh();
+
+    // Add the template new task
+    onTaskEvent({action: 'add', task: {description: "Add new task", status: 'new'}});
 
     $(window).keydown(onKey);
     $(document).mousedown(onClick);
 
     setInterval(onTimer, UPDATE_INTERVAL);
+}
+
+function setDoc(json) {
+    project = new taskLib.Project(types.extend({}, json.blob, {onTaskEvent: onTaskEvent}));
+    $doc["project-title"].text(json.title);
+}
+
+function getDoc() {
+    return {
+        blob: project.toJSON(),
+        readers: ['public']
+    };
+}
+
+function onSaveSuccess() {
+    $doc["project-title"].text(client.meta.title);
 }
 
 function onTimer() {
@@ -869,137 +885,34 @@ function onClick(evt) {
     if (editedTask) {
         saveTask(editedTask);
     }
-    evt.preventDefault();
-}
 
-function setDoc(json) {
-    project = new taskLib.Project(types.extend({}, json.blob, {onTaskChange: onTaskChange}));
-    $doc["project-title"].text(json.title);
-    refresh();
-}
+    var task  = project.getTask(target.id || target.parentNode.id);
 
-function getDoc() {
-    return {
-        blob: project.toJSON(),
-        readers: ['public']
-    };
-}
-
-function onTaskChange(event) {
-    console.log("Task {action}: {target.id} in {target.status}".format(event));
-}
-
-function onSaveSuccess() {
-    $doc["project-title"].text(client.meta.title);
-}
-
-function refresh() {
-    var listNames = ['ready', 'working', 'done'];
-
-    for (var i = 0; i < listNames.length; i++) {
-        var listName = listNames[i];
-        $('#' + listName + '-tasks').empty();
-        var list = project[listName];
-        for (var j = 0; j < list.length; j++) {
-            var task = list[j];
-            addTask(task, listName + '-tasks');
-        }
-    }
-    addTemplateTask();
-    onTimer();
-}
-
-function addTask(task, listName, className) {
-    var top = className == 'top';
-    if (top) {
-        className = undefined;
-    }
-    if (className == undefined) {
-        className = '';
-    }
-    content = task.getContentHTML ? task.getContentHTML() : task.description;
-    $doc[listName][top ? 'prepend': 'append'](TASK.format(
-        types.extend({content: content}, task)));
-    $('#' + task.id).click(editTask.curry(task));
-    if (listName == 'done-tasks') {
-        $('#check_' + task.id)[0].checked = true;
-    }
-}
-
-function addTemplateTask() {
-    addTask({id: 'new', description: "Add new task"}, 'ready-tasks', 'top');
-}
-
-function saveTask(task) {
-    var $taskDiv = $('#' + task.id);
-    $taskDiv.removeClass('edit');
-    var text = $('textarea', $taskDiv).val();
-    editedTask = undefined;
-    if (text == editedText && editedStatus == undefined) {
+    if (!task) {
+        evt.preventDefault();
         return;
     }
-    if (task.id == 'new') {
-        task = project.addTask({description: text});
-        $('#new').remove();
-        addTask(task, 'ready-tasks', 'top');
-        addTemplateTask();
-    } else {
-        task.change({description: text});
-        if (editedStatus) {
-            $taskDiv.remove();
-            addTask(task, editedStatus + '-tasks', 'top');
-        } else {
-            $('.content', $taskDiv).html(task.getContentHTML());
+
+    var classes = target.className.split(/\s+/);
+    for (var i = 0; i < classes.length; i++) {
+        switch (classes[i]) {
+        case 'task':
+            editTask(project.getTask(target.id));
+            break;
+        case 'check':
+            task.change({status: task.status == 'done' ? 'ready' : 'done'});
+            break;
+        case 'delete':
+            project.removeTask(task);
+            break;
+        case 'promote':
+            task.change({status: task.status == 'ready' ? 'working': 'ready'});
+            break;
         }
     }
-    editedStatus = undefined;
-    client.setDirty();
-    client.save();
-}
 
-function editTask(task, evt) {
-    if (editedTask) {
-        saveTask(editedTask);
-    }
-
-    $('#' + task.id).addClass('edit');
-    editedText = task.getEditText ? task.getEditText() : task.description;
-    $('textarea', '#' + task.id).val(editedText).focus().select();
-    editedTask = task;
-    // We don't want the body click event to cancel enter edit mode.
-    evt.stopPropagation();
-
-    function moveIt(status) {
-        if (editedTask.id != 'new') {
-            editedStatus = status;
-            editedTask.change({status: editedStatus});
-        }
-        saveTask(editedTask);
-    }
-
-    var id = $(evt.target).attr('id');
-    if (id.length && id.split('_').length) {
-        var type = id.split('_')[0];
-        if (type == 'delete') {
-            //deleteTask(task);
-        }
-        if (type == 'check') {
-            if (editedTask.status == 'done') {
-                moveIt('working');
-                $('#' + id)[0].checked = false;
-                return;
-            }
-            moveIt('done');
-            $('#' + id)[0].checked = true;
-        }
-        if (type == 'promote') {
-            if (editedTask.status == 'ready') {
-                moveIt('working');
-            } else if (editedTask.status == 'working') {
-                moveIt('ready');
-            }
-        }
-    }
+    evt.stopPropogation();
+    evt.preventDefault();
 }
 
 function onKey(evt) {
@@ -1026,10 +939,67 @@ function onKey(evt) {
             return;
         }
         var taskSave = editedTask;
+        // TODO: should keep task in edit mode - so may need to
+        // move OTHER tasks around it in the list!
         saveTask(editedTask);
         project.move(taskSave, evt.keyCode == up ? -1 : 1);
-        refresh();
         break;
+    }
+}
+
+function onTaskEvent(event) {
+    console.log("Task {action}: {target.id} in {target.status}".format(event));
+    var task = event.task;
+    var $taskDiv = getTaskDiv(task);
+    var listName = task.status + '-tasks';
+
+    function updateTask() {
+        $('.content', $taskDiv).html(task.getContentHTML());
+        $('.check', $taskDiv)[0].checked = (task.status == 'done');
+        client.setDirty();
+    }
+
+    switch (event.action) {
+    case 'add':
+        content = task.getContentHTML ? task.getContentHTML() : task.description;
+        $doc[listName].prepend(TASK.format(types.extend({content: content}, task)));
+        updateTask();
+        break;
+    case 'change':
+        updateTask();
+        break;
+    case 'remove':
+
+        break;
+    default:
+        console.error("Unhandled event", event);
+        break;
+    }
+    client.save();
+}
+
+function editTask(task, evt) {
+    var $taskDiv = getTaskDiv(task);
+    $taskDiv.addClass('edit');
+    editedText = task.getEditText ? task.getEditText() : task.description;
+    $('textarea', $taskDiv).val(editedText).focus().select();
+    editedTask = task;
+    // We don't want the body click event to cancel enter edit mode.
+    evt.stopPropagation();
+}
+
+function saveTask(task) {
+    var $taskDiv = getTaskDiv(task);
+    $taskDiv.removeClass('edit');
+    var text = $('textarea', $taskDiv).val();
+    editedTask = undefined;
+    if (text == editedText) {
+        return;
+    }
+    if (task.id == 'new') {
+        project.addTask({description: text});
+    } else {
+        task.change({description: text});
     }
 }
 
@@ -1046,6 +1016,10 @@ function handleAppCache() {
     }
 
     applicationCache.addEventListener('updateready', handleAppCache, false);
+}
+
+function getTaskDiv(task) {
+    return $('#' + project.getTask(task).id);
 }
 });
 
@@ -1087,7 +1061,7 @@ var now = new Date().getTime();
 function Project(options) {
     options = options || {};
     this.map = {};
-    types.extend(this, types.project(options, 'onTaskChange'));
+    types.extend(this, types.project(options, 'onTaskEvent'));
     this.ready = [];
     this.working = [];
     this.done = [];
@@ -1133,8 +1107,8 @@ Project.methods({
     },
 
     _notify: function (action, target, options) {
-        if (this.onTaskChange) {
-            this.onTaskChange(types.extend({action: action, target: target}, options));
+        if (this.onTaskEvent) {
+            this.onTaskEvent(types.extend({action: action, target: target}, options));
         }
     },
 

@@ -9,29 +9,9 @@ h2.task-header {
   border-radius: 5px;
 }
 
-#working-tasks .promote { background: url('/images/down-arrow.png'); }
-#ready-tasks .promote { background: url('/images/up-arrow.png'); }
-#done-tasks .promote { display: none; }
-
 #working-tasks { min-height: 50px; }
 
 #done-tasks .description { text-decoration: line-through; color: #777; }
-
-.action {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  line-height: 16px;
-  width: 16px;
-  height: 16px;
-}
-
-.promote {
-  width: 16px;
-  height: 16px;
-  background: url('../images/up-arrow.png');
-  display: block;
-}
 
 .icon { cursor: pointer; }
 .icon, .add-button {
@@ -70,22 +50,34 @@ a.icon:hover { text-decoration: none; }
   margin: 0px;
 }
 
-input[type='checkbox'] {
-  margin: 0px 0px 0px 2px;
+.check {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 16px;
+  height: 16px;
 }
 
 .promote {
+  width: 16px;
+  height: 16px;
+  background: url('../images/up-arrow.png');
+  display: block;
   position: absolute;
   bottom: 6px;
   left: 6px;
 }
 
+/* Styles for tasks and parts of tasks */
+
 .task {
   position: relative;
 }
 
-.promote,
-.delete {
+#working-tasks .promote { background: url('/images/down-arrow.png'); }
+#ready-tasks .promote { background: url('/images/up-arrow.png'); }
+
+.promote, .delete {
   display: none;
 }
 

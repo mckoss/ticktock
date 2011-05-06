@@ -37,7 +37,7 @@ function onReady() {
         $doc[id] = $($doc[id]);
     }
 
-    project = new taskLib.Project({onTaskChange: onTaskChange});
+    project = new taskLib.Project({onTaskEvent: onTaskEvent});
     client = new clientLib.Client(exports);
     client.saveInterval = 0;
     client.autoLoad = true;
@@ -54,7 +54,7 @@ function onReady() {
 }
 
 function setDoc(json) {
-    project = new taskLib.Project(types.extend({}, json.blob, {onTaskChange: onTaskChange}));
+    project = new taskLib.Project(types.extend({}, json.blob, {onTaskEvent: onTaskEvent}));
     $doc["project-title"].text(json.title);
 }
 
@@ -146,7 +146,7 @@ function onKey(evt) {
     }
 }
 
-function onTaskChange(event) {
+function onTaskEvent(event) {
     console.log("Task {action}: {target.id} in {target.status}".format(event));
     var task = event.task;
     var $taskDiv = getTaskDiv(task);

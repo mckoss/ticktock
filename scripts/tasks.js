@@ -34,7 +34,7 @@ var now = new Date().getTime();
 function Project(options) {
     options = options || {};
     this.map = {};
-    types.extend(this, types.project(options, 'onTaskChange'));
+    types.extend(this, types.project(options, 'onTaskEvent'));
     this.ready = [];
     this.working = [];
     this.done = [];
@@ -80,8 +80,8 @@ Project.methods({
     },
 
     _notify: function (action, target, options) {
-        if (this.onTaskChange) {
-            this.onTaskChange(types.extend({action: action, target: target}, options));
+        if (this.onTaskEvent) {
+            this.onTaskEvent(types.extend({action: action, target: target}, options));
         }
     },
 

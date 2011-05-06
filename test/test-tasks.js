@@ -159,12 +159,12 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.ok(types.isArray(data), "data array");
     });
 
-    ut.test("onTaskChange", function () {
-        var project = new taskLib.Project({onTaskChange: onTaskChange});
+    ut.test("onTaskEvent", function () {
+        var project = new taskLib.Project({onTaskEvent: onTaskEvent});
         var expects = [];
         var task;
 
-        function onTaskChange(event) {
+        function onTaskEvent(event) {
             var expect = expects.shift();
             var prop;
             if (expect == undefined) {
