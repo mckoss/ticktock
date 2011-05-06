@@ -60,7 +60,7 @@ Project.methods({
     addTask: function(task) {
         task = new Task(task, this);
         this._notify('add', task);
-        return this.insertTask(task);
+        return task;
     },
 
     insertTask: function (task) {
@@ -103,6 +103,9 @@ Project.methods({
             return -1;
         }
         var list = target.getList();
+        if (list == undefined) {
+            return -1;
+        }
         for (var i = 0; i < list.length; i++) {
             if (list[i] === target) {
                 return i;
@@ -183,6 +186,25 @@ Project.methods({
             results[curDate] = types.extend({date: curDate}, cumulative);
         }
         return results;
+    },
+
+    consistencyCheck: function () {
+        var lists = [this.ready, this.working, this.done];
+        var visited = {};
+        var ok = true;
+
+        for (var i = 0; i < lists.length; i++) {
+            var list = lists[i];
+            for (j = 0; j < list.length; j++) {
+                var task = list[j];
+                if (visited[task.id]) {
+                    console.log("Duplicate task: {id}".format(task));
+                    ok = false;
+                }
+                visited[task.id] = true;
+            }
+        }
+        return ok;
     }
 
 });
@@ -211,11 +233,10 @@ function Task(options, project) {
 
     this.id = random.randomString(16);
     this.created = now;
-    this.status = 'ready';
     this.remaining = 0;
     this.actual = 0;
     this.description = '';
-    this.change(options, true);
+    this.change(types.extend({status: 'ready'}, options), true);
     if (this.history && this.history.length == 0) {
         delete this.history;
     }

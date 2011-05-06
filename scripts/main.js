@@ -17,6 +17,7 @@ var $doc;                            // Bound elements here
 var project;
 var editedId;
 var editedText;
+var isDirty = false;
 
 var TASK =
     '<div id="{id}" class="task">' +
@@ -40,6 +41,7 @@ function onReady() {
 
     project = new taskLib.Project({onTaskEvent: onTaskEvent});
     client = new clientLib.Client(exports);
+    client.isDirty = function () { return isDirty; };
     client.autoLoad = true;
 
     client.addAppBar();
@@ -51,6 +53,11 @@ function onReady() {
     $(document).mousedown(onClick);
 
     setInterval(onTimer, UPDATE_INTERVAL);
+    setInterval(function () {
+        if (!project.consistencyCheck()) {
+            alert("inconsitent");
+        }
+    }, 10000);
 }
 
 function setDoc(json) {
@@ -166,6 +173,7 @@ function onTaskEvent(event) {
         var content = task.getContentHTML ? task.getContentHTML() : task.description;
         $('.content', $taskDiv).html(content);
         $('.check', $taskDiv)[0].checked = (task.status == 'done');
+        isDirty = true;
         client.setDirty();
     }
 

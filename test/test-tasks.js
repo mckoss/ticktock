@@ -20,6 +20,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.ok(types.isArray(project.ready));
         ut.ok(types.isArray(project.working));
         ut.ok(types.isArray(project.done));
+        ut.ok(project.consistencyCheck());
     });
 
     ut.test("tasks", function () {
@@ -32,6 +33,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
 
         var other = project.getTask(task.id);
         ut.strictEqual(task, other, "id lookup");
+        ut.ok(project.consistencyCheck());
     });
 
     ut.test("toJSON", function () {
@@ -43,6 +45,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.equal(json.ready[0].description, "foo");
         ut.equal(json.working.length, 0);
         ut.equal(json.done.length, 0);
+        ut.ok(project.consistencyCheck());
     });
 
     ut.test("task change", function () {
@@ -70,6 +73,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
                   /'what' is not one of/, "Invalid value");
         ut.raises(function () { task.change({actual: 'not a number'}); },
                   /actual is a string \(expected a number\)/, "Require a number");
+        ut.ok(project.consistencyCheck());
     });
 
     ut.test("move", function () {
@@ -106,6 +110,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
 
         project.move(project.ready[1], -1);
         testOrder([3, 10, 1, 4, 6, 2, 5, 7, 8, 9]);
+        ut.ok(project.consistencyCheck());
     });
 
     ut.test("parseDescription", function () {
@@ -151,12 +156,14 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.ok(text.indexOf("#tag") != -1, "text tag: " + text);
         ut.ok(text.indexOf("@mike") != -1, "text assignedTo: " + text);
         ut.ok(text.indexOf("+2") != -1, "text hours: " + text);
+        ut.ok(project.consistencyCheck());
     });
 
     ut.test("cumulativeData", function () {
         var project = new taskLib.Project();
         var data = project.cumulativeData();
         ut.ok(types.isArray(data), "data array");
+        ut.ok(project.consistencyCheck());
     });
 
     ut.test("onTaskEvent", function () {
@@ -201,6 +208,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
 
         ut.equal(expects.length, 0, "Processed all expected notifications: " +
                  expects.map(function (x) { return x.action; }).join(', '));
+        ut.ok(project.consistencyCheck());
     });
 
     coverage.testCoverage();
