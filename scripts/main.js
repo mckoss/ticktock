@@ -175,6 +175,11 @@ function onTaskEvent(event) {
         updateTask();
         break;
     case 'change':
+        // Move task between lists
+        if (event.properties.indexOf('status') != -1) {
+            $('#' + event.target.id).remove();
+            $doc[listName].prepend(TASK.format(task));
+        }
         updateTask();
         break;
     default:

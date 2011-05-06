@@ -976,6 +976,11 @@ function onTaskEvent(event) {
         updateTask();
         break;
     case 'change':
+        // Move task between lists
+        if (event.properties.indexOf('status') != -1) {
+            $('#' + event.target.id).remove();
+            $doc[listName].prepend(TASK.format(task));
+        }
         updateTask();
         break;
     default:
@@ -1157,8 +1162,7 @@ Project.methods({
         }
         task = list.splice(iTask, 1)[0];
         list.splice(iMove, 0, task);
-        this._notify('move', task, {from: iTask, to: iMove,
-                                    fromList: task.status, toList: task.status});
+        this._notify('move', task, {from: iTask, to: iMove,});
     },
 
     // Object to use for JSON persistence
