@@ -15,7 +15,7 @@ exports.extend({
 var client;
 var $doc;                            // Bound elements here
 var project;
-var editedTask;
+var editedId;
 var editedText;
 
 var TASK =
@@ -78,25 +78,35 @@ function onTimer() {
 }
 
 function onClick(evt) {
+    console.log("Click on " + evt.target.tagName + "." + evt.target.className, evt.target);
+
     if (evt.target.tagName == 'TEXTAREA') {
         return;
     }
-    if (editedTask) {
-        saveTask(editedTask);
+    if (editedId) {
+        saveTask(editedId);
     }
 
-    var task  = project.getTask(target.id || target.parentNode.id);
+    var id = evt.target.id || evt.target.parentNode.id;
 
-    if (!task) {
+    if (!id) {
         evt.preventDefault();
         return;
     }
 
-    var classes = target.className.split(/\s+/);
+    var task = project.getTask(id);
+    var $taskDiv = $('#' + id);
+
+    var classes = evt.target.className.split(/\s+/);
     for (var i = 0; i < classes.length; i++) {
         switch (classes[i]) {
         case 'task':
-            editTask(project.getTask(target.id));
+            $taskDiv.addClass('edit');
+            editedText = task ? task.getEditText() : '';
+            $('textarea', $taskDiv).val(editedText).focus().select();
+            editedId = id;
+            // We don't want the body click event to cancel enter edit mode.
+            evt.stopPropagation();
             break;
         case 'check':
             task.change({status: task.status == 'done' ? 'ready' : 'done'});
@@ -110,7 +120,7 @@ function onClick(evt) {
         }
     }
 
-    evt.stopPropogation();
+    evt.stopPropagation();
     evt.preventDefault();
 }
 
@@ -121,27 +131,27 @@ function onKey(evt) {
     down = 40,
     enter = 13;
 
-    if (!editedTask) {
+    if (!editedId) {
         return;
     }
 
     if (event.keyCode == enter) {
-        saveTask(editedTask);
+        saveTask(editedId);
         return;
     }
 
     switch (evt.keyCode) {
     case up:
     case down:
-        if (!evt.ctrlKey || editedTask.id == 'new') {
+        if (!evt.ctrlKey || editedId == 'new') {
             evt.preventDefault();
             return;
         }
-        var taskSave = editedTask;
+        var idSave = editedId;
         // TODO: should keep task in edit mode - so may need to
         // move OTHER tasks around it in the list!
-        saveTask(editedTask);
-        project.move(taskSave, evt.keyCode == up ? -1 : 1);
+        saveTask(editedId);
+        project.move(idSave, evt.keyCode == up ? -1 : 1);
         break;
     }
 }
@@ -152,7 +162,7 @@ function onTaskEvent(event) {
     var listName = task.status + '-tasks';
 
     function updateTask() {
-        var $taskDiv = getTaskDiv(task);
+        var $taskDiv = $('#' + event.target.id);
         var content = task.getContentHTML ? task.getContentHTML() : task.description;
         $('.content', $taskDiv).html(content);
         $('.check', $taskDiv)[0].checked = (task.status == 'done');
@@ -177,28 +187,18 @@ function onTaskEvent(event) {
     client.save();
 }
 
-function editTask(task, evt) {
-    var $taskDiv = getTaskDiv(task);
-    $taskDiv.addClass('edit');
-    editedText = task.getEditText ? task.getEditText() : task.description;
-    $('textarea', $taskDiv).val(editedText).focus().select();
-    editedTask = task;
-    // We don't want the body click event to cancel enter edit mode.
-    evt.stopPropagation();
-}
-
-function saveTask(task) {
-    var $taskDiv = getTaskDiv(task);
+function saveTask(id) {
+    var $taskDiv = $('#' + id);
     $taskDiv.removeClass('edit');
     var text = $('textarea', $taskDiv).val();
-    editedTask = undefined;
+    editedId = undefined;
     if (text == editedText) {
         return;
     }
-    if (task.id == 'new') {
+    if (id == 'new') {
         project.addTask({description: text});
     } else {
-        task.change({description: text});
+        project.getTask(id).change({description: text});
     }
 }
 
@@ -215,11 +215,4 @@ function handleAppCache() {
     }
 
     applicationCache.addEventListener('updateready', handleAppCache, false);
-}
-
-function getTaskDiv(task) {
-    if (task.id == 'new') {
-        return $('#new');
-    }
-    return $('#' + project.getTask(task).id);
 }
