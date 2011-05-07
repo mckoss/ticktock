@@ -824,9 +824,8 @@ var TASK =
     '<input class="check" type="checkbox"/>' +
     '<div class="promote icon"></div>' +
     '<div class="delete icon"></div>' +
-    '<div class="content if-not-edit">{content}</div>' +
-    // REVIEW: Need edit-container?
-    '<textarea class="if-edit"></textarea>' +
+    '<div class="content">{content}</div>' +
+    '<textarea></textarea>' +
     '</div>';
 
 var UPDATE_INTERVAL = 1000 * 60;

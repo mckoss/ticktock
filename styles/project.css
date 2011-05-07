@@ -36,9 +36,6 @@ h2.task-header {
    Individual Task Styles
    ====================================================== */
 
-div.task.edit .if-not-edit { visibility: hidden; }
-div.task:not(.edit) .if-edit { display: none; }
-
 #working-tasks div.task { background-color: #C0FFAC; }
 #working-tasks .promote { background: url('/images/down-arrow.png'); }
 #new-tasks .check, #new-tasks .icon { display: none; }
@@ -49,8 +46,8 @@ div.task {
   position: relative;
   background-color: #F9F6A8;
   min-height: 1em;
-  padding: 5px 24px 15px 24px;
-  margin-bottom: 14px;
+  padding: 5px 24px 20px 24px;
+  margin-bottom: 12px;
   -webkit-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
   box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
@@ -65,13 +62,15 @@ div.task .icon {
   opacity: 0.5;
   cursor: pointer;
 }
-div.task:hover .promote, div.task:hover .delete { display: block; }
+div.task:hover .icon { display: block; }
 div.task .icon:hover, div.task .icon:focus { opacity: 0.8; }
+div.task.edit .icon { visibility: hidden; }
+div.task.edit .check { visibility: hidden; }
 
 div.task .promote {
   background: url('/images/up-arrow.png');
   bottom: 6px;
-  left: 6px;
+  left: 4px;
 }
 
 div.task .delete {
@@ -86,6 +85,9 @@ div.task .check {
   top: 9px;
   left: 6px;
 }
+
+div.task.edit .content { visibility: hidden; }
+div.task:not(.edit) textarea { display: none; }
 
 div.task textarea {
   position: absolute;
@@ -102,7 +104,7 @@ div.task textarea {
   line-height: inherit;
   resize: none;
   z-index: 2;
-  background: transparent;
+  background: none;
 }
 
 div.task .assigned {
