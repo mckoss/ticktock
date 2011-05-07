@@ -305,7 +305,7 @@ Task.methods({
         // status working->* increment actual time
         if (oldStatus !== undefined) {
             if (this.status == 'working') {
-                this.start = now;
+                this.start = this.start || now;
             } else if (oldStatus == 'working') {
                 var hrs = (now - this.start) / msPerHour;
                 delete this.start;

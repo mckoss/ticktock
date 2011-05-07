@@ -40,6 +40,7 @@ function onReady() {
 
     project = new taskLib.Project({onTaskEvent: onTaskEvent});
     client = new clientLib.Client(exports);
+    client.saveInterval = 5;
     client.autoLoad = true;
 
     client.addAppBar();
