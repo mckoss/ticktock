@@ -61,7 +61,8 @@ function onReady() {
 }
 
 function setDoc(json) {
-    project = new taskLib.Project(types.extend({}, json.blob, {onTaskEvent: onTaskEvent}));
+    project = new taskLib.Project({onTaskEvent: onTaskEvent});
+    project.fromJSON(json.blob);
     $doc["project-title"].text(json.title);
 }
 

@@ -38,16 +38,20 @@ function Project(options) {
     this.ready = [];
     this.working = [];
     this.done = [];
-    if (!options.schema || options.schema == 1) {
-        this.mergeTasks(options.tasks);
-    } else {
-        this.mergeTasks(options.ready);
-        this.mergeTasks(options.working);
-        this.mergeTasks(options.done);
-    }
+    this.fromJSON(options);
 }
 
 Project.methods({
+    fromJSON: function (json) {
+        if (!json.schema || json.schema == 1) {
+            this.mergeTasks(json.tasks);
+        } else {
+            this.mergeTasks(json.ready);
+            this.mergeTasks(json.working);
+            this.mergeTasks(json.done);
+        }
+    },
+
     mergeTasks: function (tasks) {
         if (!tasks) {
             return;
@@ -71,11 +75,11 @@ Project.methods({
         return task;
     },
 
-    removeTask: function (task) {
+    removeTask: function (task, listName) {
         task = this.getTask(task);
-        var i = this.getListPosition(task);
+        var i = this.getListPosition(task, listName);
         if (i != -1) {
-            task.getList().splice(i, 1);
+            task.getList(listName).splice(i, 1);
             return undefined;
         }
         delete this.map[task.id];
@@ -97,12 +101,12 @@ Project.methods({
 
     // Search for target - either a task or task.id - return position
     // it's list
-    getListPosition: function (target) {
+    getListPosition: function (target, listName) {
         target = this.getTask(target);
         if (target == undefined) {
             return -1;
         }
-        var list = target.getList();
+        var list = target.getList(listName);
         if (list == undefined) {
             return -1;
         }
@@ -189,6 +193,7 @@ Project.methods({
     },
 
     consistencyCheck: function () {
+        var count = 0;
         var lists = [this.ready, this.working, this.done];
         var visited = {};
         var ok = true;
@@ -200,9 +205,22 @@ Project.methods({
                 if (visited[task.id]) {
                     console.log("Duplicate task: {id}".format(task));
                     ok = false;
+                    continue;
                 }
+                if (!this.map[task.id]) {
+                    console.log("Taks not in map: {id}".format(task));
+                }
+                count++
                 visited[task.id] = true;
             }
+        }
+
+        for (var prop in this.map) {
+            count--;
+        }
+        if (count != 0) {
+            console.log("Excess map entries: {0}".format(-count));
+            ok = false;
         }
         return ok;
     }
@@ -237,7 +255,7 @@ function Task(options, project) {
     this.actual = 0;
     this.description = '';
     this.change(types.extend({status: 'ready'}, options), true);
-    if (this.history && this.history.length == 0) {
+    if (this.history) {
         delete this.history;
     }
 }
@@ -245,56 +263,59 @@ function Task(options, project) {
 Task.methods({
     change: function (options, quiet) {
         var changed = false;
+        var oldStatus;
         parseDescription(options);
         validateProperties(options, taskValidation);
-
-        this.modified = now;
-        // status *->working: record start time
-        // status working->* increment actual time
-        if (options.status && options.status != this.status) {
-            if (options.status == 'working') {
-                this.start = now;
-            } else if (this.status == 'working') {
-                var hrs = (now - this.start) / msPerHour;
-                delete this.start;
-                this.actual += hrs;
-            }
-            // Move between lists
-            this._getProject().removeTask(this);
-            this.status = options.status;
-            this._getProject().insertTask(this);
-            changed = true;
-        }
 
         for (var prop in options) {
             if (options.hasOwnProperty(prop)) {
                 if (this[prop] == options[prop]) {
                     continue;
                 }
+
                 changed = true;
+                this.modified = now;
                 var oldValue = this[prop] || 0;
                 var newValue = options[prop];
                 this[prop] = options[prop];
                 if (!historyProps[prop]) {
                     continue;
                 }
-                if (oldValue != newValue) {
-                    if (!this.history) {
-                        this.history = [];
-                    }
-                    this.history.push({prop: prop, when: this.modified,
-                                       oldValue: oldValue, newValue: newValue});
+                if (!this.history) {
+                    this.history = [];
                 }
+                if (prop == 'status') {
+                    oldStatus = oldValue;
+                    if (!oldStatus) {
+                        this._getProject().insertTask(this);
+                    }
+                }
+                this.history.push({prop: prop, when: now, oldValue: oldValue, newValue: newValue});
             }
         }
+
+        // status *->working: record start time
+        // status working->* increment actual time
+        if (oldStatus) {
+            if (this.status == 'working') {
+                this.start = now;
+            } else if (oldStatus == 'working') {
+                var hrs = (now - this.start) / msPerHour;
+                delete this.start;
+                this.actual += hrs;
+            }
+            this._getProject().removeTask(this, oldStatus);
+            this._getProject().insertTask(this);
+        }
+
         if (changed && !quiet) {
             this._getProject()._notify('change', this, {properties: Object.keys(options)});
         }
         return this;
     },
 
-    getList: function () {
-        return this._getProject()[this.status];
+    getList: function (listName) {
+        return this._getProject()[listName || this.status];
     },
 
     getContentHTML: function () {

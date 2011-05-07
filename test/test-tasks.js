@@ -54,6 +54,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         task.change({description: "bar"});
         ut.equal(task.description, "bar");
         ut.equal(task.history, undefined);
+        ut.ok(project.consistencyCheck(), "consistency 1");
 
         taskLib.updateNow(new Date(new Date().getTime() + 1000));
         task.change({actual: 8});
@@ -62,10 +63,13 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.equal(task.history[0].oldValue, 0);
         ut.equal(task.history[0].prop, 'actual');
         ut.ok(task.modified > task.created, "modified date update");
+        ut.ok(project.consistencyCheck(), "consistency 2");
 
         ut.strictEqual(project.ready, task.getList(), "task in ready");
         task.change({status: 'working'});
+        ut.ok(project.consistencyCheck(), "consistency 3");
         ut.strictEqual(project.working, task.getList(), "task in done");
+        ut.ok(project.consistencyCheck(), "consistency 4");
 
         ut.raises(function () { task.change({noSuchProperty: 1}); },
                   /Invalid property/, "Unknown property");
@@ -73,7 +77,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
                   /'what' is not one of/, "Invalid value");
         ut.raises(function () { task.change({actual: 'not a number'}); },
                   /actual is a string \(expected a number\)/, "Require a number");
-        ut.ok(project.consistencyCheck());
+        ut.ok(project.consistencyCheck(), "consistency 5");
     });
 
     ut.test("move", function () {
