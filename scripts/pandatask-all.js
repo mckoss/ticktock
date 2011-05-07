@@ -921,13 +921,15 @@ function onClick(evt) {
             evt.stopPropagation();
             break;
         case 'check':
-            task.change({status: task.status != 'done' ? 'done' : task.previous('status', 'working') });
+            task.change({status: task.status != 'done' ? 'done' :
+                         task.previous('status', 'working') });
             break;
         case 'delete':
             project.removeTask(task);
             break;
         case 'promote':
-            task.change({status: task.status == 'ready' ? 'working': 'ready'});
+            var other = { ready: 'working', working: 'ready', done: 'working' };
+            task.change({ status: other[task.status] });
             break;
         }
     }
