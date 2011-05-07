@@ -25,7 +25,7 @@ var TASK =
     '<div class="delete icon"></div>' +
     '<div class="content if-not-edit">{content}</div>' +
     // REVIEW: Need edit-container?
-    '<div class="edit-container if-edit"><textarea></textarea></div>' +
+    '<textarea class="if-edit"></textarea>' +
     '</div>';
 
 var UPDATE_INTERVAL = 1000 * 60;

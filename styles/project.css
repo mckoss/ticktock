@@ -36,7 +36,7 @@ h2.task-header {
    Individual Task Styles
    ====================================================== */
 
-div.task.edit .if-not-edit { display: none; }
+div.task.edit .if-not-edit { visibility: hidden; }
 div.task:not(.edit) .if-edit { display: none; }
 
 #working-tasks div.task { background-color: #C0FFAC; }
@@ -48,8 +48,8 @@ div.task:not(.edit) .if-edit { display: none; }
 div.task {
   position: relative;
   background-color: #F9F6A8;
-  min-height: 50px;
-  padding: 5px 24px 5px 24px;
+  min-height: 1em;
+  padding: 5px 24px 15px 24px;
   margin-bottom: 14px;
   -webkit-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
@@ -83,27 +83,26 @@ div.task .delete {
 div.task .check {
   position: absolute;
   margin: 0;
-  top: 7px;
+  top: 9px;
   left: 6px;
 }
 
-/* REVIEW: Need do we need edit-container? */
-div.task .edit-container {
+div.task textarea {
   position: absolute;
   top: 0;
   left: 0;
-  padding-right: 7px;
-  width: 100%;
-}
-
-div.task textarea {
-  width: 100%;
-  height: 60px;
-  padding: 5px 24px 15px 24px;
+  bottom: 0;
+  right: 0;
+  padding: 5px 24px 5px 24px;
+  margin: 0;
+  border: 0;
+  outline: none;
   font-family: inherit;
   font-size: inherit;
+  line-height: inherit;
   resize: none;
-  box-sizing: border-box;
+  z-index: 2;
+  background: transparent;
 }
 
 div.task .assigned {
