@@ -124,7 +124,7 @@ function onClick(evt) {
                          task.previous('status', 'working') });
             break;
         case 'delete':
-            project.removeTask(task);
+            task.change({status: 'deleted'});
             break;
         case 'promote':
             var other = { ready: 'working', working: 'ready', done: 'working' };
@@ -166,6 +166,9 @@ function onKey(evt) {
         saveTask(editedId);
         project.move(idSave, evt.keyCode == up ? -1 : 1);
         break;
+    default:
+        console.log("Unknown keyCode: {keyCode}".format(evt));
+        break;
     }
 }
 
@@ -183,16 +186,22 @@ function onTaskEvent(event) {
 
     switch (event.action) {
     case 'add':
-        $doc[listName].prepend(TASK.format(task));
-        updateTask();
+        if (task.status != 'deleted') {
+            $doc[listName].prepend(TASK.format(task));
+            updateTask();
+        }
         break;
     case 'change':
         // Move task between lists
         if (event.properties.indexOf('status') != -1) {
             $('#' + event.target.id).remove();
-            $doc[listName].prepend(TASK.format(task));
+            if (task.status != 'deleted') {
+                $doc[listName].prepend(TASK.format(task));
+                updateTask();
+            }
+        } else {
+            updateTask();
         }
-        updateTask();
         break;
     default:
         alert("Unhandled event: {action} on {target.id}".format(event));

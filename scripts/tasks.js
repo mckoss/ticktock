@@ -38,10 +38,16 @@ function Project(options) {
     this.ready = [];
     this.working = [];
     this.done = [];
+    this.deleted = [];
     this.fromJSON(options);
 }
 
-Project.methods({
+Project.methods({    
+    // Object to use for JSON persistence
+    toJSON: function () {
+        return types.extend({schema: 3}, types.project(this, ['ready', 'working', 'done', 'deleted']));
+    },
+
     fromJSON: function (json) {
         if (!json.schema || json.schema == 1) {
             this.mergeTasks(json.tasks);
@@ -49,6 +55,7 @@ Project.methods({
             this.mergeTasks(json.ready);
             this.mergeTasks(json.working);
             this.mergeTasks(json.done);
+            this.mergeTasks(json.deleted);
         }
     },
 
@@ -153,11 +160,6 @@ Project.methods({
         this._notify('move', task, {from: iTask, to: iMove});
     },
 
-    // Object to use for JSON persistence
-    toJSON: function () {
-        return types.extend({schema: 2}, types.project(this, ['ready', 'working', 'done']));
-    },
-
     // Calculate cumulative remaining, and actual
     // by Day.
     cumulativeData: function(prop) {
@@ -201,7 +203,7 @@ Project.methods({
 
     consistencyCheck: function () {
         var count = 0;
-        var lists = [this.ready, this.working, this.done];
+        var lists = [this.ready, this.working, this.done, this.deleted];
         var visited = {};
         var ok = true;
 
@@ -242,7 +244,7 @@ Project.methods({
 // Properties we allow to be changed (id and history are internal).
 var taskValidation = {id: 'string', history: 'array',
                       actual: 'number', remaining: 'number',
-                      status: ['ready', 'working', 'done'],
+                      status: ['ready', 'working', 'done', 'deleted'],
                       description: 'string',
                       created: 'number', modified: 'number',
                       start: 'number', assignedTo: 'array', tags: 'array'};

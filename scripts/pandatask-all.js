@@ -925,7 +925,7 @@ function onClick(evt) {
                          task.previous('status', 'working') });
             break;
         case 'delete':
-            project.removeTask(task);
+            task.change({status: 'deleted'});
             break;
         case 'promote':
             var other = { ready: 'working', working: 'ready', done: 'working' };
@@ -967,6 +967,9 @@ function onKey(evt) {
         saveTask(editedId);
         project.move(idSave, evt.keyCode == up ? -1 : 1);
         break;
+    default:
+        console.log("Unknown keyCode: {keyCode}".format(evt));
+        break;
     }
 }
 
@@ -984,16 +987,22 @@ function onTaskEvent(event) {
 
     switch (event.action) {
     case 'add':
-        $doc[listName].prepend(TASK.format(task));
-        updateTask();
+        if (task.status != 'deleted') {
+            $doc[listName].prepend(TASK.format(task));
+            updateTask();
+        }
         break;
     case 'change':
         // Move task between lists
         if (event.properties.indexOf('status') != -1) {
             $('#' + event.target.id).remove();
-            $doc[listName].prepend(TASK.format(task));
+            if (task.status != 'deleted') {
+                $doc[listName].prepend(TASK.format(task));
+                updateTask();
+            }
+        } else {
+            updateTask();
         }
-        updateTask();
         break;
     default:
         alert("Unhandled event: {action} on {target.id}".format(event));
@@ -1074,10 +1083,16 @@ function Project(options) {
     this.ready = [];
     this.working = [];
     this.done = [];
+    this.deleted = [];
     this.fromJSON(options);
 }
 
 Project.methods({
+    // Object to use for JSON persistence
+    toJSON: function () {
+        return types.extend({schema: 3}, types.project(this, ['ready', 'working', 'done', 'deleted']));
+    },
+
     fromJSON: function (json) {
         if (!json.schema || json.schema == 1) {
             this.mergeTasks(json.tasks);
@@ -1085,6 +1100,7 @@ Project.methods({
             this.mergeTasks(json.ready);
             this.mergeTasks(json.working);
             this.mergeTasks(json.done);
+            this.mergeTasks(json.deleted);
         }
     },
 
@@ -1189,11 +1205,6 @@ Project.methods({
         this._notify('move', task, {from: iTask, to: iMove});
     },
 
-    // Object to use for JSON persistence
-    toJSON: function () {
-        return types.extend({schema: 2}, types.project(this, ['ready', 'working', 'done']));
-    },
-
     // Calculate cumulative remaining, and actual
     // by Day.
     cumulativeData: function(prop) {
@@ -1237,7 +1248,7 @@ Project.methods({
 
     consistencyCheck: function () {
         var count = 0;
-        var lists = [this.ready, this.working, this.done];
+        var lists = [this.ready, this.working, this.done, this.deleted];
         var visited = {};
         var ok = true;
 
@@ -1278,7 +1289,7 @@ Project.methods({
 // Properties we allow to be changed (id and history are internal).
 var taskValidation = {id: 'string', history: 'array',
                       actual: 'number', remaining: 'number',
-                      status: ['ready', 'working', 'done'],
+                      status: ['ready', 'working', 'done', 'deleted'],
                       description: 'string',
                       created: 'number', modified: 'number',
                       start: 'number', assignedTo: 'array', tags: 'array'};

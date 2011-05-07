@@ -40,11 +40,12 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         var project = new taskLib.Project();
         project.addTask({description: "foo"});
         var json = project.toJSON();
-        ut.equal(json.schema, 2, "schema");
+        ut.equal(json.schema, 3, "schema");
         ut.equal(json.ready.length, 1);
         ut.equal(json.ready[0].description, "foo");
         ut.equal(json.working.length, 0);
         ut.equal(json.done.length, 0);
+        ut.equal(json.deleted.length, 0);
         ut.ok(project.consistencyCheck());
     });
 
@@ -69,10 +70,15 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
 
         ut.strictEqual(project.ready, task.getList(), "task in ready");
         task.change({status: 'working'});
-        ut.equal(task.previous('status', 'done'), 'ready', "Previous status value");
+        ut.equal(task.previous('status', 'bogus'), 'ready', "Previous status value");
         ut.ok(project.consistencyCheck(), "consistency 3");
-        ut.strictEqual(project.working, task.getList(), "task in done");
+        ut.strictEqual(project.working, task.getList(), "task in working");
         ut.ok(project.consistencyCheck(), "consistency 4");
+        
+        task.change({status: 'deleted'});
+        ut.equal(task.previous('status', 'bogus'), 'working', "Previous status value");
+        ut.strictEqual(project.deleted, task.getList(), "task in deleted");
+        ut.ok(project.consistencyCheck(), "consistency 5");
 
         ut.raises(function () { task.change({noSuchProperty: 1}); },
                   /Invalid property/, "Unknown property");
@@ -80,7 +86,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
                   /'what' is not one of/, "Invalid value");
         ut.raises(function () { task.change({actual: 'not a number'}); },
                   /actual is a string \(expected a number\)/, "Require a number");
-        ut.ok(project.consistencyCheck(), "consistency 5");
+        ut.ok(project.consistencyCheck(), "consistency 6");
     });
 
     ut.test("move", function () {
