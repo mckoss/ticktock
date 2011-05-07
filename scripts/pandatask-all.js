@@ -897,7 +897,9 @@ function onClick(evt) {
         saveTask(editedId);
     }
 
-    var id = evt.target.id || evt.target.parentNode.id;
+    var $target = $(evt.target);
+    var $taskDiv = $target.closest('.task');
+    var id = $taskDiv.attr('id');
     console.log("Task id: {0}".format(id));
 
     if (!id) {
@@ -906,32 +908,20 @@ function onClick(evt) {
     }
 
     var task = project.getTask(id);
-    var $taskDiv = $('#' + id);
 
-    var classes = evt.target.className.split(/\s+/);
-    for (var i = 0; i < classes.length; i++) {
-        switch (classes[i]) {
-        case 'task':
-        case 'content':
-            $taskDiv.addClass('edit');
-            editedText = task ? task.getEditText() : '';
-            $('textarea', $taskDiv).val(editedText).focus().select();
-            editedId = id;
-            // We don't want the body click event to cancel enter edit mode.
-            evt.stopPropagation();
-            break;
-        case 'check':
-            task.change({status: task.status != 'done' ? 'done' :
-                         task.previous('status', 'working') });
-            break;
-        case 'delete':
-            task.change({status: 'deleted'});
-            break;
-        case 'promote':
-            var other = { ready: 'working', working: 'ready', done: 'working' };
-            task.change({ status: other[task.status] });
-            break;
-        }
+    if ($target.hasClass('check')) {
+        task.change({status: task.status != 'done' ? 'done' :
+                     task.previous('status', 'working') });
+    } else if ($target.hasClass('delete')) {
+        task.change({status: 'deleted'});
+    } else if ($target.hasClass('promote')) {
+        var other = { ready: 'working', working: 'ready', done: 'working' };
+        task.change({ status: other[task.status] });
+    } else {
+        $taskDiv.addClass('edit');
+        editedText = task ? task.getEditText() : '';
+        $('textarea', $taskDiv).val(editedText).focus().select();
+        editedId = id;
     }
 
     evt.stopPropagation();
