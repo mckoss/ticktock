@@ -818,7 +818,6 @@ var $doc;                            // Bound elements here
 var project;
 var editedId;
 var editedText;
-var isDirty = false;
 
 var TASK =
     '<div id="{id}" class="task">' +
@@ -842,7 +841,6 @@ function onReady() {
 
     project = new taskLib.Project({onTaskEvent: onTaskEvent});
     client = new clientLib.Client(exports);
-    client.isDirty = function () { return isDirty; };
     client.autoLoad = true;
 
     client.addAppBar();
@@ -975,8 +973,6 @@ function onTaskEvent(event) {
         var content = task.getContentHTML ? task.getContentHTML() : task.description;
         $('.content', $taskDiv).html(content);
         $('.check', $taskDiv)[0].checked = (task.status == 'done');
-        isDirty = true;
-        client.setDirty();
     }
 
     switch (event.action) {
@@ -1101,21 +1097,23 @@ Project.methods({
     },
 
     insertTask: function (task) {
-        var list = task.getList();
-        // Add to top of list
+        if (this.getTask(task)) {
+            this.removeTask(task);
+        }
+        var list = this[task.status];
         list.unshift(task);
-        this.map[task.id] = task;
+        this.map[task.id] = {task: task, list: list};
         return task;
     },
 
-    removeTask: function (task, listName) {
+    removeTask: function (task) {
         task = this.getTask(task);
-        var i = this.getListPosition(task, listName);
-        if (i != -1) {
-            task.getList(listName).splice(i, 1);
-            return undefined;
+        var map = this.map[task.id];
+        if (map) {
+            var i = this.getListPosition(task, map.list);
+            map.list.splice(i, 1);
+            delete this.map[task.id];
         }
-        delete this.map[task.id];
         return task;
     },
 
@@ -1125,21 +1123,26 @@ Project.methods({
         }
     },
 
-    getTask: function (id) {
-        if (typeof id == 'string') {
-            return this.map[id];
+    // Return task iff it is a member of the current project
+    getTask: function (task) {
+        if (task == undefined) {
+            return undefined;
         }
-        return id;
+        if (typeof task == 'object') {
+            task = task.id;
+        }
+        var map = this.map[task];
+        return map && map.task;
     },
 
     // Search for target - either a task or task.id - return position
     // it's list
-    getListPosition: function (target, listName) {
+    getListPosition: function (target, list) {
         target = this.getTask(target);
         if (target == undefined) {
             return -1;
         }
-        var list = target.getList(listName);
+        list = list || this[target.status];
         if (list == undefined) {
             return -1;
         }
@@ -1241,9 +1244,10 @@ Project.methods({
                     continue;
                 }
                 if (!this.map[task.id]) {
-                    console.log("Taks not in map: {id}".format(task));
+                    console.log("Task not in map: {id}".format(task));
+                    ok = false;
                 }
-                count++
+                count++;
                 visited[task.id] = true;
             }
         }
@@ -1319,9 +1323,6 @@ Task.methods({
                 }
                 if (prop == 'status') {
                     oldStatus = oldValue;
-                    if (!oldStatus) {
-                        this._getProject().insertTask(this);
-                    }
                 }
                 this.history.push({prop: prop, when: now, oldValue: oldValue, newValue: newValue});
             }
@@ -1329,7 +1330,7 @@ Task.methods({
 
         // status *->working: record start time
         // status working->* increment actual time
-        if (oldStatus) {
+        if (oldStatus !== undefined) {
             if (this.status == 'working') {
                 this.start = now;
             } else if (oldStatus == 'working') {
@@ -1337,7 +1338,6 @@ Task.methods({
                 delete this.start;
                 this.actual += hrs;
             }
-            this._getProject().removeTask(this, oldStatus);
             this._getProject().insertTask(this);
         }
 
