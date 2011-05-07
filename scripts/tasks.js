@@ -450,17 +450,9 @@ function parseDescription(options) {
 
     options.description = string.strip(desc);
 
-    if (remaining > 0) {
-        options.remaining = remaining;
-    }
-
-    if (assignedTo.length > 0) {
-        options.assignedTo = assignedTo;
-    }
-
-    if (tags.length > 0) {
-        options.tags = tags;
-    }
+    options.remaining = remaining;
+    options.assignedTo = assignedTo;
+    options.tags = tags;
 }
 
 function validateProperties(obj, validation) {

@@ -150,6 +150,9 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
             taskLib.parseDescription(options);
             ut.equal(options.description, test[1], test[0]);
             test[2].description = test[1];
+            test[2].remaining = test[2].remaining || 0;
+            test[2].assignedTo = test[2].assignedTo || [];
+            test[2].tags = test[2].tags || [];
             ut.deepEqual(options, test[2], test[0] + " properties");
         }
     });
