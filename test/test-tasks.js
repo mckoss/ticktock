@@ -35,7 +35,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.strictEqual(task, other, "id lookup");
         ut.ok(project.consistencyCheck());
     });
-
+    
     ut.test("toJSON", function () {
         var project = new taskLib.Project();
         project.addTask({description: "foo"});
@@ -54,10 +54,12 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         task.change({description: "bar"});
         ut.equal(task.description, "bar");
         ut.equal(task.history, undefined);
+        ut.equal(task.previous('active', 99), 99, "Default previous value");
         ut.ok(project.consistencyCheck(), "consistency 1");
 
         taskLib.updateNow(new Date(new Date().getTime() + 1000));
         task.change({actual: 8});
+        ut.equal(task.previous('actual', 99), 0, "Previous active value");
         ut.equal(task.history.length, 1);
         ut.equal(task.history[0].newValue, 8);
         ut.equal(task.history[0].oldValue, 0);
@@ -67,6 +69,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
 
         ut.strictEqual(project.ready, task.getList(), "task in ready");
         task.change({status: 'working'});
+        ut.equal(task.previous('status', 'done'), 'ready', "Previous status value");
         ut.ok(project.consistencyCheck(), "consistency 3");
         ut.strictEqual(project.working, task.getList(), "task in done");
         ut.ok(project.consistencyCheck(), "consistency 4");

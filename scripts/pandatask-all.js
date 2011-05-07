@@ -830,6 +830,7 @@ var TASK =
     '</div>';
 
 var UPDATE_INTERVAL = 1000 * 60;
+var DEBUG = true;
 
 function onReady() {
     handleAppCache();
@@ -852,11 +853,13 @@ function onReady() {
     $(document).mousedown(onClick);
 
     setInterval(onTimer, UPDATE_INTERVAL);
-    setInterval(function () {
-        if (!project.consistencyCheck()) {
-            alert("inconsitent");
-        }
-    }, 10000);
+    if (DEBUG) {
+        setInterval(function () {
+            if (!project.consistencyCheck()) {
+                alert("inconsitent");
+            }
+        }, 10000);
+    }
 }
 
 function setDoc(json) {
@@ -895,6 +898,7 @@ function onClick(evt) {
     }
 
     var id = evt.target.id || evt.target.parentNode.id;
+    console.log("Task id: {0}".format(id));
 
     if (!id) {
         evt.preventDefault();
@@ -908,6 +912,7 @@ function onClick(evt) {
     for (var i = 0; i < classes.length; i++) {
         switch (classes[i]) {
         case 'task':
+        case 'content':
             $taskDiv.addClass('edit');
             editedText = task ? task.getEditText() : '';
             $('textarea', $taskDiv).val(editedText).focus().select();
@@ -916,7 +921,7 @@ function onClick(evt) {
             evt.stopPropagation();
             break;
         case 'check':
-            task.change({status: task.status == 'done' ? 'ready' : 'done'});
+            task.change({status: task.status != 'done' ? 'done' : task.previous('status', 'working') });
             break;
         case 'delete':
             project.removeTask(task);
@@ -989,7 +994,7 @@ function onTaskEvent(event) {
         updateTask();
         break;
     default:
-        console.error("Unhandled event: {action} on {target.id}".format(event));
+        alert("Unhandled event: {action} on {target.id}".format(event));
         break;
     }
 }
@@ -1347,8 +1352,22 @@ Task.methods({
         return this;
     },
 
-    getList: function (listName) {
-        return this._getProject()[listName || this.status];
+    previous: function(prop, def) {
+        if (!this.history) {
+            return def;
+        }
+        for (var i = this.history.length - 1; i >= 0; i--) {
+            var hist = this.history[i];
+            if (hist.prop == prop) {
+                return hist.oldValue;
+            }
+        }
+        return def;
+    },
+
+    // REVIEW: Make a project function?
+    getList: function () {
+        return this._getProject()[this.status];
     },
 
     getContentHTML: function () {

@@ -317,9 +317,23 @@ Task.methods({
         }
         return this;
     },
+    
+    previous: function(prop, def) {
+        if (!this.history) {
+            return def;
+        }
+        for (var i = this.history.length - 1; i >= 0; i--) {
+            var hist = this.history[i];
+            if (hist.prop == prop) {
+                return hist.oldValue;
+            }
+        }
+        return def;
+    },
 
-    getList: function (listName) {
-        return this._getProject()[listName || this.status];
+    // REVIEW: Make a project function?
+    getList: function () {
+        return this._getProject()[this.status];
     },
 
     getContentHTML: function () {
