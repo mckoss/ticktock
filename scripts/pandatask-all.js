@@ -818,6 +818,7 @@ var $doc;                            // Bound elements here
 var project;
 var editedId;
 var editedText;
+var drag;
 
 var TASK =
     '<div id="{id}" class="task">' +
@@ -841,7 +842,7 @@ function onReady() {
 
     project = new taskLib.Project({onTaskEvent: onTaskEvent});
     client = new clientLib.Client(exports);
-    client.saveInterval = 5;
+    client.saveInterval = 0;
     client.autoLoad = true;
 
     client.addAppBar();
@@ -850,7 +851,9 @@ function onReady() {
     $doc['new-tasks'].append(TASK.format({id: "new", content: "Add new task"}));
 
     $(window).keydown(onKey);
-    $(document).mousedown(onClick);
+    $(document).click(onClick);
+
+    drag = new DragController('.task');
 
     setInterval(onTimer, UPDATE_INTERVAL);
     if (DEBUG) {
@@ -886,6 +889,78 @@ function onTimer() {
         $('.content', this).html(task.getContentHTML());
     });
 }
+
+function Point(x, y) {
+    this.push(x);
+    this.push(y);
+}
+
+Point.subclass(Array, {
+    add: function (other) {
+        this[0] += other[0];
+        this[1] += other[1];
+        return this;
+    },
+
+    sub: function (other) {
+        this[0] -= other[0];
+        this[1] -= other[1];
+        return this;
+    }
+});
+
+function DragController(selector) {
+    this.dragging = false;
+    this.selector = selector;
+
+    $(document).bind('touchstart mousedown', this.onMouseDown.curryThis(this));
+    $(document).bind('touchmove mousemove', this.onMouseMove.curryThis(this));
+    $(document).bind('toucheend touchcancel mouseup', this.onMouseUp.curryThis(this));
+}
+
+DragController.methods({
+    onMouseDown: function (evt) {
+        this.$target = $(evt.target).closest(this.selector);
+        if (this.$target.length != 1) {
+            this.dragging = false;
+            console.log("No draggable element: '{selector}'".format(this));
+            return;
+        }
+        this.dragging = true;
+        evt = this.getTouch(evt);
+        this.start =  new Point(evt.pageX, evt.pageY);
+        console.log("Mouse down: {0}, {1}".format(this.start));
+        evt.stopPropagation();
+        evt.preventDefault();
+    },
+
+    onMouseMove: function (evt) {
+        if (!this.dragging) {
+            return;
+        }
+        evt = this.getTouch(evt);
+        this.delta = new Point(evt.pageX, evt.pageY).sub(this.start);
+        this.$target.css('-webkit-transform', 'translate({0}px, {1}px)'.format(this.delta));
+        console.log("Mouse move: {0}, {1}".format(this.delta));
+    },
+
+    onMouseUp: function (evt) {
+        if (this.dragging) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            console.log("Killing mouse up");
+        }
+        this.dragging = false;
+    },
+
+    getTouch: function (evt) {
+        evt = evt.originalEvt || evt;
+        if (evt.type.indexOf('touch') == 0) {
+            return evt.touches[0];
+        }
+        return evt;
+    }
+});
 
 function onClick(evt) {
     console.log("Click on " + evt.target.tagName + "." + evt.target.className, evt.target);
