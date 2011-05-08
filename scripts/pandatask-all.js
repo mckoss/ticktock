@@ -927,8 +927,7 @@ DragController.methods({
             return;
         }
         this.dragging = true;
-        evt = this.getTouch(evt);
-        this.start =  new Point(evt.pageX, evt.pageY);
+        this.start =  this.getPoint(evt);
         console.log("Mouse down: {0}, {1}".format(this.start));
         evt.stopPropagation();
         evt.preventDefault();
@@ -938,10 +937,8 @@ DragController.methods({
         if (!this.dragging) {
             return;
         }
-        evt = this.getTouch(evt);
-        this.delta = new Point(evt.pageX, evt.pageY).sub(this.start);
+        this.delta = this.getPoint(evt).sub(this.start);
         this.$target.css('-webkit-transform', 'translate({0}px, {1}px)'.format(this.delta));
-        console.log("Mouse move: {0}, {1}".format(this.delta));
     },
 
     onMouseUp: function (evt) {
@@ -953,12 +950,12 @@ DragController.methods({
         this.dragging = false;
     },
 
-    getTouch: function (evt) {
-        evt = evt.originalEvt || evt;
+    getPoint: function (evt) {
+        evt = evt.originalEvent || evt;
         if (evt.type.indexOf('touch') == 0) {
-            return evt.touches[0];
+            evt = evt.touches[0];
         }
-        return evt;
+        return new Point(evt.pageX, evt.pageY);
     }
 });
 
