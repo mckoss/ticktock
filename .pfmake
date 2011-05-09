@@ -4,6 +4,7 @@
           "scripts/namespace-plus.js",
           { "path": "scripts/random.js", "namespace": "org.startpad.random"},
           { "path": "scripts/format.js", "namespace": "org.startpad.format"},
+          { "path": "scripts/drag.js", "namespace": "org.startpad.drag"},
           { "path": "scripts/main.js", "namespace": "com.pandatask.main" },
           { "path": "scripts/tasks.js", "namespace": "com.pandatask.tasks"}
       ],

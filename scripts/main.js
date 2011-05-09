@@ -2,6 +2,7 @@ var clientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
 var taskLib = require('com.pandatask.tasks');
 var types = require('org.startpad.types');
+var drag = require('org.startpad.drag');
 require('org.startpad.string').patch();
 require('org.startpad.funcs').patch();
 
@@ -17,7 +18,7 @@ var $doc;                            // Bound elements here
 var project;
 var editedId;
 var editedText;
-var drag;
+var dragger;
 
 var TASK =
     '<div id="{id}" class="task">' +
@@ -51,7 +52,7 @@ function onReady() {
 
     $(window).keydown(onKey);
     
-    drag = new DragController('.task');
+    dragger = new TaskDragger();
 
     setInterval(onTimer, UPDATE_INTERVAL);
     if (DEBUG) {
@@ -88,66 +89,17 @@ function onTimer() {
     });
 }
 
-function Point(x, y) {
-    this.push(x);
-    this.push(y);
+function TaskDragger() {
+    drag.DragController.call(this, '.task');
 }
 
-Point.subclass(Array, {
-    add: function (other) {
-        this[0] += other[0];
-        this[1] += other[1];
-        return this;
+TaskDragger.subclass(drag.DragController, {
+    onDrag: function (point) {
+        this.$target.css('-webkit-transform', 'translate({0}px, {1}px)'.format(point));      
     },
     
-    sub: function (other) {
-        this[0] -= other[0];
-        this[1] -= other[1];
-        return this;
-    }
-});
-
-function DragController(selector) {
-    this.dragging = false;
-    this.selector = selector;
-
-    $(document).bind('touchstart mousedown', this.onMouseDown.curryThis(this));
-    $(document).bind('touchmove mousemove', this.onMouseMove.curryThis(this));
-    $(document).bind('touchend touchcancel mouseup', this.onMouseUp.curryThis(this));
-}
-
-DragController.methods({
-    onMouseDown: function (evt) {
-        this.$target = $(evt.target).closest(this.selector);
-        if (this.$target.length != 1) {
-            this.dragging = false;
-            console.log("No draggable element: '{selector}'".format(this));
-            return;
-        }
-        this.dragging = true;
-        this.start =  this.getPoint(evt);
-        console.log("Mouse down: {0}, {1}".format(this.start));
-    },
-
-    onMouseMove: function (evt) {
-        if (!this.dragging) {
-            return;
-        }
-        this.delta = this.getPoint(evt).sub(this.start);
-        this.$target.css('-webkit-transform', 'translate({0}px, {1}px)'.format(this.delta));
-    },
-    
-    onMouseUp: function (evt) {
-        this.dragging = false;
+    onClick: function (evt) {
         onClick(evt);
-    },
-
-    getPoint: function (evt) {
-        evt = evt.originalEvent || evt;
-        if (evt.type.indexOf('touch') == 0) {
-            evt = evt.touches[0];
-        }
-        return new Point(evt.pageX, evt.pageY);
     }
 });
 
