@@ -828,17 +828,30 @@ DragController.methods({
             return;
         }
         this.dragging = true;
+        this.deferredStart = true;
         this.start =  this.getPoint(evt);
-        console.log("Mouse down: {0}, {1}".format(this.start));
+        evt.preventDefault();
     },
 
     onMouseMove: function (evt) {
         if (!this.dragging) {
             return;
         }
+        if (this.deferredStart) {
+            if (this.getPoint(evt).distance(this.start) > this.minDistance) {
+                this.deferredStart = false;
+                this.onDragStart();
+            }
+            return;
+        }
         this.onDrag(this.getPoint(evt).subFrom(this.start));
     },
 
+    // Override this function - called when dragging starts
+    onDragStart: function () {
+    },
+
+    // Override this function - called when mouse moves during a drag.
     onDrag: function (point) {
         console.log("Drag: {0}, {1}".format(point));
     },
@@ -854,10 +867,12 @@ DragController.methods({
         delete this.$target;
     },
 
+    // Override this function - called when drag is complete.
     onRelease: function (point) {
         console.log("Release: {0}, {1}".format(point));
     },
 
+    // Override this function - respond to a non-drag click (mouse up).
     onClick: function (evt) {
         console.log("Non-drag click", evt);
     },
@@ -995,12 +1010,24 @@ function onTimer() {
 }
 
 function TaskDragger() {
-    drag.DragController.call(this, '.task');
+    drag.DragController.call(this, '.task:not(#new):not(.edit)');
 }
 
 TaskDragger.subclass(drag.DragController, {
+    onDragStart: function () {
+        this.$clone = this.$target.clone();
+        this.$clone.addClass('phantom');
+        this.$target.addClass('dragging');
+        $(document.body).append(this.$clone);
+    },
+
     onDrag: function (point) {
-        this.$target.css('-webkit-transform', 'translate({0}px, {1}px)'.format(point));
+        this.$clone.css('-webkit-transform', 'translate({0}px, {1}px)'.format(point));
+    },
+
+    onRelease: function (point) {
+        this.$target.removeClass('dragging');
+        this.$clone.remove();
     },
 
     onClick: function (evt) {

@@ -27,17 +27,30 @@ DragController.methods({
             return;
         }
         this.dragging = true;
+        this.deferredStart = true;
         this.start =  this.getPoint(evt);
-        console.log("Mouse down: {0}, {1}".format(this.start));
+        evt.preventDefault();
     },
 
     onMouseMove: function (evt) {
         if (!this.dragging) {
             return;
         }
+        if (this.deferredStart) {
+            if (this.getPoint(evt).distance(this.start) > this.minDistance) {
+                this.deferredStart = false;
+                this.onDragStart();
+            }
+            return;
+        }
         this.onDrag(this.getPoint(evt).subFrom(this.start));
     },
     
+    // Override this function - called when dragging starts
+    onDragStart: function () {
+    },
+    
+    // Override this function - called when mouse moves during a drag.
     onDrag: function (point) {
         console.log("Drag: {0}, {1}".format(point));
     },
@@ -53,10 +66,12 @@ DragController.methods({
         delete this.$target;
     },
     
+    // Override this function - called when drag is complete.
     onRelease: function (point) {
         console.log("Release: {0}, {1}".format(point));
     },
     
+    // Override this function - respond to a non-drag click (mouse up).
     onClick: function (evt) {
         console.log("Non-drag click", evt);
     },
