@@ -50,7 +50,6 @@ function onReady() {
     $doc['new-tasks'].append(TASK.format({id: "new", content: "Add new task"}));
 
     $(window).keydown(onKey);
-    $(document).click(onClick);
     
     drag = new DragController('.task');
 
@@ -114,7 +113,7 @@ function DragController(selector) {
 
     $(document).bind('touchstart mousedown', this.onMouseDown.curryThis(this));
     $(document).bind('touchmove mousemove', this.onMouseMove.curryThis(this));
-    $(document).bind('toucheend touchcancel mouseup', this.onMouseUp.curryThis(this));
+    $(document).bind('touchend touchcancel mouseup', this.onMouseUp.curryThis(this));
 }
 
 DragController.methods({
@@ -128,8 +127,6 @@ DragController.methods({
         this.dragging = true;
         this.start =  this.getPoint(evt);
         console.log("Mouse down: {0}, {1}".format(this.start));
-        evt.stopPropagation();
-        evt.preventDefault();
     },
 
     onMouseMove: function (evt) {
@@ -141,12 +138,8 @@ DragController.methods({
     },
     
     onMouseUp: function (evt) {
-        if (this.dragging) {
-            evt.stopPropagation();
-            evt.preventDefault();
-            console.log("Killing mouse up");
-        }
         this.dragging = false;
+        onClick(evt);
     },
 
     getPoint: function (evt) {
