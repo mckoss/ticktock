@@ -1014,19 +1014,14 @@ function TaskDragger() {
 
 TaskDragger.subclass(drag.DragController, {
     onDragStart: function () {
-        this.$clone = this.$target.clone();
-        this.$clone.addClass('phantom');
-        this.$target.addClass('dragging');
-        $(document.body).append(this.$clone);
     },
 
     onDrag: function (point) {
-        this.$clone.css('-webkit-transform', 'translate({0}px, {1}px)'.format(point));
+        this.$target.css('-webkit-transform', 'translate({0}px, {1}px)'.format(point));
     },
 
     onRelease: function (point) {
         this.$target.removeClass('dragging');
-        this.$clone.remove();
     },
 
     onClick: function (evt) {

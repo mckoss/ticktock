@@ -41,14 +41,12 @@ a:focus{outline:1px dotted;}
 
 .column {
 	margin: 0 10px;
-	overflow: hidden;
 	float: left;
 	display: inline;
 }
 .row {
 	width: 960px;
 	margin: 0 auto;
-	overflow: hidden;
 }
 .row .row {
 	margin: 0 -10px;
