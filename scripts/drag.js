@@ -59,7 +59,6 @@ DragController.methods({
         if (this.dragging && this.getPoint(evt).distance(this.start) >= this.minDistance) {
             this.onRelease(this.getPoint(evt).subFrom(this.start));
         } else {
-            this.onDrag(new Point(0, 0));
             this.onClick(evt);
         }
         this.dragging = false;
