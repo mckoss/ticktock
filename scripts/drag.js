@@ -51,6 +51,7 @@ DragController.methods({
     onDragStart: function () {
         this.$clone = this.$target.clone();
         this.$clone.addClass('phantom');
+        this.$clone.width(this.$target.width());
         this.$target.addClass('dragging');
         $(document.body).append(this.$clone);
     },

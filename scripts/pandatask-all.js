@@ -801,6 +801,7 @@ function repeat(s, times) {
 namespace.module('org.startpad.drag', function (exports, require) {
 require('org.startpad.string').patch();
 require('org.startpad.funcs').patch();
+var dom = require('org.startpad.dom');
 var vector = require('org.startpad.vector');
 var types = require('org.startpad.types');
 
@@ -852,6 +853,7 @@ DragController.methods({
     onDragStart: function () {
         this.$clone = this.$target.clone();
         this.$clone.addClass('phantom');
+        this.$clone.width(this.$target.width());
         this.$target.addClass('dragging');
         $(document.body).append(this.$clone);
     },
