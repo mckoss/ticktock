@@ -45,16 +45,16 @@ DragController.methods({
         }
         this.onDrag(this.getPoint(evt).subFrom(this.start));
     },
-    
+
     // Override this function - called when dragging starts
     onDragStart: function () {
     },
-    
+
     // Override this function - called when mouse moves during a drag.
     onDrag: function (point) {
         console.log("Drag: {0}, {1}".format(point));
     },
-    
+
     onMouseUp: function (evt) {
         if (this.dragging && this.getPoint(evt).distance(this.start) >= this.minDistance) {
             this.onRelease(this.getPoint(evt).subFrom(this.start));
@@ -64,12 +64,12 @@ DragController.methods({
         this.dragging = false;
         delete this.$target;
     },
-    
+
     // Override this function - called when drag is complete.
     onRelease: function (point) {
         console.log("Release: {0}, {1}".format(point));
     },
-    
+
     // Override this function - respond to a non-drag click (mouse up).
     onClick: function (evt) {
         console.log("Non-drag click", evt);
@@ -96,17 +96,17 @@ Point.subclass(Array, {
         this[1] += other[1];
         return this;
     },
-    
+
     subFrom: function (other) {
         this[0] -= other[0];
         this[1] -= other[1];
         return this;
     },
-    
+
     copy: function () {
         return new Point(this[0], this[1]);
     },
-    
+
     distance: function (other) {
         var delta = this.copy().subFrom(other);
         return Math.sqrt(delta[0] * delta[0] + delta[1] * delta[1]);

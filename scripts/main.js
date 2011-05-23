@@ -52,7 +52,7 @@ function onReady() {
     $doc['new-tasks'].append(TASK.format({id: "new", content: "Add new task"}));
 
     $(window).keydown(onKey);
-    
+
     dragger = new TaskDragger();
 
     setInterval(onTimer, UPDATE_INTERVAL);
@@ -99,7 +99,7 @@ TaskDragger.subclass(drag.DragController, {
         this.rcReady = dom.getRect($doc['ready-tasks'][0]);
         this.rcTask = dom.getRect(this.$target[0]);
     },
-    
+
     onDrag: function (point) {
         var self = this;
         this.$target.css('-webkit-transform', 'translate({0}px, {1}px)'.format(point));
@@ -125,11 +125,11 @@ TaskDragger.subclass(drag.DragController, {
             this.last = best;
         }
     },
-    
+
     onRelease: function (point) {
         this.$target.removeClass('dragging');
     },
-    
+
     onClick: function (evt) {
         onClick(evt);
     }
@@ -144,7 +144,7 @@ function onClick(evt) {
     if (editedId) {
         saveTask(editedId);
     }
-    
+
     var $target = $(evt.target);
     var $taskDiv = $target.closest('.task');
     var id = $taskDiv.attr('id');
@@ -169,7 +169,7 @@ function onClick(evt) {
         $taskDiv.addClass('edit');
         editedText = task ? task.getEditText() : '';
         $('textarea', $taskDiv).val(editedText).focus().select();
-        editedId = id;       
+        editedId = id;
     }
 
     evt.stopPropagation();

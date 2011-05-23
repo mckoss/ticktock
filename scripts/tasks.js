@@ -42,7 +42,7 @@ function Project(options) {
     this.fromJSON(options);
 }
 
-Project.methods({    
+Project.methods({
     // Object to use for JSON persistence
     toJSON: function () {
         return types.extend({schema: 3}, types.project(this, ['ready', 'working', 'done', 'deleted']));
@@ -83,7 +83,7 @@ Project.methods({
         this.map[task.id] = {task: task, list: list};
         return task;
     },
-    
+
     removeTask: function (task) {
         task = this.getTask(task);
         var map = this.map[task.id];
@@ -319,7 +319,7 @@ Task.methods({
         }
         return this;
     },
-    
+
     previous: function(prop, def) {
         if (!this.history) {
             return def;
