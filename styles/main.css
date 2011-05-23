@@ -40,18 +40,19 @@ a:focus{outline:1px dotted;}
 .grid_16 { width:940px; }
 
 .column {
-	margin: 0 10px;
-	float: left;
-	display: inline;
+  margin: 0 10px;
+  float: left;
+  display: inline;
 }
 .row {
-	width: 960px;
-	margin: 0 auto;
+  width: 960px;
+  margin: 0 auto;
+  overflow: hidden;
 }
 .row .row {
-	margin: 0 -10px;
-	width: auto;
-	display: inline-block;
+  margin: 0 -10px;
+  width: auto;
+  display: inline-block;
 }
 
 .row#top,
