@@ -1,5 +1,6 @@
 require('org.startpad.string').patch();
 require('org.startpad.funcs').patch();
+var vector = require('org.startpad.vector');
 var types = require('org.startpad.types');
 
 exports.extend({
@@ -10,7 +11,7 @@ function DragController(selector, container, options) {
     container = container || document;
     this.dragging = false;
     this.selector = selector;
-    this.minDistance = 4;
+    this.minDistance2 = 4 * 4;
     types.extend(this, options);
 
     $(container).bind('touchstart mousedown', this.onMouseDown.curryThis(this));
@@ -37,27 +38,32 @@ DragController.methods({
             return;
         }
         if (this.deferredStart) {
-            if (this.getPoint(evt).distance(this.start) > this.minDistance) {
+            if (vector.distance2(this.getPoint(evt), this.start) > this.minDistance2) {
                 this.deferredStart = false;
                 this.onDragStart();
             }
             return;
         }
-        this.onDrag(this.getPoint(evt).subFrom(this.start));
+        this.onDrag(vector.subFrom(this.getPoint(evt), this.start));
     },
 
     // Override this function - called when dragging starts
     onDragStart: function () {
+        this.$clone = this.$target.clone();
+        this.$clone.addClass('phantom');
+        this.$target.addClass('dragging');
+        $(document.body).append(this.$clone);
     },
 
     // Override this function - called when mouse moves during a drag.
     onDrag: function (point) {
-        console.log("Drag: {0}, {1}".format(point));
+        this.$clone.css('-webkit-transform', 'translate({0}px, {1}px)'.format(point));
     },
 
     onMouseUp: function (evt) {
-        if (this.dragging && this.getPoint(evt).distance(this.start) >= this.minDistance) {
-            this.onRelease(this.getPoint(evt).subFrom(this.start));
+        if (this.dragging &&
+            vector.distance2(this.getPoint(evt), this.start) >= this.minDistance2) {
+            this.onRelease(vector.subFrom(this.getPoint(evt), this.start));
         } else {
             this.onClick(evt);
         }
@@ -67,7 +73,8 @@ DragController.methods({
 
     // Override this function - called when drag is complete.
     onRelease: function (point) {
-        console.log("Release: {0}, {1}".format(point));
+        this.$target.removeClass('dragging');
+        this.$clone.remove();
     },
 
     // Override this function - respond to a non-drag click (mouse up).
@@ -80,35 +87,6 @@ DragController.methods({
         if (evt.type.indexOf('touch') == 0) {
             evt = evt.touches[0];
         }
-        return new Point(evt.pageX, evt.pageY);
-    }
-});
-
-
-function Point(x, y) {
-    this.push(x);
-    this.push(y);
-}
-
-Point.subclass(Array, {
-    addTo: function (other) {
-        this[0] += other[0];
-        this[1] += other[1];
-        return this;
-    },
-
-    subFrom: function (other) {
-        this[0] -= other[0];
-        this[1] -= other[1];
-        return this;
-    },
-
-    copy: function () {
-        return new Point(this[0], this[1]);
-    },
-
-    distance: function (other) {
-        var delta = this.copy().subFrom(other);
-        return Math.sqrt(delta[0] * delta[0] + delta[1] * delta[1]);
+        return [evt.pageX, evt.pageY];
     }
 });

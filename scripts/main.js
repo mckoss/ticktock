@@ -1,6 +1,5 @@
 var clientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
-var vector = require('org.startpad.vector');
 var taskLib = require('com.pandatask.tasks');
 var types = require('org.startpad.types');
 var drag = require('org.startpad.drag');
@@ -95,41 +94,6 @@ function TaskDragger() {
 }
 
 TaskDragger.subclass(drag.DragController, {
-    onDragStart: function () {
-        this.rcReady = dom.getRect($doc['ready-tasks'][0]);
-        this.rcTask = dom.getRect(this.$target[0]);
-    },
-
-    onDrag: function (point) {
-        var self = this;
-        this.$target.css('-webkit-transform', 'translate({0}px, {1}px)'.format(point));
-        var rcTest = vector.add(this.rcTask, point);
-        var bestArea = 0;
-        var best;
-        $('.task', $doc['ready-tasks']).each(function() {
-            if (this == self.$target[0]) {
-                return;
-            }
-            var size = vector.size(vector.rcClipToRect(rcTest, dom.getRect(this)));
-            var area = size[0] * size[1];
-            if (area > bestArea) {
-                best = this;
-                bestArea = area;
-            }
-        });
-        if (this.last && best != this.last) {
-            $(this.last).css('margin-top', 0);
-        }
-        if (best) {
-            $(best).css('margin-top', 100);
-            this.last = best;
-        }
-    },
-
-    onRelease: function (point) {
-        this.$target.removeClass('dragging');
-    },
-
     onClick: function (evt) {
         onClick(evt);
     }
