@@ -94,6 +94,16 @@ function TaskDragger() {
 }
 
 TaskDragger.subclass(drag.DragController, {
+    onDrag: function (point) {
+        drag.DragController.prototype.onDrag.call(this, point);
+        if (this.$dropTarget !== this.$lastDropTarget) {
+            if (this.$lastDropTarget) {
+                this.$lastDropTarget.css('margin-top', 0);
+            }
+            $dropTarget.css('margin-top', this.$clone.height());
+        }
+    },
+
     onClick: function (evt) {
         onClick(evt);
     }

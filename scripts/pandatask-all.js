@@ -852,6 +852,7 @@ DragController.methods({
 
     // Override this function - called when dragging starts
     onDragStart: function () {
+        var self = this;
         this.$clone = this.$target.clone();
         this.$clone.addClass('phantom');
         this.$clone.width(this.$target.width());
@@ -860,6 +861,26 @@ DragController.methods({
         this.$clone.offset(offset);
         this.$target.addClass('dragging');
         $(document.body).append(this.$clone);
+
+        this.dropTargets = [];
+        $(this.selector).each(function () {
+            // Don't drop target on self
+            if (this.id == self.$target[0].id) {
+                return;
+            }
+            var $dropTarget = $(this);
+            var offset = $dropTarget.offset();
+            var rect = [offset.left, offset.top,
+                        offset.left + $dropTarget.width(),
+                        offset.top + $dropTarget.height()];
+            self.dropTargets.push({
+                id: this.id,
+                rect: rect
+            });
+        });
+
+        this.$dropTarget = undefined;
+        this.$lastDropTarget = undefined;
     },
 
     // Override this function - called when mouse moves during a drag.
@@ -996,6 +1017,16 @@ function TaskDragger() {
 }
 
 TaskDragger.subclass(drag.DragController, {
+    onDrag: function (point) {
+        drag.DragController.prototype.onDrag.call(this, point);
+        if (this.$dropTarget !== this.$lastDropTarget) {
+            if (this.$lastDropTarget) {
+                this.$lastDropTarget.css('margin-top', 0);
+            }
+            $dropTarget.css('margin-top', this.$clone.height());
+        }
+    },
+
     onClick: function (evt) {
         onClick(evt);
     }
