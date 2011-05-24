@@ -12,6 +12,8 @@ function DragController(selector, container, options) {
     this.dragging = false;
     this.selector = selector;
     this.minDistance2 = 4 * 4;
+    // jQuery bug with relative body positioning
+    this.topFix = $(document.body).offset().top;
     types.extend(this, options);
 
     $(container).bind('touchstart mousedown', this.onMouseDown.curryThis(this));
@@ -52,6 +54,9 @@ DragController.methods({
         this.$clone = this.$target.clone();
         this.$clone.addClass('phantom');
         this.$clone.width(this.$target.width());
+        var offset = this.$target.offset();
+        offset.top -= this.topFix;
+        this.$clone.offset(offset);
         this.$target.addClass('dragging');
         $(document.body).append(this.$clone);
     },
@@ -62,8 +67,7 @@ DragController.methods({
     },
 
     onMouseUp: function (evt) {
-        if (this.dragging &&
-            vector.distance2(this.getPoint(evt), this.start) >= this.minDistance2) {
+        if (this.dragging && !this.deferredStart) {
             this.onRelease(vector.subFrom(this.getPoint(evt), this.start));
         } else {
             this.onClick(evt);
