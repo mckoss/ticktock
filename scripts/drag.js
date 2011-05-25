@@ -52,6 +52,7 @@ DragController.methods({
     // Override this function - called when dragging starts
     onDragStart: function () {
         var self = this;
+        this.rcTarget = self.getRect(this.$target);
         this.$clone = this.$target.clone();
         this.$clone.addClass('phantom');
         this.$clone.width(this.$target.width());
@@ -68,23 +69,60 @@ DragController.methods({
                 return;
             }
             var $dropTarget = $(this);
-            var offset = $dropTarget.offset();
-            var rect = [offset.left, offset.top,
-                        offset.left + $dropTarget.width(),
-                        offset.top + $dropTarget.height()];
             self.dropTargets.push({
                 id: this.id,
-                rect: rect
+                rect: self.getRect($dropTarget)
             });
         });
 
-        this.$dropTarget = undefined;
         this.$lastDropTarget = undefined;
+    },
+
+    getRect: function ($elt) {
+        var offset = $elt.offset();
+        var rect = [offset.left, offset.top,
+                    offset.left + $elt.outerWidth(),
+                    offset.top + $elt.outerHeight()];
+        return rect;
     },
 
     // Override this function - called when mouse moves during a drag.
     onDrag: function (point) {
         this.$clone.css('-webkit-transform', 'translate({0}px, {1}px)'.format(point));
+        var rcTest = vector.add(this.rcTarget, point);
+        var size;
+
+        var bestArea = 0;
+        var bestId;
+        for (var i = 0; i < this.dropTargets.length; i++) {
+            size = vector.size(vector.rcClipToRect(rcTest, this.dropTargets[i].rect));
+            var area = size[0] * size[1];
+            if (area > bestArea) {
+                bestArea = area;
+                bestId = this.dropTargets[i].id;
+            }
+        }
+
+        if (!bestId) {
+            if (this.$lastDropTarget) {
+                this.onDragOver(undefined, this.$lastDropTarget);
+                this.$lastDropTarget = undefined;
+            }
+            return;
+        }
+
+        if (this.$lastDropTarget && bestId == this.$lastDropTarget[0].id) {
+            return;
+        }
+
+        console.log("overlap: ", size[0], size[1]);
+        var $dropTarget = $('#' + bestId);
+        this.onDragOver($dropTarget, this.$lastDropTarget);
+        this.$lastDropTarget = $dropTarget;
+    },
+
+    // Override - called when target is dragged over a drop target
+    onDragOver: function ($dropTarget, $lastDropTarget) {
     },
 
     onMouseUp: function (evt) {

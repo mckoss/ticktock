@@ -94,13 +94,13 @@ function TaskDragger() {
 }
 
 TaskDragger.subclass(drag.DragController, {
-    onDrag: function (point) {
-        drag.DragController.prototype.onDrag.call(this, point);
-        if (this.$dropTarget !== this.$lastDropTarget) {
-            if (this.$lastDropTarget) {
-                this.$lastDropTarget.css('margin-top', 0);
-            }
-            $dropTarget.css('margin-top', this.$clone.height());
+    onDragOver: function ($dropTarget, $lastDropTarget) {
+        console.log("Drag over", $dropTarget);
+        if ($lastDropTarget) {
+            $lastDropTarget.css('margin-top', 0);
+        }
+        if ($dropTarget) {
+            $dropTarget.css('margin-top', (this.$clone.outerHeight() + 24) + 'px');
         }
     },
 
