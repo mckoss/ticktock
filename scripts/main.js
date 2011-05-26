@@ -90,12 +90,32 @@ function onTimer() {
 }
 
 function TaskDragger() {
-    drag.DragController.call(this, '.task:not(#new):not(.edit)');
+    drag.DragController.call(this, '.task:not(#new):not(.edit):not(.no-target)');
 }
 
 TaskDragger.subclass(drag.DragController, {
     onClick: function (evt) {
         onClick(evt);
+    },
+
+    onDragStart: function () {
+        // Don't allow drag over the following task in it's list
+        var task = project.getTask(this.$target.attr('id'));
+        var pos = project.getListPosition(task);
+        var nextTask = project[task.status][pos + 1];
+        if (nextTask) {
+            this.$noTarget = $('#' + nextTask.id);
+            this.$noTarget.addClass('no-target');
+        }
+        drag.DragController.prototype.onDragStart.call(this);
+    },
+
+    onRelease: function (point) {
+        if (this.$noTarget) {
+            this.$noTarget.removeClass('no-target');
+            this.$noTarget = undefined;
+        }
+        drag.DragController.prototype.onRelease.call(this, point);
     }
 });
 
