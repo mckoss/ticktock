@@ -850,7 +850,6 @@ DragController.methods({
         this.onDrag(vector.subFrom(this.getPoint(evt), this.start));
     },
 
-    // Override this function - called when dragging starts
     onDragStart: function () {
         var self = this;
         this.rcTarget = self.getRect(this.$target);
@@ -887,7 +886,6 @@ DragController.methods({
         return rect;
     },
 
-    // Override this function - called when mouse moves during a drag.
     onDrag: function (point) {
         this.$clone.css('-webkit-transform', 'translate({0}px, {1}px)'.format(point));
         var rcTest = vector.add(this.rcTarget, point);
@@ -922,8 +920,13 @@ DragController.methods({
         this.$lastDropTarget = $dropTarget;
     },
 
-    // Override - called when target is dragged over a drop target
     onDragOver: function ($dropTarget, $lastDropTarget) {
+        if ($lastDropTarget) {
+            $lastDropTarget.removeClass('drop-target');
+        }
+        if ($dropTarget) {
+            $dropTarget.addClass('drop-target');
+        }
     },
 
     onMouseUp: function (evt) {
@@ -1055,16 +1058,6 @@ function TaskDragger() {
 }
 
 TaskDragger.subclass(drag.DragController, {
-    onDragOver: function ($dropTarget, $lastDropTarget) {
-        console.log("Drag over", $dropTarget);
-        if ($lastDropTarget) {
-            $lastDropTarget.css('margin-top', 0);
-        }
-        if ($dropTarget) {
-            $dropTarget.css('margin-top', (this.$clone.outerHeight() + 24) + 'px');
-        }
-    },
-
     onClick: function (evt) {
         onClick(evt);
     }

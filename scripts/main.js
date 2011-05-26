@@ -94,16 +94,6 @@ function TaskDragger() {
 }
 
 TaskDragger.subclass(drag.DragController, {
-    onDragOver: function ($dropTarget, $lastDropTarget) {
-        console.log("Drag over", $dropTarget);
-        if ($lastDropTarget) {
-            $lastDropTarget.css('margin-top', 0);
-        }
-        if ($dropTarget) {
-            $dropTarget.css('margin-top', (this.$clone.outerHeight() + 24) + 'px');
-        }
-    },
-
     onClick: function (evt) {
         onClick(evt);
     }

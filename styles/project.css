@@ -52,7 +52,11 @@ div.task {
   -moz-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
   box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
   overflow: hidden;
-  -webkit-transition: margin-top 1s ease-in-out;
+  -webkit-transition: margin-top 0.5s ease-in-out;
+}
+
+div.task.drop-target {
+  margin-top: 50px;
 }
 
 div.task.phantom {
