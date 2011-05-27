@@ -231,6 +231,12 @@ function onTaskEvent(event) {
             updateTask();
         }
         break;
+    case 'move':
+        $('#' + event.target.id).remove();
+        var pos = project.getListPosition(event.target);
+        $($('.task', $doc[listName])[pos]).before(TASK.format(task));
+        updateTask();
+        break;
     default:
         alert("Unhandled event: {action} on {target.id}".format(event));
         break;
