@@ -104,16 +104,20 @@ TaskDragger.subclass(drag.DragController, {
         var pos = project.getListPosition(task);
         var nextTask = project[task.status][pos + 1];
         if (nextTask) {
-            this.$noTarget = $('#' + nextTask.id);
-            this.$noTarget.addClass('no-target');
+            this.$nextTask = $('#' + nextTask.id);
+            this.$nextTask.addClass('no-target');
         }
         drag.DragController.prototype.onDragStart.call(this);
     },
 
     onRelease: function (point) {
-        if (this.$noTarget) {
-            this.$noTarget.removeClass('no-target');
-            this.$noTarget = undefined;
+        if (this.$nextTask) {
+            this.$nextTask.removeClass('no-target');
+            this.$nextTask = undefined;
+        }
+        if (this.$lastDropTarget) {
+            project.moveBefore(this.$target.attr('id'),
+                               this.$lastDropTarget.attr('id'));
         }
         drag.DragController.prototype.onRelease.call(this, point);
     }
@@ -215,7 +219,8 @@ function onTaskEvent(event) {
         }
         break;
     case 'change':
-        // Move task between lists
+        // Move task
+        console.log('change', event.properties);
         if (event.properties.indexOf('status') != -1) {
             $('#' + event.target.id).remove();
             if (task.status != 'deleted') {

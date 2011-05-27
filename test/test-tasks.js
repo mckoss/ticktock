@@ -35,7 +35,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.strictEqual(task, other, "id lookup");
         ut.ok(project.consistencyCheck());
     });
-    
+
     ut.test("toJSON", function () {
         var project = new taskLib.Project();
         project.addTask({description: "foo"});
@@ -74,7 +74,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         ut.ok(project.consistencyCheck(), "consistency 3");
         ut.strictEqual(project.working, task.getList(), "task in working");
         ut.ok(project.consistencyCheck(), "consistency 4");
-        
+
         task.change({status: 'deleted'});
         ut.equal(task.previous('status', 'bogus'), 'working', "Previous status value");
         ut.strictEqual(project.deleted, task.getList(), "task in deleted");
@@ -123,6 +123,16 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
 
         project.move(project.ready[1], -1);
         testOrder([3, 10, 1, 4, 6, 2, 5, 7, 8, 9]);
+
+        project.moveBefore(project.ready[1], project.ready[0]);
+        testOrder([10, 3, 1, 4, 6, 2, 5, 7, 8, 9]);
+
+        project.moveBefore(project.ready[0], project.ready[1]);
+        testOrder([10, 3, 1, 4, 6, 2, 5, 7, 8, 9]);
+
+        project.moveBefore(project.ready[0], project.ready[2]);
+        testOrder([3, 10, 1, 4, 6, 2, 5, 7, 8, 9]);
+
         ut.ok(project.consistencyCheck());
     });
 
@@ -150,9 +160,6 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
             taskLib.parseDescription(options);
             ut.equal(options.description, test[1], test[0]);
             test[2].description = test[1];
-            test[2].remaining = test[2].remaining || 0;
-            test[2].assignedTo = test[2].assignedTo || [];
-            test[2].tags = test[2].tags || [];
             ut.deepEqual(options, test[2], test[0] + " properties");
         }
     });
@@ -205,7 +212,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
             delete expect.target;
             delete expect.task;
             for (prop in expect) {
-                ut.equal(event[prop], expect[prop], prop + " == " + expect[prop]);
+                ut.deepEqual(event[prop], expect[prop], prop + " == " + expect[prop]);
             }
         }
 
@@ -215,11 +222,14 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         expects.push({action: 'add', task: {description: "test 2"}});
         task = project.addTask({description: "test 2"});
 
-        expects.push({action: 'change', target: task, task: {description: "task 2 prime"}});
+        expects.push({action: 'change', target: task,
+                      task: {description: "task 2 prime"},
+                      properties: ['description']});
         task.change({description: "task 2 prime"});
 
-        expects.push({action: 'move', target: task,
-                      from: 0, to: 1});
+        expects.push({action: 'change', target: task,
+                      properties: ['position'],
+                      oldPosition: 0});
         project.move(task.id, 1);
 
         ut.equal(expects.length, 0, "Processed all expected notifications: " +

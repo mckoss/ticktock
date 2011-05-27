@@ -916,17 +916,18 @@ DragController.methods({
 
         console.log("overlap: ", size[0], size[1]);
         var $dropTarget = $('#' + bestId);
-        this.onDragOver($dropTarget, this.$lastDropTarget);
-        this.$lastDropTarget = $dropTarget;
+        this.onDragOver($dropTarget);
     },
 
-    onDragOver: function ($dropTarget, $lastDropTarget) {
-        if ($lastDropTarget) {
-            $lastDropTarget.removeClass('drop-target');
+    // Should only be called when drop target changes
+    onDragOver: function ($dropTarget) {
+        if (this.$lastDropTarget) {
+            this.$lastDropTarget.removeClass('drop-target');
         }
         if ($dropTarget) {
             $dropTarget.addClass('drop-target');
         }
+        this.$lastDropTarget = $dropTarget;
     },
 
     onMouseUp: function (evt) {
@@ -943,6 +944,7 @@ DragController.methods({
     onRelease: function (point) {
         this.$target.removeClass('dragging');
         this.$clone.remove();
+        this.onDragOver(undefined);
     },
 
     // Override this function - respond to a non-drag click (mouse up).
@@ -1068,16 +1070,20 @@ TaskDragger.subclass(drag.DragController, {
         var pos = project.getListPosition(task);
         var nextTask = project[task.status][pos + 1];
         if (nextTask) {
-            this.$noTarget = $('#' + nextTask.id);
-            this.$noTarget.addClass('no-target');
+            this.$nextTask = $('#' + nextTask.id);
+            this.$nextTask.addClass('no-target');
         }
         drag.DragController.prototype.onDragStart.call(this);
     },
 
     onRelease: function (point) {
-        if (this.$noTarget) {
-            this.$noTarget.removeClass('no-target');
-            this.$noTarget = undefined;
+        if (this.$nextTask) {
+            this.$nextTask.removeClass('no-target');
+            this.$nextTask = undefined;
+        }
+        if (this.$lastDropTarget) {
+            project.moveBefore(this.$target.attr('id'),
+                               this.$lastDropTarget.attr('id'));
         }
         drag.DragController.prototype.onRelease.call(this, point);
     }
@@ -1179,7 +1185,8 @@ function onTaskEvent(event) {
         }
         break;
     case 'change':
-        // Move task between lists
+        // Move task
+        console.log('change', event.properties);
         if (event.properties.indexOf('status') != -1) {
             $('#' + event.target.id).remove();
             if (task.status != 'deleted') {
@@ -1276,7 +1283,8 @@ function Project(options) {
 Project.methods({
     // Object to use for JSON persistence
     toJSON: function () {
-        return types.extend({schema: 3}, types.project(this, ['ready', 'working', 'done', 'deleted']));
+        return types.extend({schema: 3},
+                            types.project(this, ['ready', 'working', 'done', 'deleted']));
     },
 
     fromJSON: function (json) {
@@ -1377,6 +1385,20 @@ Project.methods({
         this.move(mover, n);
     },
 
+    // Move the first tasks to a position just before the second task.
+    moveBefore: function (mover, target) {
+        target = this.getTask(target);
+        mover = this.getTask(mover);
+        if (target && mover.status != target.status) {
+            mover.change({status: target.status});
+        }
+        var n = this.getListPosition(target) - this.getListPosition(mover);
+        if (n > 0) {
+            n--;
+        }
+        this.move(mover, n);
+    },
+
     // Move task by n positions up or down
     move: function (task, n) {
         task = this.getTask(task);
@@ -1388,7 +1410,8 @@ Project.methods({
         }
         task = list.splice(iTask, 1)[0];
         list.splice(iMove, 0, task);
-        this._notify('move', task, {from: iTask, to: iMove});
+        this._notify('change', task, {properties: ['position'],
+                                      oldPosition: iTask});
     },
 
     // Calculate cumulative remaining, and actual
@@ -1681,9 +1704,15 @@ function parseDescription(options) {
 
     options.description = string.strip(desc);
 
-    options.remaining = remaining;
-    options.assignedTo = assignedTo;
-    options.tags = tags;
+    if (remaining != 0) {
+        options.remaining = remaining;
+    }
+    if (assignedTo.length != 0) {
+        options.assignedTo = assignedTo;
+    }
+    if (tags.length != 0) {
+        options.tags = tags;
+    }
 }
 
 function validateProperties(obj, validation) {

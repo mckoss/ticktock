@@ -115,17 +115,18 @@ DragController.methods({
 
         console.log("overlap: ", size[0], size[1]);
         var $dropTarget = $('#' + bestId);
-        this.onDragOver($dropTarget, this.$lastDropTarget);
-        this.$lastDropTarget = $dropTarget;
+        this.onDragOver($dropTarget);
     },
 
-    onDragOver: function ($dropTarget, $lastDropTarget) {
-        if ($lastDropTarget) {
-            $lastDropTarget.removeClass('drop-target');
+    // Should only be called when drop target changes
+    onDragOver: function ($dropTarget) {
+        if (this.$lastDropTarget) {
+            this.$lastDropTarget.removeClass('drop-target');
         }
         if ($dropTarget) {
             $dropTarget.addClass('drop-target');
         }
+        this.$lastDropTarget = $dropTarget;
     },
 
     onMouseUp: function (evt) {
@@ -142,6 +143,7 @@ DragController.methods({
     onRelease: function (point) {
         this.$target.removeClass('dragging');
         this.$clone.remove();
+        this.onDragOver(undefined);
     },
 
     // Override this function - respond to a non-drag click (mouse up).

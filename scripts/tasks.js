@@ -45,7 +45,8 @@ function Project(options) {
 Project.methods({
     // Object to use for JSON persistence
     toJSON: function () {
-        return types.extend({schema: 3}, types.project(this, ['ready', 'working', 'done', 'deleted']));
+        return types.extend({schema: 3},
+                            types.project(this, ['ready', 'working', 'done', 'deleted']));
     },
 
     fromJSON: function (json) {
@@ -146,6 +147,20 @@ Project.methods({
         this.move(mover, n);
     },
 
+    // Move the first tasks to a position just before the second task.
+    moveBefore: function (mover, target) {
+        target = this.getTask(target);
+        mover = this.getTask(mover);
+        if (target && mover.status != target.status) {
+            mover.change({status: target.status});
+        }
+        var n = this.getListPosition(target) - this.getListPosition(mover);
+        if (n > 0) {
+            n--;
+        }
+        this.move(mover, n);
+    },
+
     // Move task by n positions up or down
     move: function (task, n) {
         task = this.getTask(task);
@@ -157,7 +172,8 @@ Project.methods({
         }
         task = list.splice(iTask, 1)[0];
         list.splice(iMove, 0, task);
-        this._notify('move', task, {from: iTask, to: iMove});
+        this._notify('change', task, {properties: ['position'],
+                                      oldPosition: iTask});
     },
 
     // Calculate cumulative remaining, and actual
@@ -450,9 +466,15 @@ function parseDescription(options) {
 
     options.description = string.strip(desc);
 
-    options.remaining = remaining;
-    options.assignedTo = assignedTo;
-    options.tags = tags;
+    if (remaining != 0) {
+        options.remaining = remaining;
+    }
+    if (assignedTo.length != 0) {
+        options.assignedTo = assignedTo;
+    }
+    if (tags.length != 0) {
+        options.tags = tags;
+    }
 }
 
 function validateProperties(obj, validation) {
