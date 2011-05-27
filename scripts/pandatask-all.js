@@ -1008,7 +1008,7 @@ function onReady() {
 
     project = new taskLib.Project({onTaskEvent: onTaskEvent});
     client = new clientLib.Client(exports);
-    client.saveInterval = 0;
+    client.saveInterval = 2;
     client.autoLoad = true;
 
     client.addAppBar();
@@ -1024,14 +1024,19 @@ function onReady() {
     if (DEBUG) {
         setInterval(function () {
             if (!project.consistencyCheck()) {
-                alert("inconsitent");
+                alert("inconsistent project data");
             }
         }, 10000);
     }
 }
 
 function setDoc(json) {
+    var listTypes = ['ready', 'working', 'done'];
     project = new taskLib.Project({onTaskEvent: onTaskEvent});
+    for (var i = 0; i < listTypes.length; i++) {
+        var name = listTypes[i] + '-tasks';
+        $doc[name].empty();
+    }
     project.fromJSON(json.blob);
     $doc["project-title"].text(json.title);
 }
@@ -1049,6 +1054,7 @@ function onSaveSuccess() {
 
 function onTimer() {
     taskLib.updateNow();
+    // Update timers in all working tasks
     $('div.task', $doc['working-tasks']).each(function () {
         var task = project.getTask(this.id);
         $('.content', this).html(task.getContentHTML());
@@ -1277,16 +1283,19 @@ var now = new Date().getTime();
 
 function Project(options) {
     options = options || {};
-    this.map = {};
-    types.extend(this, types.project(options, 'onTaskEvent'));
-    this.ready = [];
-    this.working = [];
-    this.done = [];
-    this.deleted = [];
     this.fromJSON(options);
+    types.extend(this, types.project(options, 'onTaskEvent'));
 }
 
 Project.methods({
+    init: function () {
+        this.map = {};
+        this.ready = [];
+        this.working = [];
+        this.done = [];
+        this.deleted = [];
+    },
+
     // Object to use for JSON persistence
     toJSON: function () {
         return types.extend({schema: 3},
@@ -1294,6 +1303,7 @@ Project.methods({
     },
 
     fromJSON: function (json) {
+        this.init();
         if (!json.schema || json.schema == 1) {
             this.mergeTasks(json.tasks);
         } else {
@@ -1524,9 +1534,6 @@ function Task(options, project) {
     this.actual = 0;
     this.description = '';
     this.change(types.extend({status: 'ready'}, options), true);
-    if (this.history) {
-        delete this.history;
-    }
 }
 
 Task.methods({
@@ -1551,14 +1558,14 @@ Task.methods({
                 if (newValue == undefined) {
                     delete this[prop];
                 }
-                if (!historyProps[prop]) {
+                if (prop == 'status') {
+                    oldStatus = oldValue;
+                }
+                if (quiet || !historyProps[prop]) {
                     continue;
                 }
                 if (!this.history) {
                     this.history = [];
-                }
-                if (prop == 'status') {
-                    oldStatus = oldValue;
                 }
                 this.history.push({prop: prop, when: now, oldValue: oldValue, newValue: newValue});
             }

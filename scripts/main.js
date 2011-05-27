@@ -42,7 +42,7 @@ function onReady() {
 
     project = new taskLib.Project({onTaskEvent: onTaskEvent});
     client = new clientLib.Client(exports);
-    client.saveInterval = 0;
+    client.saveInterval = 2;
     client.autoLoad = true;
 
     client.addAppBar();
@@ -58,14 +58,19 @@ function onReady() {
     if (DEBUG) {
         setInterval(function () {
             if (!project.consistencyCheck()) {
-                alert("inconsitent");
+                alert("inconsistent project data");
             }
         }, 10000);
     }
 }
 
 function setDoc(json) {
+    var listTypes = ['ready', 'working', 'done'];
     project = new taskLib.Project({onTaskEvent: onTaskEvent});
+    for (var i = 0; i < listTypes.length; i++) {
+        var name = listTypes[i] + '-tasks';
+        $doc[name].empty();
+    }
     project.fromJSON(json.blob);
     $doc["project-title"].text(json.title);
 }
@@ -83,6 +88,7 @@ function onSaveSuccess() {
 
 function onTimer() {
     taskLib.updateNow();
+    // Update timers in all working tasks
     $('div.task', $doc['working-tasks']).each(function () {
         var task = project.getTask(this.id);
         $('.content', this).html(task.getContentHTML());

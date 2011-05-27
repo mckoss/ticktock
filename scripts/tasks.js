@@ -33,16 +33,19 @@ var now = new Date().getTime();
 
 function Project(options) {
     options = options || {};
-    this.map = {};
-    types.extend(this, types.project(options, 'onTaskEvent'));
-    this.ready = [];
-    this.working = [];
-    this.done = [];
-    this.deleted = [];
     this.fromJSON(options);
+    types.extend(this, types.project(options, 'onTaskEvent'));
 }
 
 Project.methods({
+    init: function () {
+        this.map = {};
+        this.ready = [];
+        this.working = [];
+        this.done = [];
+        this.deleted = [];
+    },
+
     // Object to use for JSON persistence
     toJSON: function () {
         return types.extend({schema: 3},
@@ -50,6 +53,7 @@ Project.methods({
     },
 
     fromJSON: function (json) {
+        this.init();
         if (!json.schema || json.schema == 1) {
             this.mergeTasks(json.tasks);
         } else {
@@ -280,9 +284,6 @@ function Task(options, project) {
     this.actual = 0;
     this.description = '';
     this.change(types.extend({status: 'ready'}, options), true);
-    if (this.history) {
-        delete this.history;
-    }
 }
 
 Task.methods({
@@ -307,14 +308,14 @@ Task.methods({
                 if (newValue == undefined) {
                     delete this[prop];
                 }
-                if (!historyProps[prop]) {
+                if (prop == 'status') {
+                    oldStatus = oldValue;
+                }
+                if (quiet || !historyProps[prop]) {
                     continue;
                 }
                 if (!this.history) {
                     this.history = [];
-                }
-                if (prop == 'status') {
-                    oldStatus = oldValue;
                 }
                 this.history.push({prop: prop, when: now, oldValue: oldValue, newValue: newValue});
             }
