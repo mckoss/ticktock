@@ -1410,8 +1410,7 @@ Project.methods({
         }
         task = list.splice(iTask, 1)[0];
         list.splice(iMove, 0, task);
-        this._notify('change', task, {properties: ['position'],
-                                      oldPosition: iTask});
+        this._notify('move', task);
     },
 
     // Calculate cumulative remaining, and actual
@@ -1503,8 +1502,8 @@ var taskValidation = {id: 'string', history: 'array',
                       created: 'number', modified: 'number',
                       start: 'number', assignedTo: 'array', tags: 'array'};
 // Record history for changes to these properties.
-var historyProps = {'actual': true, 'remaining': true, 'status': true};
-
+var historyProps = {'actual': true, 'remaining': true, 'status': true,
+                    'assignedTo': true, 'tags': true};
 
 function Task(options, project) {
     // Don't migrate other tasks project over
@@ -1526,7 +1525,7 @@ function Task(options, project) {
 
 Task.methods({
     change: function (options, quiet) {
-        var changed = false;
+        var changed;
         var oldStatus;
         parseDescription(options);
         validateProperties(options, taskValidation);
@@ -1537,11 +1536,15 @@ Task.methods({
                     continue;
                 }
 
-                changed = true;
+                changed = changed || [];
+                changed.push(prop);
                 this.modified = now;
                 var oldValue = this[prop] || 0;
                 var newValue = options[prop];
-                this[prop] = options[prop];
+                this[prop] = newValue;
+                if (newValue == undefined) {
+                    delete this[prop];
+                }
                 if (!historyProps[prop]) {
                     continue;
                 }
@@ -1569,7 +1572,7 @@ Task.methods({
         }
 
         if (changed && !quiet) {
-            this._getProject()._notify('change', this, {properties: Object.keys(options)});
+            this._getProject()._notify('change', this, {properties: changed});
         }
         return this;
     },
@@ -1703,16 +1706,9 @@ function parseDescription(options) {
     });
 
     options.description = string.strip(desc);
-
-    if (remaining != 0) {
-        options.remaining = remaining;
-    }
-    if (assignedTo.length != 0) {
-        options.assignedTo = assignedTo;
-    }
-    if (tags.length != 0) {
-        options.tags = tags;
-    }
+    options.remaining = remaining;
+    options.assignedTo = assignedTo.length ? assignedTo : undefined;
+    options.tags = tags.length ? tags : undefined;
 }
 
 function validateProperties(obj, validation) {
@@ -1721,6 +1717,9 @@ function validateProperties(obj, validation) {
         if (obj.hasOwnProperty(prop)) {
             if (!validation[prop]) {
                 throw new Error("Invalid property: " + prop);
+            }
+            if (obj[prop] == undefined) {
+                continue;
             }
             if (types.typeOf(validation[prop]) == 'array') {
                 var allowed = validation[prop];

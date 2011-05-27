@@ -54,17 +54,23 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
         var task = project.addTask({description: "foo"});
         task.change({description: "bar"});
         ut.equal(task.description, "bar");
-        ut.equal(task.history, undefined);
-        ut.equal(task.previous('active', 99), 99, "Default previous value");
+        ut.ok(!task.hasOwnProperty('history'));
+        ut.ok(!task.hasOwnProperty('tags'));
+        ut.ok(!task.hasOwnProperty('assignedTo'));
+        ut.equal(task.previous('actual', 99), 99, "Default previous value");
         ut.ok(project.consistencyCheck(), "consistency 1");
+
+        task.change({description: "bar #tag @mike"});
+        ut.equal(task.description, "bar");
+        ut.ok(task.hasOwnProperty('history'));
+        ut.deepEqual(task.tags, ['tag']);
+        ut.deepEqual(task.assignedTo, ['mike']);
+        ut.ok(project.consistencyCheck(), "consistency 1a");
 
         taskLib.updateNow(new Date(new Date().getTime() + 1000));
         task.change({actual: 8});
-        ut.equal(task.previous('actual', 99), 0, "Previous active value");
-        ut.equal(task.history.length, 1);
-        ut.equal(task.history[0].newValue, 8);
-        ut.equal(task.history[0].oldValue, 0);
-        ut.equal(task.history[0].prop, 'actual');
+        ut.equal(task.previous('actual', 99), 0, "Previous actual value");
+        ut.equal(task.history.length, 3);
         ut.ok(task.modified > task.created, "modified date update");
         ut.ok(project.consistencyCheck(), "consistency 2");
 
@@ -160,6 +166,9 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
             taskLib.parseDescription(options);
             ut.equal(options.description, test[1], test[0]);
             test[2].description = test[1];
+            test[2].remaining = test[2].remaining || 0;
+            test[2].assignedTo = test[2].assignedTo || undefined;
+            test[2].tags = test[2].tags || undefined;
             ut.deepEqual(options, test[2], test[0] + " properties");
         }
     });
@@ -192,7 +201,7 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
     ut.test("onTaskEvent", function () {
         var project = new taskLib.Project({onTaskEvent: onTaskEvent});
         var expects = [];
-        var task;
+        var task1, task2, task3;
 
         function onTaskEvent(event) {
             var expect = expects.shift();
@@ -216,21 +225,33 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
             }
         }
 
-        expects.push({action: 'add', task: {description: "test 1"}});
-        project.addTask({description: "test 1"});
+        expects.push({action: 'add', task: {description: "test 3"}});
+        task3 = project.addTask({description: "test 3"});
 
         expects.push({action: 'add', task: {description: "test 2"}});
-        task = project.addTask({description: "test 2"});
+        task2 = project.addTask({description: "test 2"});
 
-        expects.push({action: 'change', target: task,
+        expects.push({action: 'add', task: {description: "test 1"}});
+        task1 = project.addTask({description: "test 1"});
+
+        expects.push({action: 'change', target: task2,
                       task: {description: "task 2 prime"},
                       properties: ['description']});
-        task.change({description: "task 2 prime"});
+        task2.change({description: "task 2 prime"});
 
-        expects.push({action: 'change', target: task,
-                      properties: ['position'],
-                      oldPosition: 0});
-        project.move(task.id, 1);
+        expects.push({action: 'move', target: task2});
+        project.move(task2.id, 1);
+
+        expects.push({action: 'change', target: task2,
+                      task: {status: "working"}
+                     });
+        task2.change({status: 'working'});
+
+        expects.push({action: 'change', target: task2,
+                      task: {status: "ready"}
+                     });
+        expects.push({action: 'move', target: task2});
+        project.moveBefore(task2, task3);
 
         ut.equal(expects.length, 0, "Processed all expected notifications: " +
                  expects.map(function (x) { return x.action; }).join(', '));
