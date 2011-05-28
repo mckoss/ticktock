@@ -26,7 +26,6 @@ DragController.methods({
         this.$target = $(evt.target).closest(this.selector);
         if (this.$target.length != 1) {
             this.dragging = false;
-            console.log("No draggable element: '{selector}'".format(this));
             return;
         }
         this.dragging = true;
@@ -113,7 +112,6 @@ DragController.methods({
             return;
         }
 
-        console.log("overlap: ", size[0], size[1]);
         var $dropTarget = $('#' + bestId);
         this.onDragOver($dropTarget);
     },
@@ -148,12 +146,11 @@ DragController.methods({
 
     // Override this function - respond to a non-drag click (mouse up).
     onClick: function (evt) {
-        console.log("Non-drag click", evt);
     },
 
     getPoint: function (evt) {
         evt = evt.originalEvent || evt;
-        if (evt.type.indexOf('touch') == 0) {
+        if (evt.type.indexOf('touch') == 0 && evt.touches && evt.touches.length > 0) {
             evt = evt.touches[0];
         }
         return [evt.pageX, evt.pageY];

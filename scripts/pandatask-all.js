@@ -827,7 +827,6 @@ DragController.methods({
         this.$target = $(evt.target).closest(this.selector);
         if (this.$target.length != 1) {
             this.dragging = false;
-            console.log("No draggable element: '{selector}'".format(this));
             return;
         }
         this.dragging = true;
@@ -914,7 +913,6 @@ DragController.methods({
             return;
         }
 
-        console.log("overlap: ", size[0], size[1]);
         var $dropTarget = $('#' + bestId);
         this.onDragOver($dropTarget);
     },
@@ -949,12 +947,11 @@ DragController.methods({
 
     // Override this function - respond to a non-drag click (mouse up).
     onClick: function (evt) {
-        console.log("Non-drag click", evt);
     },
 
     getPoint: function (evt) {
         evt = evt.originalEvent || evt;
-        if (evt.type.indexOf('touch') == 0) {
+        if (evt.type.indexOf('touch') == 0 && evt.touches && evt.touches.length > 0) {
             evt = evt.touches[0];
         }
         return [evt.pageX, evt.pageY];
@@ -1096,8 +1093,6 @@ TaskDragger.subclass(drag.DragController, {
 });
 
 function onClick(evt) {
-    console.log("Click on " + evt.target.tagName + "." + evt.target.className, evt.target);
-
     if (evt.target.tagName == 'TEXTAREA') {
         return;
     }
@@ -1108,7 +1103,6 @@ function onClick(evt) {
     var $target = $(evt.target);
     var $taskDiv = $target.closest('.task');
     var id = $taskDiv.attr('id');
-    console.log("Task id: {0}".format(id));
 
     if (!id) {
         evt.preventDefault();
@@ -1166,13 +1160,11 @@ function onKey(evt) {
         project.move(idSave, evt.keyCode == up ? -1 : 1);
         break;
     default:
-        console.log("Unknown keyCode: {keyCode}".format(evt));
         break;
     }
 }
 
 function onTaskEvent(event) {
-    console.log("Task {action}: {target.id} in {target.status}".format(event));
     var task = event.target;
     var listName = task.status + '-tasks';
 
@@ -1192,7 +1184,6 @@ function onTaskEvent(event) {
         break;
     case 'change':
         // Move task
-        console.log('change', event.properties);
         if (event.properties.indexOf('status') != -1) {
             $('#' + event.target.id).remove();
             if (task.status != 'deleted') {

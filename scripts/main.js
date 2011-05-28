@@ -130,8 +130,6 @@ TaskDragger.subclass(drag.DragController, {
 });
 
 function onClick(evt) {
-    console.log("Click on " + evt.target.tagName + "." + evt.target.className, evt.target);
-
     if (evt.target.tagName == 'TEXTAREA') {
         return;
     }
@@ -142,7 +140,6 @@ function onClick(evt) {
     var $target = $(evt.target);
     var $taskDiv = $target.closest('.task');
     var id = $taskDiv.attr('id');
-    console.log("Task id: {0}".format(id));
 
     if (!id) {
         evt.preventDefault();
@@ -200,13 +197,11 @@ function onKey(evt) {
         project.move(idSave, evt.keyCode == up ? -1 : 1);
         break;
     default:
-        console.log("Unknown keyCode: {keyCode}".format(evt));
         break;
     }
 }
 
 function onTaskEvent(event) {
-    console.log("Task {action}: {target.id} in {target.status}".format(event));
     var task = event.target;
     var listName = task.status + '-tasks';
 
@@ -226,7 +221,6 @@ function onTaskEvent(event) {
         break;
     case 'change':
         // Move task
-        console.log('change', event.properties);
         if (event.properties.indexOf('status') != -1) {
             $('#' + event.target.id).remove();
             if (task.status != 'deleted') {
