@@ -143,6 +143,8 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
     });
 
     ut.test("parseDescription", function () {
+        var options;
+
         var tests = [
             ["nothing here", "nothing here", {}],
             ["  extra space  ", "extra space", {}],
@@ -162,15 +164,16 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
 
         for (var i = 0; i < tests.length; i++) {
             var test = tests[i];
-            var options = {description: test[0]};
+            options = {description: test[0]};
             taskLib.parseDescription(options);
             ut.equal(options.description, test[1], test[0]);
             test[2].description = test[1];
-            test[2].remaining = test[2].remaining || 0;
-            test[2].assignedTo = test[2].assignedTo || undefined;
-            test[2].tags = test[2].tags || undefined;
             ut.deepEqual(options, test[2], test[0] + " properties");
         }
+
+        options = {description: "generic @bobby", assignedTo: ["mike"], tags: ["bug"]};
+        taskLib.parseDescription(options);
+        ut.deepEqual(options, {description: "generic", assignedTo: ["bobby"], tags: ["bug"]});
     });
 
     ut.test("Task", function () {

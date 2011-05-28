@@ -431,7 +431,7 @@ function timeString(hrs) {
     return format.thousands(min + 0.5, 0) + 'm';
 }
 
-// Parse description to exctract:
+// Parse description to extract:
 // +hrs - remaining (optional 'h', 'd', or 'm' suffix)
 // [tags] - tags
 // @person - assignedTo
@@ -469,9 +469,16 @@ function parseDescription(options) {
     });
 
     options.description = string.strip(desc);
-    options.remaining = remaining;
-    options.assignedTo = assignedTo.length ? assignedTo : undefined;
-    options.tags = tags.length ? tags : undefined;
+    // Only when values are specifically set, do we override the properties
+    if (remaining > 0) {
+        options.remaining = remaining;
+    }
+    if (assignedTo.length > 0) {
+        options.assignedTo = assignedTo;
+    }
+    if (tags.length > 0) {
+        options.tags = tags;
+    }
 }
 
 function validateProperties(obj, validation) {
