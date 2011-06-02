@@ -886,7 +886,9 @@ DragController.methods({
     },
 
     onDrag: function (point) {
+        // TODO: Conditionally appy the correct style based on capability test
         this.$clone.css('-webkit-transform', 'translate({0}px, {1}px)'.format(point));
+        this.$clone.css('-moz-transform', 'translate({0}px, {1}px)'.format(point));
         var rcTest = vector.add(this.rcTarget, point);
         var size;
 
@@ -1141,7 +1143,7 @@ function onKey(evt) {
         return;
     }
 
-    if (event.keyCode == enter) {
+    if (evt.keyCode == enter) {
         saveTask(editedId);
         return;
     }

@@ -178,7 +178,7 @@ function onKey(evt) {
         return;
     }
 
-    if (event.keyCode == enter) {
+    if (evt.keyCode == enter) {
         saveTask(editedId);
         return;
     }
