@@ -130,11 +130,14 @@ TaskDragger.subclass(drag.DragController, {
 });
 
 function onClick(evt) {
+    var fPrevent = true;
+
     if (evt.target.tagName == 'TEXTAREA') {
         return;
     }
     if (editedId) {
         saveTask(editedId);
+        // Signal iPad keyboard to retract
     }
 
     var $target = $(evt.target);
@@ -161,10 +164,14 @@ function onClick(evt) {
         editedText = task ? task.getEditText() : '';
         $('textarea', $taskDiv).val(editedText).focus().select();
         editedId = id;
+        // iPad won't bring up keyboard if default is prevented?
+        fPrevent = false;
     }
 
     evt.stopPropagation();
-    evt.preventDefault();
+    if (fPrevent) {
+        evt.preventDefault();
+    }
 }
 
 function onKey(evt) {
@@ -246,6 +253,7 @@ function onTaskEvent(event) {
 function saveTask(id) {
     var $taskDiv = $('#' + id);
     $taskDiv.removeClass('edit');
+    $('textarea', $taskDiv).blur();
     var text = $('textarea', $taskDiv).val();
     editedId = undefined;
     if (text == editedText) {
