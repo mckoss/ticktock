@@ -40,6 +40,11 @@ function onReady() {
         $doc[id] = $($doc[id]);
     }
 
+    // Style UI for touch devices
+    if ('ontouchstart' in window) {
+        $(document.body).addClass('touch-device');
+    }
+
     project = new taskLib.Project({onTaskEvent: onTaskEvent});
     client = new clientLib.Client(exports);
     client.saveInterval = 2;
@@ -155,7 +160,9 @@ function onClick(evt) {
         task.change({status: task.status != 'done' ? 'done' :
                      task.previous('status', 'working') });
     } else if ($target.hasClass('delete')) {
-        task.change({status: 'deleted'});
+        if (confirm("Are you sure you want to delete this task?")) {
+            task.change({status: 'deleted'});
+        }
     } else if ($target.hasClass('promote')) {
         var other = { ready: 'working', working: 'ready', done: 'working' };
         task.change({ status: other[task.status] });

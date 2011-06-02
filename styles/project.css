@@ -75,6 +75,7 @@ div.task .icon {
   cursor: pointer;
 }
 div.task:hover .icon { display: block; }
+body.touch-device div.task .icon {display: block}
 div.task .icon:hover, div.task .icon:focus { opacity: 0.8; }
 div.task.edit .icon { visibility: hidden; }
 div.task.edit .check { visibility: hidden; }
