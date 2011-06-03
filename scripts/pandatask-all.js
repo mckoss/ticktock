@@ -970,6 +970,7 @@ var dom = require('org.startpad.dom');
 var taskLib = require('com.pandatask.tasks');
 var types = require('org.startpad.types');
 var drag = require('org.startpad.drag');
+var viz;
 require('org.startpad.string').patch();
 require('org.startpad.funcs').patch();
 
@@ -986,6 +987,7 @@ var project;
 var editedId;
 var editedText;
 var dragger;
+var burnDownChart;
 
 var TASK =
     '<div id="{id}" class="task">' +
@@ -1000,6 +1002,7 @@ var UPDATE_INTERVAL = 1000 * 60;
 var DEBUG = true;
 
 function onReady() {
+    viz = google.visualization;
     handleAppCache();
     $doc = dom.bindIDs();
     // REVIEW: This should be the native behavior of bindIDs.
@@ -1011,6 +1014,8 @@ function onReady() {
     if ('ontouchstart' in window) {
         $(document.body).addClass('touch-device');
     }
+
+    burnDownChart = new viz.LineChart($doc['burn-down'][0]);
 
     project = new taskLib.Project({onTaskEvent: onTaskEvent});
     client = new clientLib.Client(exports);
@@ -1191,6 +1196,8 @@ function onTaskEvent(event) {
         var content = task.getContentHTML ? task.getContentHTML() : task.description;
         $('.content', $taskDiv).html(content);
         $('.check', $taskDiv)[0].checked = (task.status == 'done');
+
+        updateChart();
     }
 
     switch (event.action) {
@@ -1222,6 +1229,25 @@ function onTaskEvent(event) {
         alert("Unhandled event: {action} on {target.id}".format(event));
         break;
     }
+}
+
+function updateChart() {
+    var data = new viz.DataTable();
+    data.addColumn('string', 'Day');
+    data.addColumn('number', 'Remaining');
+    data.addRows(3);
+    for (var i = 0; i < 3; i++) {
+        data.setValue(i, 0, (i + 1).toString());
+        data.setValue(i, 1, i);
+    }
+    burnDownChart.draw(data, {
+        legend: 'none',
+        backgroundColor: '#FCEEE0',
+        width: 200,
+        height: 240,
+        title: 'BURN DOWN',
+        titleTextStyle: {fontName: 'helvetica', fontSize: 14}
+    });
 }
 
 function saveTask(id) {

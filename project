@@ -13,9 +13,14 @@
     <script type="text/javascript" src="/lib/beta/js/pf-client.js"></script>
     <script type="text/javascript" src="/scripts/pandatask-all.js"></script>
 
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
     <script type="text/javascript">
-      var panda = namespace.com.pandatask.main;
-      $(document).ready(panda.onReady);
+      google.load("visualization", "1", {packages: ["corechart"]});
+      google.setOnLoadCallback(function () {
+          var panda = namespace.com.pandatask.main;
+          $(document).ready(panda.onReady);
+      });
     </script>
 
   </head>
@@ -62,6 +67,9 @@
             <div>Ctrl-Down Arrow - Move task down</div>
             <div>Ctrl-N - Create new task</div>
           </div>
+        </div>
+        <div class="box">
+          <div id="burn-down"></div>
         </div>
       </div>
     </div>

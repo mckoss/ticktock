@@ -100,7 +100,6 @@ li { line-height: 120%; margin-bottom: 8px; }
 .box {
   padding: 7px;
   margin: 0px 4px 4px 0px;
-  background: #fafafa;
   background: rgba(255, 255, 255, 0.7);
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
