@@ -196,8 +196,27 @@ namespace.module('com.pandatask.tasks.test', function (exports, require) {
 
     ut.test("cumulativeData", function () {
         var project = new taskLib.Project();
+
+        taskLib.updateNow(new Date(2011, 6, 3));
+        var task1 = project.addTask({description: "task 1"});
+        var task2 = project.addTask({description: "task 2"});
+        task2.change({status: 'working'});
+
+        taskLib.updateNow(new Date(2011, 6, 4));
+        var task3 = project.addTask({description: "task 3"});
+        task2.change({status: 'done'});
+
+        taskLib.updateNow(new Date(2011, 6, 5));
+        task1.change({status: 'done'});
+        task3.change({status: 'deleted'});
+
         var data = project.cumulativeData();
         ut.ok(types.isArray(data), "data array");
+        ut.equal(data.length, 3, "3 data points");
+        ut.deepEqual(data[0], {day: 15158, ready: 1, working: 1, done: 0});
+        ut.deepEqual(data[1], {day: 15159, ready: 2, working: 0, done: 1});
+        ut.deepEqual(data[2], {day: 15160, ready: 0, working: 0, done: 2});
+
         ut.ok(project.consistencyCheck());
     });
 

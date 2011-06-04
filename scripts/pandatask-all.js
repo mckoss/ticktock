@@ -967,6 +967,7 @@ DragController.methods({
 namespace.module('com.pandatask.main', function (exports, require) {
 var clientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
+var format = require('org.startpad.format');
 var taskLib = require('com.pandatask.tasks');
 var types = require('org.startpad.types');
 var drag = require('org.startpad.drag');
@@ -1235,10 +1236,12 @@ function updateChart() {
     var data = new viz.DataTable();
     data.addColumn('string', 'Day');
     data.addColumn('number', 'Remaining');
-    data.addRows(3);
-    for (var i = 0; i < 3; i++) {
-        data.setValue(i, 0, (i + 1).toString());
-        data.setValue(i, 1, i);
+
+    var cumData = project.cumulativeData();
+    data.addRows(cumData.length);
+    for (var i = 0; i < cumData.length; i++) {
+        data.setValue(i, 0, format.shortDate(new Date(cumData[i].date)));
+        data.setValue(i, 1, cumData[i].remaining);
     }
     burnDownChart.draw(data, {
         legend: 'none',
@@ -1301,6 +1304,7 @@ exports.extend({
 });
 
 var msPerHour = 1000 * 60 * 60;
+var msPerDay = msPerHour * 24;
 var reTag = /\s+#([a-zA-Z]\S+)/g;
 var rePerson = /\s+@(\S+)/g;
 var reRemain = /\s+\+(\d+(?:\.\d*)?)([dhm]?)/g;
@@ -1467,41 +1471,61 @@ Project.methods({
 
     // Calculate cumulative remaining, and actual
     // by Day.
-    cumulativeData: function(prop) {
-        var minDate, maxDate;
+    cumulativeData: function() {
+        var minDay, maxDay, day;
         var buckets = {};
         var bucket, i, j;
+        var createdStatus;
+        var task, hist, change;
 
-        var tasks = this.ready.concat(this.working, this.done);
+        var tasks = this.ready.concat(this.working, this.done, this.deleted);
+
+        function countChange(status, ms, n) {
+            var day = Math.floor(ms / msPerDay);
+            if (minDay == undefined || day < minDay) {
+                minDay = day;
+            }
+            if (maxDay == undefined || day > maxDay) {
+                maxDay = day;
+            }
+            var bucket = buckets[day];
+            if (bucket == undefined) {
+                bucket = {ready: 0, working: 0, done: 0};
+                buckets[day] = bucket;
+            }
+            bucket[status] += n;
+        }
 
         for (i = 0; i < tasks.length; i++) {
-            var task = tasks[i];
-            var hist = task.history || [];
+            task = tasks[i];
+            hist = task.history || [];
+            createdStatus = undefined;
             for (j = 0; j < hist.length; j++) {
-                var change = hist[j];
-                if (minDate == undefined || change.when < minDate) {
-                    minDate = change.when;
+                change = hist[j];
+                if (change.prop != 'status') {
+                    continue;
                 }
-                if (maxDate == undefined || change.when > maxDate) {
-                    maxDate = change.when;
+                if (!createdStatus) {
+                    createdStatus = change.oldValue;
                 }
-                bucket = buckets[change.when];
-                if (bucket == undefined) {
-                    bucket = {actual: 0, remaining: 0};
-                    buckets[change.when] = bucket;
-                }
-                bucket[change.prop] += change.newValue - change.oldValue;
+                countChange(change.oldValue, change.when, -1);
+                countChange(change.newValue, change.when, +1);
             }
+            if (!createdStatus) {
+                createdStatus = task.status;
+            }
+            countChange(createdStatus, task.created, 1);
         }
         var results = [];
-        var cumulative = {actual: 0, remaining: 0};
-        for (var curDate = minDate; curDate <= maxDate; curDate = tomorrow(curDate)) {
-            bucket = buckets[curDate];
+        var cumulative = {ready: 0, working: 0, done: 0};
+        for (day = minDay; day <= maxDay; day++) {
+            bucket = buckets[day];
             if (bucket != undefined) {
-                cumulative.actual += bucket.actual;
-                cumulative.remaining += bucket.remaining;
+                cumulative.ready += bucket.ready;
+                cumulative.working += bucket.working;
+                cumulative.done += bucket.done;
             }
-            results[curDate] = types.extend({date: curDate}, cumulative);
+            results.push(types.extend({day: day}, cumulative));
         }
         return results;
     },

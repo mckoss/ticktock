@@ -1,5 +1,6 @@
 var clientLib = require('com.pageforest.client');
 var dom = require('org.startpad.dom');
+var format = require('org.startpad.format');
 var taskLib = require('com.pandatask.tasks');
 var types = require('org.startpad.types');
 var drag = require('org.startpad.drag');
@@ -268,10 +269,12 @@ function updateChart() {
     var data = new viz.DataTable();
     data.addColumn('string', 'Day');
     data.addColumn('number', 'Remaining');
-    data.addRows(3);
-    for (var i = 0; i < 3; i++) {
-        data.setValue(i, 0, (i + 1).toString());
-        data.setValue(i, 1, i);
+
+    var cumData = project.cumulativeData();
+    data.addRows(cumData.length);
+    for (var i = 0; i < cumData.length; i++) {
+        data.setValue(i, 0, format.shortDate(new Date(cumData[i].date)));
+        data.setValue(i, 1, cumData[i].remaining);
     }
     burnDownChart.draw(data, {
         legend: 'none',
