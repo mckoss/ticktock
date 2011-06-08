@@ -22,6 +22,7 @@ var editedId;
 var editedText;
 var dragger;
 var burnDownChart;
+var loading = false;
 
 var TASK =
     '<div id="{id}" class="task">' +
@@ -77,6 +78,7 @@ function onReady() {
 
 function setDoc(json) {
     var listTypes = ['ready', 'working', 'done'];
+    loading = true;
     project = new taskLib.Project({onTaskEvent: onTaskEvent});
     for (var i = 0; i < listTypes.length; i++) {
         var name = listTypes[i] + '-tasks';
@@ -84,6 +86,8 @@ function setDoc(json) {
     }
     project.fromJSON(json.blob);
     $doc["project-title"].text(json.title);
+    loading = false;
+    updateChart();
 }
 
 function getDoc() {
@@ -266,6 +270,9 @@ function onTaskEvent(event) {
 }
 
 function updateChart() {
+    if (loading) {
+        return;
+    }
     var data = new viz.DataTable();
     data.addColumn('string', 'Day');
     data.addColumn('number', 'Remaining');
@@ -283,7 +290,8 @@ function updateChart() {
         height: 240,
         title: 'BURN DOWN',
         titleTextStyle: {fontName: 'helvetica', fontSize: 14},
-        hAxis: {title: "Days"}
+        hAxis: {title: "Days"},
+        vAxis: {baseline: 0}
     });
 }
 

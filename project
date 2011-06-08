@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html manifest="/app.manifest_disable">
+<html manifest="/app.manifest">
   <head>
     <title>PandaTask</title>
 
