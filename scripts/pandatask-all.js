@@ -1240,8 +1240,8 @@ function updateChart() {
     var cumData = project.cumulativeData();
     data.addRows(cumData.length);
     for (var i = 0; i < cumData.length; i++) {
-        data.setValue(i, 0, format.shortDate(new Date(cumData[i].date)));
-        data.setValue(i, 1, cumData[i].remaining);
+        data.setValue(i, 0, (i + 1).toString());
+        data.setValue(i, 1, cumData[i].ready + cumData[i].working);
     }
     burnDownChart.draw(data, {
         legend: 'none',
@@ -1249,7 +1249,8 @@ function updateChart() {
         width: 200,
         height: 240,
         title: 'BURN DOWN',
-        titleTextStyle: {fontName: 'helvetica', fontSize: 14}
+        titleTextStyle: {fontName: 'helvetica', fontSize: 14},
+        hAxis: {title: "Days"}
     });
 }
 
